@@ -14,6 +14,9 @@
     <!-- Google Fonts: Inter / Roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
+    <!-- html2pdf.js para exportar HTML a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -42,6 +45,40 @@
         .navbar-uni {
             background-color: #700000;
             border-bottom: 3px solid #d4af37; /* Detalle dorado UNI */
+        }
+
+        /* Estilos aplicados al PDF al momento de renderizar */
+        .modo-pdf .btn, 
+        .modo-pdf .btn-close,
+        .modo-pdf button {
+            display: none !important;
+        }
+
+        .modo-pdf .card {
+            border: 1px solid #dcdcdc !important;
+            box-shadow: none !important;
+            margin-bottom: 15px !important;
+            page-break-inside: avoid;
+        }
+
+        .modo-pdf .card-header {
+            background-color: #1a365d !important;
+            color: #ffffff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .modo-pdf input, 
+        .modo-pdf select, 
+        .modo-pdf textarea {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            font-weight: 600 !important;
+            color: #2d3748 !important;
+            padding: 0 !important;
         }
     </style>
 </head>
