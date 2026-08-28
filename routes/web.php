@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\HorarioController;
@@ -17,15 +18,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-Route::middleware(['auth'])->group(function () {
-    // Información Docente
+    Route::get('/api/docentes/{docenteId}/familiares', [DocenteFamiliarController::class, 'getFamiliares']);
+    Route::post('/api/docentes/familiares', [DocenteFamiliarController::class, 'store']);
+    Route::delete('/api/docentes/familiares/{id}', [DocenteFamiliarController::class, 'destroy']);
+    Route::get('/docentes/{docenteId}/familiares/pdf', [DocenteFamiliarController::class, 'exportPdf'])->name('familiares.pdf');
+
+    // --- MÓDULO DOCENTE ---
+    // 1. Información Docente
     Route::get('/docente/informacion', [DocenteController::class, 'index'])->name('docente.informacion');
     
-    // Asistencia Docente
+    // 2. Asistencia Docente
     Route::get('/docente/asistencia', [AsistenciaController::class, 'index'])->name('docente.asistencia');
     
-    // Horario Docente
+    // 3. Vista Principal del Horario (resources/views/docente/horario.blade.php)
     Route::get('/docente/horario', [HorarioController::class, 'index'])->name('docente.horario');
+
+    // --- API ENDPOINTS PARA AJAX (FETCH) ---
+    // Soporta las peticiones a /api/horarios y /docente/api/horarios
+    Route::get('/api/horarios', [HorarioController::class, 'getHorarios']);
+    Route::get('/docente/api/horarios', [HorarioController::class, 'getHorarios']);
+
+    // Soporta las peticiones del modal a /api/alumnos y /docente/api/alumnos
+    Route::get('/api/alumnos', [HorarioController::class, 'getAlumnosMatriculados']);
+    Route::get('/docente/api/alumnos', [HorarioController::class, 'getAlumnosMatriculados']);
 });
+
 require __DIR__.'/auth.php';

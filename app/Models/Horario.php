@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,9 +11,6 @@ class Horario extends Model
 
     protected $table = 'horarios';
     protected $primaryKey = 'codHorario';
-    public $incrementing = true;
-    
-    // Desactivamos los timestamps por defecto de Laravel para mapear tus campos exactos
     public $timestamps = false;
 
     protected $fillable = [
@@ -30,11 +28,11 @@ class Horario extends Model
         'fecModificacion',
     ];
 
-    protected $casts = [
-        'fecRegistrado' => 'datetime',
-        'fecModificacion' => 'datetime',
-        'codAula' => 'integer',
-        'tope' => 'integer',
-        'estado' => 'integer',
-    ];
+    // Relación con las matrículas asociadas a este curso y sección
+    public function matriculas()
+    {
+        return $this->hasMany(Matricula::class, 'codCurso', 'codCurso')
+                    ->where('secCurso', $this->secCurso)
+                    ->where('semestre', $this->semestre);
+    }
 }

@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "codCurso": "BIC01",
+        "nomCurso": "FÍSICA I",
+        "secCurso": "F",
+        "codDocente": 87546374,
+        "docente": "DOCENTE UNI",
+        "teopra": "T",
+        "hora": "08-09",
+        "dia": "VI",
+        "semestre": 20242
+    },
+    {
+        "id": 2,
+        "codCurso": "BIC01",
+        "nomCurso": "FÍSICA I",
+        "secCurso": "F",
+        "codDocente": 87546374,
+        "docente": "DOCENTE UNI",
+        "teopra": "P",
+        "hora": "09-11",
+        "dia": "VI",
+        "semestre": 20242
+    },
+    {
+        "id": 3,
+        "codCurso": "MB545",
+        "nomCurso": "MATEMÁTICAS II",
+        "secCurso": "C",
+        "codDocente": 87546374,
+        "docente": "DOCENTE UNI",
+        "teopra": "T",
+        "hora": "17-20",
+        "dia": "MI",
+        "semestre": 20242
+    },
+    {
+        "id": 4,
+        "codCurso": "MC510",
+        "nomCurso": "ALGORITMOS",
+        "secCurso": "C/D",
+        "codDocente": 87546374,
+        "docente": "DOCENTE UNI",
+        "teopra": "T",
+        "hora": "08-10",
+        "dia": "MA",
+        "semestre": 20242
+    }
+]
