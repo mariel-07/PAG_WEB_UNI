@@ -1,0 +1,23 @@
+[
+    {
+        "id": 6,
+        "periodo": 20252,
+        "fechInicioAsistencia": "2025-08-15",
+        "fechFinalAsistencia": "2025-12-20",
+        "periodoActual": 0
+    },
+    {
+        "id": 7,
+        "periodo": 20261,
+        "fechInicioAsistencia": "2026-03-23",
+        "fechFinalAsistencia": "2026-07-25",
+        "periodoActual": 0
+    },
+    {
+        "id": 16,
+        "periodo": 20262,
+        "fechInicioAsistencia": "2026-08-01",
+        "fechFinalAsistencia": "2026-12-15",
+        "periodoActual": 1
+    }
+]

@@ -1,0 +1,44 @@
+[
+    {
+        "codHorario": 27921,
+        "semestre": 20262,
+        "dia": "SA",
+        "hora": "09-10",
+        "codCurso": "BIC01",
+        "secCurso": "F",
+        "teopra": "T",
+        "codAula": "VIRTUAL",
+        "tope": 20,
+        "codDocente": 10115533,
+        "estado": 1,
+        "fecRegistrado": "2026-08-01 11:36:46"
+    },
+    {
+        "codHorario": 27922,
+        "semestre": 20262,
+        "dia": "MI",
+        "hora": "09-11",
+        "codCurso": "BIC01",
+        "secCurso": "F",
+        "teopra": "P",
+        "codAula": "LAB-01",
+        "tope": 20,
+        "codDocente": 10115533,
+        "estado": 1,
+        "fecRegistrado": "2026-08-01 11:36:46"
+    },
+    {
+        "codHorario": 28093,
+        "semestre": 20262,
+        "dia": "LU",
+        "hora": "11-13",
+        "codCurso": "MB545",
+        "secCurso": "C",
+        "teopra": "T",
+        "codAula": "VIRTUAL",
+        "tope": 35,
+        "codDocente": 10115533,
+        "estado": 1,
+        "fecRegistrado": "2026-08-01 11:36:46"
+    }
+]
