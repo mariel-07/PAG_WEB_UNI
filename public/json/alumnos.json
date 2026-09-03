@@ -55,7 +55,7 @@
   },
   {
     "id": 7,
-    "idHorario": 27922,
+    "idHorario": 28922,
     "codigoEstudiante": "20231007",
     "nombres": "Medina Rojas, Sofia Valentina",
     "correo": "sofia.medina@uni.edu.pe",
@@ -133,5 +133,365 @@
     "correo": "ariana.navarro@uni.edu.pe",
     "asistencia": "FALTA",
     "observacion": "Permiso oficial"
+  },
+  {
+        "id": 16,
+        "idHorario": 27922,
+        "codigoEstudiante": "20231011",
+        "nombres": "Gómez Silva, Carlos Alberto",
+        "correo": "carlos.gomez.s@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 17,
+        "idHorario": 29222,
+        "codigoEstudiante": "20231022",
+        "nombres": "Pérez Quispe, María Alejandra",
+        "correo": "maria.perez.q@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 18,
+        "idHorario": 28922,
+        "codigoEstudiante": "20241003",
+        "nombres": "Rodríguez Torres, Luis Fernando",
+        "correo": "luis.rodriguez.t@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 19,
+        "idHorario": 28922,
+        "codigoEstudiante": "20241014",
+        "nombres": "Huamán Rojas, Ana Sofía",
+        "correo": "ana.huaman.r@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 20,
+        "idHorario": 27922,
+        "codigoEstudiante": "20231035",
+        "nombres": "Chávez Mendoza, Jorge Luis",
+        "correo": "jorge.chavez.m@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 21,
+        "idHorario": 28922,
+        "codigoEstudiante": "20241046",
+        "nombres": "Vargas Mamani, Valeria Nicole",
+        "correo": "valeria.vargas.m@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 22,
+        "idHorario": 27922,
+        "codigoEstudiante": "20231057",
+        "nombres": "Castillo Medina, Diego Alonso",
+        "correo": "diego.castillo.m@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": "Justificado por salud"
+    },
+    {
+        "id": 23,
+        "idHorario": 29222,
+        "codigoEstudiante": "20241068",
+        "nombres": "Ramos Paredes, Lucía Fernanda",
+        "correo": "lucia.ramos.p@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 24,
+        "idHorario": 28522,
+        "codigoEstudiante": "20231079",
+        "nombres": "Flores Cárdenas, Gabriel Alejandro",
+        "correo": "gabriel.flores.c@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 25,
+        "idHorario": 27922,
+        "codigoEstudiante": "20241080",
+        "nombres": "Torres Espinoza, Camila Andrea",
+        "correo": "camila.torres.e@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 26,
+        "idHorario": 28922,
+        "codigoEstudiante": "20231091",
+        "nombres": "Salazar Cardenas, Renzo Daniel",
+        "correo": "renzo.salazar.c@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 27,
+        "idHorario": 29222,
+        "codigoEstudiante": "20241102",
+        "nombres": "Morales Benites, Fiorella Nicole",
+        "correo": "fiorella.morales.b@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": ""
+    },
+    {
+        "id": 28,
+        "idHorario": 29222,
+        "codigoEstudiante": "20231113",
+        "nombres": "Espinoza Cruz, Ricardo Manuel",
+        "correo": "ricardo.espinoza.c@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": "Llegó 10 minutos tarde"
+    },
+    {
+        "id": 29,
+        "idHorario": 28922,
+        "codigoEstudiante": "20241124",
+        "nombres": "Quispe Huamán, Gianella Milagros",
+        "correo": "gianella.quispe.h@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 30,
+        "idHorario": 28922,
+        "codigoEstudiante": "20231135",
+        "nombres": "Medina Vargas, Sebastián Alonso",
+        "correo": "sebastian.medina.v@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": ""
+    },
+    {
+        "id": 31,
+        "idHorario": 28922,
+        "codigoEstudiante": "20241146",
+        "nombres": "Rojas Castillo, Ariana Beatriz",
+        "correo": "ariana.rojas.c@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 32,
+        "idHorario": 28922,
+        "codigoEstudiante": "20231157",
+        "nombres": "Navarro Castro, Fabricio Josué",
+        "correo": "fabricio.navarro.c@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": ""
+    },
+    {
+        "id": 33,
+        "idHorario": 28522,
+        "codigoEstudiante": "20241168",
+        "nombres": "Vega Sotomayor, Nicole Alejandra",
+        "correo": "nicole.vega.s@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": "Justificado por salud"
+    },
+    {
+        "id": 34,
+        "idHorario": 28922,
+        "codigoEstudiante": "20231179",
+        "nombres": "Campos Alarcón, Bruno Enrique",
+        "correo": "bruno.campos.a@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 35,
+        "idHorario": 29222,
+        "codigoEstudiante": "20241180",
+        "nombres": "Rios Valdivia, Daniela Fernanda",
+        "correo": "daniela.rios.v@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 35,
+        "idHorario": 29622,
+        "codigoEstudiante": "20232001",
+        "nombres": "Soto Meléndez, Carlos Javier",
+        "correo": "carlos.soto.m@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": ""
+    },
+    {
+        "id": 36,
+        "idHorario": 29622,
+        "codigoEstudiante": "20232002",
+        "nombres": "Poma Ch Chávez, Lucero Milagros",
+        "correo": "lucero.poma.c@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 37,
+        "idHorario": 29622,
+        "codigoEstudiante": "20242003",
+        "nombres": "Álvarez Ramos, Diego Armando",
+        "correo": "diego.alvarez.r@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": ""
+    },
+    {
+        "id": 38,
+        "idHorario": 29622,
+        "codigoEstudiante": "20242004",
+        "nombres": "Quispe Torres, María del Carmen",
+        "correo": "maria.quispe.t@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": "Justificado por salud"
+    },
+    {
+        "id": 39,
+        "idHorario": 29622,
+        "codigoEstudiante": "20232005",
+        "nombres": "Medina Flores, Gianfranco",
+        "correo": "gianfranco.medina.f@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 40,
+        "idHorario": 29622,
+        "codigoEstudiante": "20242006",
+        "nombres": "Cáceres Rojas, Valeria Sofía",
+        "correo": "valeria.caceres.r@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 41,
+        "idHorario": 29622,
+        "codigoEstudiante": "20232007",
+        "nombres": "Huerta Gómez, Renzo Paolo",
+        "correo": "renzo.huerta.g@uni.edu.pe",
+        "asistencia": "FALTO",
+        "observacion": ""
+    },
+    {
+        "id": 42,
+        "idHorario": 29622,
+        "codigoEstudiante": "20242008",
+        "nombres": "Navarro Benites, Andrea Jimena",
+        "correo": "andrea.navarro.b@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": ""
+    },
+    {
+        "id": 43,
+        "idHorario": 29622,
+        "codigoEstudiante": "20232009",
+        "nombres": "Castillo Paredes, Bruno Alonso",
+        "correo": "bruno.castillo.p@uni.edu.pe",
+        "asistencia": "ASISTIO",
+        "observacion": ""
+    },
+    {
+        "id": 44,
+        "idHorario": 29622,
+        "codigoEstudiante": "20242010",
+        "nombres": "Vargas Morales, Fernanda Nicole",
+        "correo": "fernanda.vargas.m@uni.edu.pe",
+        "asistencia": "TARDANZA",
+        "observacion": "Justificado por salud"
+    },
+    {
+    "id": 45,
+    "idHorario": 29022,
+    "codigoEstudiante": "20233001",
+    "nombres": "Rojas Mendoza, Kevin Piero",
+    "correo": "kevin.rojas.m@uni.edu.pe",
+    "asistencia": "ASISTIO",
+    "observacion": ""
+  },
+  {
+    "id": 46,
+    "idHorario": 29022,
+    "codigoEstudiante": "20233002",
+    "nombres": "Paredes Cárdenas, Stefany Nicole",
+    "correo": "stefany.paredes.c@uni.edu.pe",
+    "asistencia": "TARDANZA",
+    "observacion": "Llegó 10 minutos tarde"
+  },
+  {
+    "id": 47,
+    "idHorario": 29022,
+    "codigoEstudiante": "20243003",
+    "nombres": "Gutiérrez Salinas, Bryan Stiven",
+    "correo": "bryan.gutierrez.s@uni.edu.pe",
+    "asistencia": "ASISTIO",
+    "observacion": ""
+  },
+  {
+    "id": 48,
+    "idHorario": 29022,
+    "codigoEstudiante": "20243004",
+    "nombres": "Mendoza Véliz, Fiorella Alessandra",
+    "correo": "fiorella.mendoza.v@uni.edu.pe",
+    "asistencia": "FALTO",
+    "observacion": "Justificado por salud"
+  },
+  {
+    "id": 49,
+    "idHorario": 29022,
+    "codigoEstudiante": "20233005",
+    "nombres": "Silva Huamán, Jhonatan Smith",
+    "correo": "jhonatan.silva.h@uni.edu.pe",
+    "asistencia": "ASISTIO",
+    "observacion": ""
+  },
+  {
+    "id": 50,
+    "idHorario": 29022,
+    "codigoEstudiante": "20243006",
+    "nombres": "Córdova Ramos, Alexandra Nicole",
+    "correo": "alexandra.cordova.r@uni.edu.pe",
+    "asistencia": "TARDANZA",
+    "observacion": ""
+  },
+  {
+    "id": 51,
+    "idHorario": 29022,
+    "codigoEstudiante": "20233007",
+    "nombres": "Espinoza Vega, Christian David",
+    "correo": "christian.espinoza.v@uni.edu.pe",
+    "asistencia": "ASISTIO",
+    "observacion": ""
+  },
+  {
+    "id": 52,
+    "idHorario": 29022,
+    "codigoEstudiante": "20243008",
+    "nombres": "Valdivia Campos, Milagros Beatriz",
+    "correo": "milagros.valdivia.c@uni.edu.pe",
+    "asistencia": "FALTO",
+    "observacion": ""
+  },
+  {
+    "id": 53,
+    "idHorario": 29022,
+    "codigoEstudiante": "20233009",
+    "nombres": "Huerta Quispe, Harold Junior",
+    "correo": "harold.huerta.q@uni.edu.pe",
+    "asistencia": "ASISTIO",
+    "observacion": ""
+  },
+  {
+    "id": 54,
+    "idHorario": 29022,
+    "codigoEstudiante": "20243010",
+    "nombres": "Benites Torres, Katerin Tatiana",
+    "correo": "katerin.benites.t@uni.edu.pe",
+    "asistencia": "TARDANZA",
+    "observacion": "Llegó 10 minutos tarde"
   }
 ]

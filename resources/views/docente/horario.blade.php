@@ -123,9 +123,11 @@
     id="selectSemestre"
     class="uni-select"
     onchange="cargarHorariosDesdeJSON()"> <!-- AQUÍ ESTABA EL ERROR -->
-                <option value="20251" selected>2025-I</option>
-                <option value="20242">2024-II</option>
-                <option value="20241">2024-I</option>
+    <option value="20262"selected>2026-II</option>
+    <option value="20261">2026-I</option>
+    <option value="20252">2025-II</option>            
+                
+                
 
             </select>
 
@@ -481,26 +483,12 @@
 
                         <div class="d-flex gap-2">
 
-                            <button
-                                type="button"
-                                class="uni-export-pdf">
-
-                                <i class="fas fa-file-pdf"></i>
-
-                                PDF
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                class="uni-export-excel">
-
-                                <i class="fas fa-file-excel"></i>
-
-                                Excel
-
-                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="exportarPDFAlumnos()">
+    <i class="fas fa-file-pdf me-1"></i> PDF
+</button>
+<button type="button" class="btn btn-outline-success btn-sm" onclick="exportarExcelAlumnos()">
+    <i class="fas fa-file-excel me-1"></i> Excel
+</button>
 
                         </div>
 
@@ -541,6 +529,12 @@
         </div>
 
     </div>
+
+<!-- Declaramos las rutas de Laravel para que JavaScript las lea sin errores -->
+<script>
+    window.urlHorarioJson = "{{ asset('json/horario.json') }}";
+    window.urlAlumnosJson = "{{ asset('json/alumnos.json') }}";
+</script>
 
 <script src="{{ asset('js/horario.js') }}"></script>
 

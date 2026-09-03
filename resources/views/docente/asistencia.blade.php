@@ -1,223 +1,1152 @@
+{{-- =========================================================
+    VISTA: ASISTENCIA DOCENTE
+========================================================= --}}
+
 <x-app-layout>
+
+    {{-- =====================================================
+        HEADER
+    ====================================================== --}}
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Asistencia Docente') }}
-        </h2>
+
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+            <div class="d-flex align-items-center">
+
+                <div class="uni-header-icon me-3">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+
+                <div>
+                    <h2 class="h5 fw-bold mb-1 uni-title">
+                        {{ __('Asistencia Docente') }}
+                    </h2>
+
+                    <span class="uni-subtitle">
+                        Control y seguimiento de asistencia
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="uni-institution">
+
+                <i class="fas fa-university me-2"></i>
+
+                UNIVERSIDAD NACIONAL DE INGENIERÍA
+
+                <span class="uni-divider">|</span>
+
+                FIM
+
+            </div>
+
+        </div>
+
     </x-slot>
 
-<!-- FontAwesome, FullCalendar & CSS Externo -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-<link rel="stylesheet" href="{{ asset('css/asistencia_docente.css') }}" />
 
-<div class="container py-4">
-    
-    <!-- TÍTULO Y BOTÓN SUPERIOR (Estilo Horario Docente) -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold text-dark mb-1" style="font-size: 1.5rem; letter-spacing: -0.5px;">Asistencia Docente</h3>
-            <p class="text-muted small mb-0">Consulte y registre la asistencia de clases por día, semana y mes.</p>
-        </div>
-        <a href="#" class="btn btn-outline-danger btn-sm px-3 shadow-sm d-flex align-items-center gap-1">
-            <i class="fas fa-eye"></i> Mis asistencias
-        </a>
-    </div>
+    {{-- =====================================================
+        FONT AWESOME
+    ====================================================== --}}
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- TARJETAS DE INDICADORES SUPERIORES -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-12">
-            <div class="card border-0 shadow-sm rounded-3 p-2 bg-white">
-                <div class="card-body py-2">
-                    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
-                        <span class="badge bg-secondary px-3 py-2 fw-normal">PROGRAMADAS <span class="badge bg-white text-dark rounded-circle ms-1">2</span></span>
-                        <span class="badge bg-success px-3 py-2 fw-normal">PUNTUALES <span class="badge bg-white text-dark rounded-circle ms-1">53</span></span>
-                        <span class="badge bg-warning text-dark px-3 py-2 fw-normal">TARDANZAS <span class="badge bg-white text-dark rounded-circle ms-1">2</span></span>
-                        <span class="badge bg-danger px-3 py-2 fw-normal">INASISTENCIAS <span class="badge bg-white text-dark rounded-circle ms-1">0</span></span>
-                        <span class="badge bg-info text-dark px-3 py-2 fw-normal">NO APLICA <span class="badge bg-white text-dark rounded-circle ms-1">11</span></span>
-                        <span class="badge px-3 py-2 fw-normal" style="background-color: #1e3a8a; color: white;">EN PROCESO DE CAMBIO <span class="badge bg-white text-dark rounded-circle ms-1">0</span></span>
+
+    {{-- =====================================================
+        ESTILOS
+    ====================================================== --}}
+    <style>
+
+        .asistencia-page {
+            background: #f5f7fa;
+            min-height: calc(100vh - 70px);
+        }
+
+        .asistencia-container {
+            max-width: 1450px;
+            margin: auto;
+            padding: 28px 25px 45px;
+        }
+
+        /* HEADER */
+
+        .asistencia-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .section-label {
+            display: block;
+            color: #800000;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .asistencia-heading h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .asistencia-heading p {
+            margin: 7px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .btn-pdf {
+            border: 1px solid #800000;
+            background: white;
+            color: #800000;
+            border-radius: 7px;
+            padding: 9px 15px;
+            font-weight: 700;
+            font-size: 13px;
+            transition: .2s;
+        }
+
+        .btn-pdf:hover {
+            background: #800000;
+            color: white;
+        }
+
+
+        /* INFORMACIÓN */
+
+        .info-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid #e4e7eb;
+            border-radius: 9px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .info-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3e8e8;
+            color: #800000;
+            font-size: 17px;
+        }
+
+        .info-card span {
+            display: block;
+            color: #8a8f98;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        .info-card strong {
+            display: block;
+            margin-top: 3px;
+            color: #252a31;
+            font-size: 15px;
+        }
+
+
+        /* ESTADÍSTICAS */
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e5e9;
+            border-radius: 8px;
+            padding: 12px 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #b8bec6;
+        }
+
+        .stat-card.programadas::before {
+            background: #7b61d1;
+        }
+
+        .stat-card.puntuales::before {
+            background: #28a745;
+        }
+
+        .stat-card.tardanzas::before {
+            background: #f0ad00;
+        }
+
+        .stat-card.inasistencias::before {
+            background: #dc3545;
+        }
+
+        .stat-card.no-aplica::before {
+            background: #6c757d;
+        }
+
+        .stat-card.proceso::before {
+            background: #1499d5;
+        }
+
+        .stat-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: #737981;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #20252b;
+            margin-top: 4px;
+        }
+
+
+        /* CALENDARIO */
+
+        .calendar-card {
+            background: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 7px rgba(0,0,0,.04);
+        }
+
+        .calendar-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid #e3e6e9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .calendar-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .calendar-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #800000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-title h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #252a30;
+        }
+
+        .calendar-title p {
+            margin: 3px 0 0;
+            color: #8a9097;
+            font-size: 11px;
+        }
+
+        .week-controls {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .week-controls button {
+            border: 1px solid #d8dde2;
+            background: white;
+            color: #4b5563;
+            width: 33px;
+            height: 31px;
+            border-radius: 5px;
+        }
+
+        .week-controls button:hover {
+            background: #800000;
+            color: white;
+            border-color: #800000;
+        }
+
+        .week-label {
+            min-width: 180px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #374151;
+        }
+
+
+        /* TABLA */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .asistencia-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            min-width: 1100px;
+        }
+
+        .asistencia-table thead th {
+            background: #edf8fc;
+            border: 1px solid #dce8ed;
+            height: 42px;
+            font-size: 11px;
+            color: #5d7680;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .asistencia-table thead th.hora-header {
+            width: 90px;
+        }
+
+        .asistencia-table thead th.domingo {
+            background: #f9e5e5;
+            color: #a12d2d;
+        }
+
+        .asistencia-table tbody td {
+            border: 1px solid #e1e5e8;
+            height: 54px;
+            padding: 0;
+            vertical-align: top;
+            background: #fff;
+        }
+
+        .asistencia-table tbody td.hora-cell {
+            background: #fafbfc;
+            text-align: center;
+            vertical-align: middle;
+            padding: 5px;
+        }
+
+        .hora-inicio {
+            font-size: 11px;
+            font-weight: 800;
+            color: #515860;
+        }
+
+        .hora-separador {
+            font-size: 9px;
+            color: #a3a8ae;
+            margin: 1px 0;
+        }
+
+        .hora-fin {
+            font-size: 10px;
+            color: #777e86;
+        }
+
+        .domingo-cell {
+            background: #fff4f4 !important;
+        }
+
+        .feriado-cell {
+            background: #fff0f0 !important;
+        }
+
+
+        /* BLOQUES */
+
+        .bloque-asistencia {
+            height: 100%;
+            min-height: 53px;
+            padding: 8px 9px;
+            margin: 1px;
+            border-radius: 5px;
+            background: #b8e5a5;
+            border-left: 4px solid #5eb84d;
+            cursor: pointer;
+            position: relative;
+            transition: .18s;
+            overflow: hidden;
+        }
+
+        .bloque-asistencia:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,.12);
+        }
+
+        .bloque-programada {
+            background: #c8b8f3;
+            border-left-color: #7458c7;
+        }
+
+        .bloque-puntual {
+            background: #b9e5a6;
+            border-left-color: #55a83e;
+        }
+
+        .bloque-tardanza {
+            background: #ffe3a3;
+            border-left-color: #d79a00;
+        }
+
+        .bloque-inasistencia {
+            background: #f4c4c4;
+            border-left-color: #c93636;
+        }
+
+        .bloque-no-aplica {
+            background: #e1e4e7;
+            border-left-color: #7b8187;
+        }
+
+        .bloque-proceso {
+            background: #bce6f7;
+            border-left-color: #269bc9;
+        }
+
+        .bloque-curso {
+            font-size: 11px;
+            font-weight: 900;
+            color: #283039;
+        }
+
+        .bloque-info {
+            font-size: 9px;
+            color: #4d555c;
+            margin-top: 3px;
+        }
+
+        .bloque-estado {
+            margin-top: 5px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .bloque-ojo {
+            position: absolute;
+            right: 7px;
+            bottom: 6px;
+            width: 23px;
+            height: 23px;
+            border-radius: 50%;
+            border: 0;
+            background: rgba(255,255,255,.7);
+            color: #4b5563;
+            cursor: pointer;
+        }
+
+        .bloque-ojo:hover {
+            background: #800000;
+            color: white;
+        }
+
+
+        /* LEYENDA */
+
+        .legend {
+            padding: 15px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            border-top: 1px solid #e4e7ea;
+        }
+
+        .legend-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #626a72;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #626a72;
+        }
+
+        .legend-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 3px;
+        }
+
+        .dot-programada { background: #c8b8f3; }
+        .dot-puntual { background: #b9e5a6; }
+        .dot-tardanza { background: #ffe3a3; }
+        .dot-inasistencia { background: #f4c4c4; }
+        .dot-no-aplica { background: #e1e4e7; }
+        .dot-proceso { background: #bce6f7; }
+
+
+        /* MODAL */
+
+        .modal-header-uni {
+            background: #800000;
+            color: white;
+            border-bottom: 4px solid #d5a900;
+        }
+
+        .student-row {
+            padding: 11px 5px;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .student-name {
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .student-code {
+            color: #8a9097;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .attendance-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 5px 8px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .badge-presente {
+            background: #d8f1d1;
+            color: #277321;
+        }
+
+        .badge-tarde {
+            background: #fff0c5;
+            color: #946600;
+        }
+
+        .badge-falta {
+            background: #f7d4d4;
+            color: #a32020;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media(max-width: 1000px) {
+
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .asistencia-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+        }
+
+        @media(max-width: 600px) {
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .asistencia-container {
+                padding: 18px 10px;
+            }
+
+        }
+
+
+        /* IMPRESIÓN */
+
+        @media print {
+
+            .week-controls,
+            .btn-pdf {
+                display: none !important;
+            }
+
+            .asistencia-page {
+                background: white;
+            }
+
+            .calendar-card {
+                box-shadow: none;
+            }
+
+        }
+
+    </style>
+
+
+    {{-- =====================================================
+        CONTENIDO
+    ====================================================== --}}
+
+    <div class="asistencia-page">
+
+        <div class="asistencia-container">
+
+
+            {{-- =================================================
+                ENCABEZADO
+            ================================================== --}}
+
+            <div class="asistencia-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        GESTIÓN ACADÉMICA
+                    </span>
+
+                    <h1>
+                        Asistencia docente
+                    </h1>
+
+                    <p>
+                        Consulte y supervise la asistencia correspondiente
+                        a sus clases programadas.
+                    </p>
+
+                </div>
+
+
+                <button class="btn-pdf"
+                        type="button"
+                        onclick="window.print()">
+
+                    <i class="fas fa-file-pdf me-2"></i>
+
+                    Exportar PDF
+
+                </button>
+
+            </div>
+
+
+            {{-- =================================================
+                INFORMACIÓN
+            ================================================== --}}
+
+            <div class="info-row">
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-<!-- TARJETAS DE INDICADORES SUPERIORES CON SEMESTRE ACADÉMICO -->
+                    <div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
-            <div class="d-flex align-items-center mb-2">
-                <i class="fas fa-graduation-cap text-primary me-2"></i>
-                <span class="text-uppercase small fw-bold text-muted">Semestre Académico</span>
-            </div>
-            <select id="select-semestre" class="form-select form-select-sm fw-bold text-dark">
-                <!-- Se llena dinámicamente con JS -->
-            </select>
-            <span class="badge bg-success-subtle text-success mt-2 w-fit small" style="width: fit-content;">DEFINITIVO</span>
-        </div>
-    </div>
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm rounded-3 p-2 bg-white h-100 d-flex flex-column justify-content-center">
-            <div class="card-body py-1">
-                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
-                    <span class="badge bg-secondary px-3 py-2 fw-normal">PROGRAMADAS <span class="badge bg-white text-dark rounded-circle ms-1">2</span></span>
-                    <span class="badge bg-success px-3 py-2 fw-normal">PUNTUALES <span class="badge bg-white text-dark rounded-circle ms-1">53</span></span>
-                    <span class="badge bg-warning text-dark px-3 py-2 fw-normal">TARDANZAS <span class="badge bg-white text-dark rounded-circle ms-1">2</span></span>
-                    <span class="badge bg-danger px-3 py-2 fw-normal">INASISTENCIAS <span class="badge bg-white text-dark rounded-circle ms-1">0</span></span>
-                    <span class="badge bg-info text-dark px-3 py-2 fw-normal">NO APLICA <span class="badge bg-white text-dark rounded-circle ms-1">11</span></span>
+                        <span>
+                            SEMESTRE ACADÉMICO
+                        </span>
+
+                        <select id="selectSemestre"
+                                class="form-select form-select-sm mt-1">
+
+                            <option value="20262">
+                                2026-II
+                            </option>
+
+                            <option value="20261">
+                                2026-I
+                            </option>
+
+                            <option value="20252">
+                                2025-II
+                            </option>
+
+                        </select>
+
+                    </div>
+
                 </div>
+
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <span>
+                            DOCENTE
+                        </span>
+
+                        <strong id="lblDocente">
+                            Dulce
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+
+                    <div>
+
+                        <span>
+                            CARGA HORARIA
+                        </span>
+
+                        <strong id="lblCargaHoraria">
+                            0 HRS
+                        </strong>
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </div>
-</div>
-        <!-- SECCIÓN DE CURSOS DEL DÍA -->
-        <div class="card border-0 shadow-sm rounded-3 mb-4 overflow-hidden">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold text-dark m-0" style="font-size: 1.1rem;">
-                    <i class="fas fa-calendar-day text-primary me-2"></i> Cursos de hoy: <span id="fecha-hoy-txt" class="text-muted fw-normal">mié. 16 de jul.</span>
-                </h5>
+
+
+            {{-- =================================================
+                ESTADÍSTICAS
+            ================================================== --}}
+
+            <div class="stats-row">
+
+                <div class="stat-card programadas">
+
+                    <span class="stat-title">
+                        PROGRAMADAS
+                    </span>
+
+                    <div class="stat-value"
+                         id="statProgramadas">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card puntuales">
+
+                    <span class="stat-title">
+                        PUNTUALES
+                    </span>
+
+                    <div class="stat-value"
+                         id="statPuntuales">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card tardanzas">
+
+                    <span class="stat-title">
+                        TARDANZAS
+                    </span>
+
+                    <div class="stat-value"
+                         id="statTardanzas">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card inasistencias">
+
+                    <span class="stat-title">
+                        INASISTENCIAS
+                    </span>
+
+                    <div class="stat-value"
+                         id="statInasistencias">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card no-aplica">
+
+                    <span class="stat-title">
+                        NO APLICA
+                    </span>
+
+                    <div class="stat-value"
+                         id="statNoAplica">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card proceso">
+
+                    <span class="stat-title">
+                        EN PROCESO DE CAMBIO
+                    </span>
+
+                    <div class="stat-value"
+                         id="statProceso">
+                        0
+                    </div>
+
+                </div>
+
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 text-center small">
-                        <thead class="table-light text-secondary border-bottom">
+
+
+            {{-- =================================================
+                CALENDARIO
+            ================================================== --}}
+
+            <div class="calendar-card">
+
+
+                <div class="calendar-header">
+
+                    <div class="calendar-title">
+
+                        <div class="calendar-title-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Programación de asistencia
+                            </h3>
+
+                            <p>
+                                Clases programadas según horario docente
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="week-controls">
+
+                        <button id="btnSemanaAnterior"
+                                title="Semana anterior">
+
+                            <i class="fas fa-chevron-left"></i>
+
+                        </button>
+
+
+                        <div class="week-label"
+                             id="lblSemana">
+
+                            --
+
+                        </div>
+
+
+                        <button id="btnSemanaSiguiente"
+                                title="Semana siguiente">
+
+                            <i class="fas fa-chevron-right"></i>
+
+                        </button>
+
+
+                        <button id="btnSemanaActual"
+                                title="Semana actual">
+
+                            <i class="fas fa-calendar-day"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="asistencia-table"
+                           id="tablaAsistencia">
+
+                        <thead>
+
                             <tr>
-                                <th class="py-3">N°</th>
-                                <th class="py-3 text-start ps-4">CURSO</th>
-                                <th class="py-3">HR. CLASE</th>
-                                <th class="py-3">HR. MARCACION</th>
-                                <th class="py-3">ESTADO</th>
-                                <th class="py-3">ACCIONES</th>
+
+                                <th class="hora-header">
+                                    HORA
+                                </th>
+
+                                <th data-dia="LUNES">
+                                    LUNES
+                                </th>
+
+                                <th data-dia="MARTES">
+                                    MARTES
+                                </th>
+
+                                <th data-dia="MIÉRCOLES">
+                                    MIÉRCOLES
+                                </th>
+
+                                <th data-dia="JUEVES">
+                                    JUEVES
+                                </th>
+
+                                <th data-dia="VIERNES">
+                                    VIERNES
+                                </th>
+
+                                <th data-dia="SÁBADO">
+                                    SÁBADO
+                                </th>
+
+                                <th data-dia="DOMINGO"
+                                    class="domingo">
+                                    DOMINGO
+                                </th>
+
                             </tr>
+
                         </thead>
-                        <tbody id="tabla-cursos-hoy">
-                            <tr>
-                                <td colspan="6" class="text-muted py-4">No se encontraron registros</td>
-                            </tr>
+
+
+                        <tbody id="tbodyAsistencia">
+
                         </tbody>
+
                     </table>
+
                 </div>
+
+
+                {{-- =================================================
+                    LEYENDA
+                ================================================== --}}
+
+                <div class="legend">
+
+                    <span class="legend-title">
+                        Referencia:
+                    </span>
+
+
+                    <span class="legend-item">
+                        <span class="legend-dot dot-programada"></span>
+                        Programada
+                    </span>
+
+
+                    <span class="legend-item">
+                        <span class="legend-dot dot-puntual"></span>
+                        Puntual
+                    </span>
+
+
+                    <span class="legend-item">
+                        <span class="legend-dot dot-tardanza"></span>
+                        Tardanza
+                    </span>
+
+
+                    <span class="legend-item">
+                        <span class="legend-dot dot-inasistencia"></span>
+                        Inasistencia
+                    </span>
+
+
+                    <span class="legend-item">
+                        <span class="legend-dot dot-no-aplica"></span>
+                        No aplica
+                    </span>
+
+
+                    <span class="legend-item">
+                        <span class="legend-dot dot-proceso"></span>
+                        En proceso de cambio
+                    </span>
+
+                </div>
+
             </div>
+
         </div>
 
-    <!-- SECCIÓN DE CALENDARIO GENERAL -->
-    <div class="mb-3 fw-bold text-dark d-flex align-items-center" style="cursor: pointer;">
-        <i class="fas fa-chevron-right text-primary me-2"></i> Mis solicitudes
     </div>
 
-    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
-        <div class="card-body bg-white p-4">
-            <div id="calendar"></div>
+
+    {{-- =====================================================
+        MODAL DE ALUMNOS
+    ====================================================== --}}
+
+    <div class="modal fade"
+         id="modalAsistencia"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header modal-header-uni">
+
+                    <div>
+
+                        <h5 class="modal-title"
+                            id="modalTitulo">
+
+                            Asistencia de alumnos
+
+                        </h5>
+
+                        <small id="modalSubtitulo">
+
+                            --
+
+                        </small>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal">
+
+                    </button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-4">
+
+                            <small class="text-muted">
+                                CURSO
+                            </small>
+
+                            <strong id="modalCurso"
+                                    class="d-block">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <small class="text-muted">
+                                HORARIO
+                            </small>
+
+                            <strong id="modalHorario"
+                                    class="d-block">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <small class="text-muted">
+                                ESTADO
+                            </small>
+
+                            <strong id="modalEstado"
+                                    class="d-block">
+                                --
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div id="listaAlumnos">
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary btn-sm"
+                            data-bs-dismiss="modal">
+
+                        CERRAR
+
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
+
     </div>
-</div>
 
-<!-- MODAL VISTA DE ASISTENCIA -->
-<div class="modal fade" id="modalAsistencia" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden">
-            <div class="modal-header bg-light border-bottom px-4 py-3">
-                <h5 class="modal-title fw-bold text-dark">Información de asistencia</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <!-- ENCABEZADO DE LA SESIÓN -->
-                <div class="p-3 rounded-3 mb-3 bg-white border shadow-sm">
-                    <div class="row align-items-center">
-                        <div class="col-md-7 border-end">
-                            <h6 class="fw-bold text-primary mb-2" id="modal-sesion-id">SESION N° 2510017672</h6>
-                            <p class="mb-1 small text-secondary"><strong>DOCENTE:</strong> <span id="modal-docente" class="text-dark">RAMIREZ TENORIO, JULIAN</span></p>
-                            <p class="mb-1 small text-secondary"><strong>CURSO:</strong> <span id="modal-curso" class="text-dark">MB545 - C (P) PROGRAMACION ORIENTADA A OBJETOS</span></p>
-                            <p class="mb-0 small text-secondary"><strong>DIA:</strong> <span id="modal-dia" class="text-dark">martes, 24 de junio de 2025</span></p>
-                        </div>
-                        <div class="col-md-5 ps-md-4 mt-3 mt-md-0">
-                            <p class="mb-1 small text-secondary"><strong>HORA:</strong> <span id="modal-hora" class="text-dark">09-12</span></p>
-                            <p class="mb-1 small text-secondary"><strong>H. ENTRADA:</strong> <span class="text-dark">09:08</span> &nbsp;|&nbsp; <strong>H. SALIDA:</strong> <span class="text-dark">12:00</span></p>
-                            <p class="mb-0 small text-secondary"><strong>ASISTENCIAS TOMADAS:</strong> <span class="badge bg-primary">1</span></p>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- SECCIÓN TEMA -->
-                <div class="p-3 mb-4 rounded-3 bg-light border-start border-4 border-primary shadow-sm">
-                    <span class="fw-bold text-uppercase small text-primary d-block mb-1">Tema:</span>
-                    <span class="small text-secondary" id="modal-tema">1. Aplicaciones con Menús, como un sistema de opciones</span>
-                </div>
-
-                <!-- PESTAÑAS DEL MODAL -->
-                <ul class="nav nav-tabs nav-fill border-bottom mb-3" role="tablist">
-                    <li class="nav-item">
-                        <button class="nav-link active fw-bold small py-2" data-bs-toggle="tab" data-bs-target="#tab-alumnos">
-                            <i class="fas fa-user-graduate me-1 text-primary"></i> Asistencia alumnos
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold small text-secondary py-2" data-bs-toggle="tab" data-bs-target="#tab-solicitudes">
-                            <i class="fas fa-clipboard-list me-1"></i> Solicitudes
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold small text-secondary py-2" data-bs-toggle="tab" data-bs-target="#tab-acta">
-                            <i class="fas fa-file-alt me-1"></i> Acta física
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold small text-secondary py-2" data-bs-toggle="tab" data-bs-target="#tab-control">
-                            <i class="fas fa-database me-1"></i> Control de cambios
-                        </button>
-                    </li>
-                </ul>
-
-                <div class="tab-content">
-                    <!-- PESTAÑA ALUMNOS -->
-                    <div class="tab-pane fade show active" id="tab-alumnos">
-                        <div class="d-flex justify-content-end mb-3">
-                            <button class="btn btn-outline-danger btn-sm shadow-sm"><i class="fas fa-file-pdf me-1"></i> Exportar PDF</button>
-                        </div>
-                        <div class="table-responsive border rounded-3 overflow-hidden shadow-sm">
-                            <table class="table table-striped table-hover align-middle text-center small mb-0">
-                                <thead class="table-light text-secondary">
-                                    <tr>
-                                        <th class="py-3">N°</th>
-                                        <th class="py-3">COD.</th>
-                                        <th class="py-3 text-start ps-3">APELLIDOS Y NOMBRES</th>
-                                        <th class="py-3">SEC.</th>
-                                        <th class="py-3">ULT. RESPONSABLE</th>
-                                        <th class="py-3">ACT. FIS.</th>
-                                        <th class="py-3">ACT. VIR.</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="lista-alumnos-body">
-                                    <!-- Generado dinámicamente en JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- OTRAS PESTAÑAS -->
-                    <div class="tab-pane fade py-4 text-center text-muted" id="tab-solicitudes">
-                        No existen solicitudes registradas para esta clase.
-                    </div>
-                    <div class="tab-pane fade py-4 text-center text-muted" id="tab-acta">
-                        Sin archivos de acta física adjuntos.
-                    </div>
-                    <div class="tab-pane fade py-4 text-center text-muted" id="tab-control">
-                        Historial de cambios sin novedades.
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer bg-light border-top px-4 py-3">
-                <button type="button" class="btn btn-outline-secondary btn-sm px-4" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary btn-sm px-4" onclick="guardarAsistencia()">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+    {{-- =====================================================
+        URL DEL JSON
+    ====================================================== --}}
 <script>
-    window.appUrl = "{{ asset('') }}";
+    window.urlAsistenciaJson = "{{ asset('json/asistencia-docente.json') }}";
+    window.urlHorarioJson = "{{ asset('json/horario.json') }}";
+    window.urlAlumnosJson = "{{ asset('json/alumnos.json') }}";
 </script>
 
-<script src="{{ asset('js/fecha_asistencia.js') }}"></script>
+<script src="{{ asset('js/asistencia.js') }}"></script>
+
 
 </x-app-layout>
