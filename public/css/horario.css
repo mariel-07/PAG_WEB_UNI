@@ -1,275 +1,270 @@
-/* =========================================================
+/* ============================================================
    HORARIO ACADÉMICO DOCENTE
-   FIM - UNI
-   DISEÑO INSTITUCIONAL
-   ========================================================= */
+   DISEÑO INSTITUCIONAL UNI
+   GUINDA + ROJO + VERDE + DORADO
+   ============================================================ */
+
+
+/* ============================================================
+   VARIABLES
+   ============================================================ */
 
 :root {
+    --uni-guinda: #7A0019;
+    --uni-guinda-dark: #560012;
+    --uni-guinda-light: #f7e8eb;
 
-    --uni-blue: #173f67;
-    --uni-blue-dark: #102f4d;
-    --uni-blue-light: #edf3f8;
+    --uni-rojo: #b91c2c;
+    --uni-rojo-light: #f8dfe2;
 
-    --uni-red: #8b0000;
+    --uni-verde: #4b9b3f;
+    --uni-verde-light: #dcefd7;
 
-    --text: #24384d;
-    --text-light: #6b7b8b;
+    --uni-dorado: #c9a227;
+    --uni-dorado-light: #f5ebca;
 
-    --border: #d9e1e8;
+    --uni-blanco: #ffffff;
 
-    --background: #f4f6f8;
+    --uni-bg: #f4f5f7;
 
-    --white: #ffffff;
+    --uni-text: #252b31;
+    --uni-text-secondary: #59636d;
+    --uni-text-muted: #89929b;
 
-    --success: #287a4b;
+    --uni-border: #dfe3e7;
+    --uni-border-dark: #d1d6db;
+
+    --uni-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.055);
+
+    --uni-shadow-hover:
+        0 5px 16px rgba(0, 0, 0, 0.09);
 }
 
 
-/* =========================================================
-   PÁGINA
-   ========================================================= */
+/* ============================================================
+   RESET
+   ============================================================ */
 
-.uni-page {
-
-    width: 100%;
-
-    min-height: calc(100vh - 60px);
-
-    background: var(--background);
-
-    padding: 30px 20px 45px;
-
+* {
     box-sizing: border-box;
 }
 
+body {
+    margin: 0;
 
-/* =========================================================
-   CONTENEDOR CENTRAL
-   ========================================================= */
+    background: var(--uni-bg);
 
-.uni-container {
+    color: var(--uni-text);
 
-    width: 100%;
-
-    max-width: 1200px;
-
-    margin: 0 auto;
+    font-family:
+        "Segoe UI",
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
 
-/* =========================================================
-   HEADER SUPERIOR
-   ========================================================= */
-
-.uni-top-header {
-
-    width: 100%;
-
-    max-width: 1200px;
-
-    margin: 0 auto;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-}
-
-
-.uni-top-left {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 11px;
-}
-
+/* ============================================================
+   HEADER DE LARAVEL
+   ============================================================ */
 
 .uni-header-icon {
-
-    width: 35px;
-
-    height: 35px;
-
-    background: var(--uni-blue);
-
-    color: white;
-
-    border-radius: 4px;
+    width: 42px;
+    height: 42px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    font-size: 14px;
+    background: var(--uni-guinda);
+
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    font-size: 18px;
+
+    box-shadow:
+        0 2px 6px rgba(122, 0, 25, .18);
 }
 
+.uni-title {
+    color: var(--uni-text) !important;
 
-.uni-header-title {
+    font-size: 17px !important;
+    font-weight: 800 !important;
 
-    color: var(--uni-blue-dark);
-
-    font-size: 16px;
-
-    font-weight: 700;
+    letter-spacing: -.2px;
 }
 
+.uni-subtitle {
+    display: block;
 
-.uni-header-subtitle {
-
-    color: var(--text-light);
+    color: var(--uni-text-muted);
 
     font-size: 11px;
-
-    margin-top: 2px;
 }
-
 
 .uni-institution {
+    display: flex;
+    align-items: center;
 
-    color: var(--uni-blue);
+    color: var(--uni-guinda);
 
-    font-size: 11px;
+    font-size: 10px;
+    font-weight: 800;
 
-    font-weight: 600;
+    letter-spacing: .35px;
 
-    letter-spacing: .2px;
+    text-transform: uppercase;
 }
-
 
 .uni-institution i {
+    font-size: 13px;
+}
 
-    margin-right: 5px;
+.uni-divider {
+    margin: 0 9px;
+
+    color: #c3c7ca;
 }
 
 
-.uni-institution span {
+/* ============================================================
+   PÁGINA PRINCIPAL
+   ============================================================ */
 
-    color: #aab5bf;
+.uni-page {
+    width: 100%;
+    min-height: calc(100vh - 70px);
 
-    margin: 0 6px;
+    background:
+        linear-gradient(
+            180deg,
+            #f6f7f8 0%,
+            #f3f4f6 100%
+        );
+}
+
+.uni-page > .container-fluid {
+    max-width: 1550px;
+
+    margin: 0 auto;
 }
 
 
-/* =========================================================
-   TITULO PRINCIPAL
-   ========================================================= */
+/* ============================================================
+   ENCABEZADO DEL MÓDULO
+   ============================================================ */
 
 .uni-page-heading {
-
-    width: 100%;
-
     display: flex;
-
-    justify-content: space-between;
 
     align-items: flex-end;
 
+    justify-content: space-between;
+
     gap: 20px;
 
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
-
 
 .uni-section-label {
-
-    display: block;
-
-    color: var(--uni-blue);
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    letter-spacing: 1px;
+    display: inline-block;
 
     margin-bottom: 5px;
-}
 
+    color: var(--uni-guinda);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .8px;
+
+    text-transform: uppercase;
+}
 
 .uni-page-heading h1 {
-
     margin: 0;
 
-    color: var(--uni-blue-dark);
+    color: var(--uni-text);
 
-    font-size: 27px;
+    font-size: 25px;
+    font-weight: 800;
 
-    font-weight: 700;
-
-    line-height: 1.15;
+    letter-spacing: -.4px;
 }
 
-
 .uni-page-heading p {
+    margin: 5px 0 0;
 
-    margin: 7px 0 0;
-
-    color: var(--text-light);
+    color: var(--uni-text-muted);
 
     font-size: 12px;
 }
 
 
-/* =========================================================
-   BOTON PDF
-   ========================================================= */
+/* ============================================================
+   BOTÓN PDF
+   ============================================================ */
 
 .uni-btn-pdf {
-
-    height: 36px;
-
-    padding: 0 14px;
-
-    background: white;
-
-    border: 1px solid #b42318;
-
-    border-radius: 4px;
-
-    color: #a51d14;
-
-    font-size: 11px;
-
-    font-weight: 600;
-
     display: inline-flex;
 
     align-items: center;
+    justify-content: center;
 
-    gap: 7px;
+    gap: 8px;
+
+    height: 36px;
+
+    padding: 0 15px;
+
+    background: var(--uni-guinda);
+
+    border: 1px solid var(--uni-guinda);
+
+    border-radius: 6px;
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 700;
 
     cursor: pointer;
 
-    white-space: nowrap;
-
-    transition: all .15s ease;
+    transition:
+        background .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
 }
-
 
 .uni-btn-pdf:hover {
+    background: var(--uni-guinda-dark);
 
-    background: #a51d14;
+    border-color: var(--uni-guinda-dark);
 
-    color: white;
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(122, 0, 25, .16);
 }
 
 
-/* =========================================================
+/* ============================================================
    INFORMACIÓN ACADÉMICA
-   ========================================================= */
+   ============================================================ */
 
 .uni-info-wrapper {
-
-    width: 100%;
-
     display: grid;
 
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns:
+        1.15fr
+        1fr
+        .8fr;
 
     gap: 14px;
 
@@ -277,60 +272,112 @@
 }
 
 
+/* ============================================================
+   TARJETAS DE INFORMACIÓN
+   ============================================================ */
+
 .uni-info-card {
-
     position: relative;
-
-    min-height: 88px;
-
-    background: white;
-
-    border: 1px solid var(--border);
-
-    border-radius: 5px;
-
-    padding: 14px;
-
-    box-sizing: border-box;
-
-    display: flex;
-
-    align-items: flex-start;
-
-    gap: 11px;
-
-    box-shadow: 0 1px 3px rgba(20, 40, 60, .04);
-}
-
-
-.uni-info-icon {
-
-    width: 34px;
-
-    height: 34px;
-
-    min-width: 34px;
-
-    background: var(--uni-blue-light);
-
-    color: var(--uni-blue);
-
-    border-radius: 4px;
 
     display: flex;
 
     align-items: center;
 
-    justify-content: center;
+    min-height: 91px;
 
-    font-size: 13px;
+    padding: 16px 18px;
+
+    background: var(--uni-blanco);
+
+    border: 1px solid var(--uni-border);
+
+    border-radius: 9px;
+
+    box-shadow: var(--uni-shadow);
+
+    overflow: hidden;
+
+    transition:
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+.uni-info-card:hover {
+    box-shadow: var(--uni-shadow-hover);
+
+    transform: translateY(-1px);
 }
 
 
+/* Línea institucional */
+
+.uni-info-card::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 4px;
+
+    background: var(--uni-guinda);
+}
+
+.uni-info-card:nth-child(2)::before {
+    background: var(--uni-dorado);
+}
+
+.uni-info-card:nth-child(3)::before {
+    background: var(--uni-verde);
+}
+
+
+/* ============================================================
+   ICONOS INFORMACIÓN
+   ============================================================ */
+
+.uni-info-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    margin-right: 13px;
+
+    background: var(--uni-guinda-light);
+
+    border-radius: 8px;
+
+    color: var(--uni-guinda);
+
+    font-size: 16px;
+}
+
+.uni-info-card:nth-child(2) .uni-info-icon {
+    background: var(--uni-dorado-light);
+
+    color: #927516;
+}
+
+.uni-info-card:nth-child(3) .uni-info-icon {
+    background: var(--uni-verde-light);
+
+    color: #397b31;
+}
+
+
+/* ============================================================
+   CONTENIDO INFORMACIÓN
+   ============================================================ */
+
 .uni-info-content {
-
-    flex: 1;
-
     min-width: 0;
 
     display: flex;
@@ -340,780 +387,1511 @@
     align-items: flex-start;
 }
 
-
 .uni-info-content > span {
+    margin-bottom: 4px;
 
-    color: #718091;
+    color: var(--uni-text-muted);
 
     font-size: 9px;
+    font-weight: 800;
 
-    font-weight: 700;
+    letter-spacing: .5px;
 
-    letter-spacing: .7px;
-
-    margin-bottom: 6px;
+    text-transform: uppercase;
 }
-
 
 .uni-info-content strong {
-
-    color: var(--uni-blue-dark);
+    color: var(--uni-text);
 
     font-size: 14px;
-
-    font-weight: 700;
+    font-weight: 800;
 }
-
 
 .uni-info-content small {
+    margin-top: 2px;
 
-    color: var(--text-light);
+    color: var(--uni-text-muted);
 
-    font-size: 10px;
-
-    margin-top: 3px;
+    font-size: 9px;
 }
 
 
-/* =========================================================
-   SELECT
-   ========================================================= */
+/* ============================================================
+   SELECT SEMESTRE
+   ============================================================ */
 
 .uni-select {
+    width: 150px;
 
-    width: 112px;
+    height: 32px;
 
-    height: 30px;
+    padding:
+        0
+        30px
+        0
+        9px;
 
-    padding: 3px 8px;
+    background-color: #ffffff;
 
-    background: white;
+    border: 1px solid var(--uni-border-dark);
 
-    border: 1px solid #c8d2dc;
+    border-radius: 5px;
 
-    border-radius: 3px;
-
-    color: var(--uni-blue-dark);
+    color: var(--uni-text);
 
     font-size: 11px;
-
     font-weight: 700;
 
     outline: none;
 
     cursor: pointer;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
 }
 
+.uni-select:hover {
+    border-color: #b7bdc3;
+}
 
 .uni-select:focus {
+    border-color: var(--uni-guinda);
 
-    border-color: var(--uni-blue);
-
-    box-shadow: 0 0 0 2px rgba(23, 63, 103, .08);
+    box-shadow:
+        0 0 0 3px rgba(122, 0, 25, .08);
 }
 
 
-/* =========================================================
-   ESTADO
-   ========================================================= */
+/* ============================================================
+   ESTADO DEFINITIVO
+   ============================================================ */
 
 .uni-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
 
     margin-top: 5px;
 
-    color: var(--success);
-
-    font-size: 9px;
-
-    font-weight: 700;
-}
-
-
-.uni-status i {
+    color: var(--uni-verde);
 
     font-size: 8px;
+    font-weight: 800;
 
-    margin-right: 3px;
+    letter-spacing: .4px;
+}
+
+.uni-status i {
+    font-size: 9px;
 }
 
 
-/* =========================================================
+/* ============================================================
    HORAS
-   ========================================================= */
+   ============================================================ */
 
 .uni-hours strong {
+    color: var(--uni-guinda);
 
-    color: var(--uni-blue);
-
-    font-size: 22px;
-
-    line-height: 1;
-
-    margin-top: 2px;
+    font-size: 19px;
 }
 
 
-/* =========================================================
-   HORARIO
-   ========================================================= */
+/* ============================================================
+   TARJETA DEL HORARIO
+   ============================================================ */
 
 .uni-schedule-card {
-
     width: 100%;
 
-    background: white;
+    background: #ffffff;
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--uni-border);
 
-    border-radius: 5px;
+    border-radius: 10px;
+
+    box-shadow: var(--uni-shadow);
 
     overflow: hidden;
-
-    box-shadow: 0 2px 6px rgba(20, 40, 60, .05);
 }
 
 
-/* =========================================================
-   CABECERA
-   ========================================================= */
+/* ============================================================
+   CABECERA DEL HORARIO
+   ============================================================ */
 
 .uni-schedule-header {
-
-    min-height: 62px;
-
-    padding: 12px 15px;
+    min-height: 78px;
 
     display: flex;
+
+    align-items: center;
 
     justify-content: space-between;
 
-    align-items: center;
+    gap: 20px;
 
-    border-bottom: 1px solid var(--border);
+    padding: 15px 19px;
 
-    box-sizing: border-box;
+    background: #ffffff;
+
+    border-bottom: 1px solid var(--uni-border);
 }
-
 
 .uni-schedule-title {
-
     display: flex;
 
     align-items: center;
 
-    gap: 10px;
+    gap: 12px;
 }
-
 
 .uni-calendar-icon {
-
-    width: 32px;
-
-    height: 32px;
-
-    background: var(--uni-blue-light);
-
-    color: var(--uni-blue);
-
-    border-radius: 4px;
+    width: 41px;
+    height: 41px;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    font-size: 13px;
-}
+    background: var(--uni-guinda);
 
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    font-size: 17px;
+}
 
 .uni-schedule-title h3 {
-
     margin: 0;
 
-    color: var(--uni-blue-dark);
+    color: var(--uni-text);
 
     font-size: 15px;
-
-    font-weight: 700;
+    font-weight: 800;
 }
 
-
 .uni-schedule-title p {
-
     margin: 3px 0 0;
 
-    color: var(--text-light);
+    color: var(--uni-text-muted);
 
     font-size: 10px;
 }
 
-
 .uni-schedule-info {
+    display: flex;
 
-    color: #738292;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 7px 10px;
+
+    background: var(--uni-guinda-light);
+
+    border: 1px solid #eed4d9;
+
+    border-radius: 5px;
+
+    color: var(--uni-guinda);
 
     font-size: 9px;
+    font-weight: 700;
+}
 
-    font-weight: 600;
+.uni-schedule-info i {
+    font-size: 10px;
 }
 
 
-/* =========================================================
-   TABLA
-   ========================================================= */
+/* ============================================================
+   CONTENEDOR TABLA
+   ============================================================ */
 
 .uni-table-container {
-
     width: 100%;
 
     overflow-x: auto;
+    overflow-y: hidden;
+
+    background: #ffffff;
 }
 
 
+/* ============================================================
+   TABLA PRINCIPAL
+   ============================================================ */
+
 .tbl-horario {
+    width: 100% !important;
 
-    width: 100%;
+    min-width: 980px;
 
-    margin: 0;
-
-    border-collapse: collapse;
+    margin: 0 !important;
 
     table-layout: fixed;
 
-    font-family: Arial, sans-serif;
+    border-collapse: separate !important;
+
+    border-spacing: 0 !important;
+
+    background: #ffffff;
 }
 
 
-/* =========================================================
+/* ============================================================
    CABECERA TABLA
-   ========================================================= */
+   ============================================================ */
 
 .tbl-horario thead th {
+    height: 43px;
 
-    height: 40px;
+    padding: 8px 5px !important;
 
-    padding: 5px;
+    background: #eef1f3;
 
-    background: var(--uni-blue-dark);
+    border-top: none !important;
 
-    color: white;
+    border-right: 1px solid #d9dee2 !important;
 
-    border: 1px solid #294b69;
+    border-bottom: 1px solid #d9dee2 !important;
+
+    color: #5a6570;
+
+    font-size: 9px !important;
+
+    font-weight: 800 !important;
+
+    letter-spacing: .4px;
 
     text-align: center;
 
-    vertical-align: middle;
+    vertical-align: middle !important;
 
-    font-size: 9px;
-
-    font-weight: 700;
-
-    letter-spacing: .3px;
+    white-space: nowrap;
 }
-
 
 .tbl-horario thead th:first-child {
+    width: 92px;
 
-    width: 90px;
+    background: #e9edf0;
+
+    color: #53606a;
+}
+
+.tbl-horario thead th:last-child {
+    background: #f8e7e9;
+
+    border-right: none !important;
+
+    color: var(--uni-guinda);
 }
 
 
-/* =========================================================
-   CELDAS
-   ========================================================= */
+/* ============================================================
+   CUERPO
+   ============================================================ */
 
 .tbl-horario tbody td {
+    height: 58px;
 
-    height: 39px;
+    padding: 0 !important;
 
-    padding: 3px;
+    background: #ffffff;
 
-    background: white;
+    border-right: 1px solid #e1e5e8 !important;
 
-    border: 1px solid #dfe5ea;
+    border-bottom: 1px solid #e1e5e8 !important;
 
-    vertical-align: middle;
+    vertical-align: top !important;
+}
+
+.tbl-horario tbody tr {
+    height: 58px;
+}
+
+.tbl-horario tbody td:last-child {
+    background: #fff8f9;
+
+    border-right: none !important;
+}
+
+
+/* ============================================================
+   CELDA HORA
+   ============================================================ */
+
+.tbl-horario .hora-column {
+    width: 92px;
+}
+
+.tbl-horario .celda-hora {
+    width: 92px;
+
+    padding: 7px 4px !important;
+
+    background: #fafbfc;
 
     text-align: center;
+
+    vertical-align: middle !important;
+}
+
+.celda-hora .hora-inicio {
+    display: block;
+
+    color: #35424d;
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.celda-hora .hora-separador {
+    display: block;
+
+    margin: 1px 0;
+
+    color: #a5adb4;
+
+    font-size: 8px;
+}
+
+.celda-hora .hora-fin {
+    display: block;
+
+    color: #77828c;
 
     font-size: 9px;
 }
 
 
-/* =========================================================
-   HORA
-   ========================================================= */
+/* ============================================================
+   CELDAS DE LOS DÍAS
+   ============================================================ */
 
-.tbl-horario .celda-hora {
+.tbl-horario .celda-dia {
+    position: relative;
 
-    width: 90px;
+    height: 58px;
 
-    min-width: 90px;
+    padding: 0 !important;
 
-    background: #f3f6f8;
+    background: #ffffff;
 
-    color: var(--uni-blue-dark);
+    vertical-align: top !important;
 
-    font-weight: 700;
+    transition:
+        background .2s ease;
+}
 
-    border-right: 2px solid #c7d1da;
+.tbl-horario .celda-dia:hover {
+    background: #fcfcfd;
 }
 
 
-/* =========================================================
+/* ============================================================
+   DOMINGO
+   ============================================================ */
+
+.tbl-horario tbody td:nth-child(8) {
+    background: #fff8f9;
+}
+
+.tbl-horario thead th:nth-child(8) {
+    background: #f8e7e9;
+
+    color: var(--uni-guinda);
+}
+
+
+/* ============================================================
    BLOQUE DE CLASE
-   ========================================================= */
+   ============================================================ */
 
 .bloque-clase {
+    position: relative;
 
-    min-height: 55px;
+    width: calc(100% - 6px);
 
-    padding: 7px;
+    height: calc(100% - 4px);
 
-    box-sizing: border-box;
+    min-height: 54px;
 
-    background: #17466f;
+    margin: 2px 3px;
 
-    border-left: 3px solid #9cbad2;
+    padding: 7px 8px;
 
-    border-radius: 3px;
+    background: var(--uni-verde-light);
 
-    color: white;
+    border-left: 4px solid var(--uni-verde);
 
-    text-align: left;
+    border-radius: 5px;
+
+    color: #243328;
+
+    overflow: hidden;
 
     cursor: pointer;
 
-    font-size: 8px;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, .045);
 
-    transition: .15s ease;
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        filter .18s ease;
 }
 
-
 .bloque-clase:hover {
-
-    background: #123957;
+    z-index: 20;
 
     transform: translateY(-1px);
 
-    box-shadow: 0 3px 7px rgba(0,0,0,.12);
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, .13);
+
+    filter: brightness(.985);
 }
 
+
+/* ============================================================
+   CABECERA DEL BLOQUE
+   ============================================================ */
+
+.bloque-cabecera {
+    display: flex;
+
+    align-items: center;
+
+    width: 100%;
+}
+
+.bloque-curso {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    min-width: 0;
+
+    color: #243127;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.bloque-curso i {
+    flex-shrink: 0;
+
+    color: #36513a;
+
+    font-size: 9px;
+}
+
+.bloque-seccion {
+    margin-left: 4px;
+
+    color: #68766b;
+
+    font-size: 8px;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   INFORMACIÓN INTERNA DEL BLOQUE
+   ============================================================ */
+
+.bloque-aula,
+.bloque-tipo,
+.bloque-alumnos,
+.bloque-hora {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    margin-top: 3px;
+
+    color: #5d6b61;
+
+    font-size: 8px;
+
+    line-height: 1.15;
+}
+
+.bloque-aula i,
+.bloque-tipo i,
+.bloque-alumnos i,
+.bloque-hora i {
+    width: 10px;
+
+    flex-shrink: 0;
+
+    color: #6f7b72;
+
+    font-size: 7px;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   TIPO DE ASISTENCIA
+   ============================================================ */
+
+.bloque-tipo {
+    color: #2f7628;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+/* ============================================================
+   BOTÓN CONSULTAR
+   ============================================================ */
+
+.bloque-consultar {
+    position: absolute;
+
+    right: 5px;
+
+    bottom: 4px;
+
+    width: 22px;
+    height: 22px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    background: rgba(255, 255, 255, .93);
+
+    border: none;
+
+    border-radius: 50%;
+
+    color: #66716a;
+
+    font-size: 9px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, .12);
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.bloque-consultar:hover {
+    background: var(--uni-guinda);
+
+    color: #ffffff;
+
+    transform: scale(1.08);
+}
+
+
+/* ============================================================
+   ESTADOS DE LOS BLOQUES
+   ============================================================ */
+
+
+/* VERDE - PUNTUAL */
+
+.bloque-puntual {
+    background: #cce8c3;
+
+    border-left-color: #4b9b3f;
+}
+
+.bloque-puntual .bloque-tipo {
+    color: #2e7627;
+}
+
+
+/* DORADO - TARDANZA */
+
+.bloque-tardanza {
+    background: #f6e2b8;
+
+    border-left-color: #c38a19;
+}
+
+.bloque-tardanza .bloque-tipo {
+    color: #956000;
+}
+
+
+/* ROJO - INASISTENCIA */
+
+.bloque-inasistencia {
+    background: #f2c7cc;
+
+    border-left-color: #c52235;
+}
+
+.bloque-inasistencia .bloque-tipo {
+    color: #9f1728;
+}
+
+
+/* GRIS - NO APLICA */
+
+.bloque-no-aplica {
+    background: #eeeeef;
+
+    border-left-color: #8c9399;
+
+    color: #555d63;
+}
+
+.bloque-no-aplica .bloque-tipo {
+    color: #646b71;
+}
+
+
+/* DORADO CLARO - PROCESO */
+
+.bloque-proceso {
+    background: #f2e8c9;
+
+    border-left-color: var(--uni-dorado);
+}
+
+.bloque-proceso .bloque-tipo {
+    color: #80640f;
+}
+
+
+/* GUINDA - PROGRAMADA */
+
+.bloque-programada {
+    background: #f3dfe3;
+
+    border-left-color: var(--uni-guinda);
+}
+
+.bloque-programada .bloque-tipo {
+    color: var(--uni-guinda);
+}
+
+
+/* ============================================================
+   BLOQUE CLARO
+   ============================================================ */
 
 .bloque-clase-claro {
-
-    background: #315d78;
+    background: #e3f1de;
 }
 
 
-/* =========================================================
+/* ============================================================
    LEYENDA
-   ========================================================= */
+   ============================================================ */
 
 .uni-legend {
-
-    min-height: 40px;
-
-    padding: 9px 14px;
-
     display: flex;
 
     align-items: center;
 
     flex-wrap: wrap;
 
-    gap: 12px;
+    gap: 17px;
 
-    border-top: 1px solid var(--border);
+    min-height: 52px;
 
-    color: #6b7b8b;
+    padding: 11px 18px;
+
+    background: #fafbfc;
+
+    border-top: 1px solid var(--uni-border);
+}
+
+.uni-legend-title {
+    color: var(--uni-text);
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.uni-legend-item {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: var(--uni-text-secondary);
+
+    font-size: 9px;
+}
+
+.uni-legend-class,
+.uni-legend-empty {
+    width: 14px;
+    height: 14px;
+
+    display: inline-block;
+
+    border-radius: 3px;
+}
+
+.uni-legend-class {
+    background: #cce8c3;
+
+    border-left: 3px solid var(--uni-verde);
+}
+
+.uni-legend-empty {
+    background: #ffffff;
+
+    border: 1px solid #d9dee2;
+}
+
+.uni-legend-note {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    margin-left: auto;
+
+    color: var(--uni-text-muted);
+
+    font-size: 8px;
+}
+
+.uni-legend-note i {
+    color: var(--uni-guinda);
 
     font-size: 9px;
 }
 
 
-.uni-legend-title {
+/* ============================================================
+   INFORMACIÓN INFERIOR
+   ============================================================ */
 
-    color: var(--uni-blue-dark);
-
-    font-weight: 700;
-}
-
-
-.uni-legend-item {
+.uni-help-card,
+.uni-update-card {
+    min-height: 82px;
 
     display: flex;
 
     align-items: center;
 
-    gap: 5px;
+    gap: 13px;
+
+    padding: 15px 17px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--uni-border);
+
+    border-radius: 9px;
+
+    box-shadow: var(--uni-shadow);
 }
 
 
-.uni-legend-class,
-.uni-legend-empty {
+/* ============================================================
+   ICONO AYUDA
+   ============================================================ */
 
-    width: 10px;
+.uni-help-icon {
+    width: 38px;
+    height: 38px;
 
-    height: 10px;
+    display: flex;
 
-    display: inline-block;
+    align-items: center;
+    justify-content: center;
 
-    border-radius: 2px;
+    flex-shrink: 0;
+
+    background: var(--uni-guinda-light);
+
+    border-radius: 7px;
+
+    color: var(--uni-guinda);
+
+    font-size: 15px;
+}
+
+.uni-help-card strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: var(--uni-text);
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.uni-help-card p {
+    margin: 0;
+
+    color: var(--uni-text-muted);
+
+    font-size: 9px;
+
+    line-height: 1.5;
 }
 
 
-.uni-legend-class {
+/* ============================================================
+   ESTADO DEL SISTEMA
+   ============================================================ */
 
-    background: #17466f;
+.uni-update-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: var(--uni-verde-light);
+
+    border-radius: 7px;
+
+    color: var(--uni-verde);
+
+    font-size: 14px;
+}
+
+.uni-update-card span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--uni-text-muted);
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .5px;
+}
+
+.uni-update-card strong {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: #3e7337;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.uni-update-card strong i {
+    color: var(--uni-verde);
+
+    font-size: 7px;
 }
 
 
-.uni-legend-empty {
+/* ============================================================
+   MODAL
+   ============================================================ */
 
-    background: white;
+.uni-modal {
+    border: none !important;
 
-    border: 1px solid #cbd5dd;
+    border-radius: 10px !important;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, .22);
 }
 
 
-.uni-legend-note {
+/* ============================================================
+   HEADER MODAL
+   ============================================================ */
 
-    margin-left: auto;
+.uni-modal-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    min-height: 72px;
+
+    padding: 14px 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--uni-guinda),
+            var(--uni-guinda-dark)
+        );
+
+    color: #ffffff;
+}
+
+.uni-modal-icon {
+    width: 39px;
+    height: 39px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 11px;
+
+    background: rgba(255, 255, 255, .14);
+
+    border: 1px solid rgba(255, 255, 255, .18);
+
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    font-size: 15px;
+}
+
+.uni-modal-header .modal-title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+#modalCantidadAlumnos {
+    display: block;
+
+    margin-top: 2px;
+
+    color: rgba(255, 255, 255, .72);
+
+    font-size: 9px;
 }
 
 
-/* =========================================================
-   INFORMACIÓN INFERIOR
-   ========================================================= */
+/* ============================================================
+   MODAL BODY
+   ============================================================ */
 
-.uni-bottom-info {
+.uni-modal .modal-body {
+    padding: 16px !important;
 
-    width: 100%;
-
-    margin-top: 14px;
-
-    display: grid;
-
-    grid-template-columns: 1fr 270px;
-
-    gap: 14px;
+    background: #f7f8f9;
 }
 
 
-.uni-help-card,
-.uni-update-card {
+/* ============================================================
+   BARRA EXPORTACIÓN
+   ============================================================ */
 
-    min-height: 65px;
+.uni-export-bar {
+    display: flex;
 
-    background: white;
+    align-items: center;
 
-    border: 1px solid var(--border);
+    justify-content: space-between;
 
-    border-radius: 5px;
+    gap: 12px;
 
-    padding: 12px 14px;
+    margin-bottom: 12px;
 
-    box-sizing: border-box;
+    padding: 10px 12px;
 
+    background: #ffffff;
+
+    border: 1px solid var(--uni-border);
+
+    border-radius: 7px;
+}
+
+.uni-export-bar > span {
+    color: var(--uni-text-secondary);
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+.uni-export-bar > span i {
+    color: var(--uni-guinda);
+}
+
+
+/* ============================================================
+   BOTÓN PDF DEL MODAL
+   ============================================================ */
+
+.uni-export-bar .btn-outline-danger {
+    color: var(--uni-rojo) !important;
+
+    border-color: #d8a0a8 !important;
+
+    background: #fff !important;
+
+    font-size: 9px !important;
+
+    font-weight: 700 !important;
+}
+
+.uni-export-bar .btn-outline-danger:hover {
+    background: var(--uni-rojo-light) !important;
+
+    border-color: var(--uni-rojo) !important;
+}
+
+
+/* ============================================================
+   BOTÓN EXCEL DEL MODAL
+   ============================================================ */
+
+.uni-export-bar .btn-outline-success {
+    color: #36782e !important;
+
+    border-color: #a8c99f !important;
+
+    background: #fff !important;
+
+    font-size: 9px !important;
+
+    font-weight: 700 !important;
+}
+
+.uni-export-bar .btn-outline-success:hover {
+    background: var(--uni-verde-light) !important;
+
+    border-color: var(--uni-verde) !important;
+}
+
+
+/* ============================================================
+   LISTA ALUMNOS
+   ============================================================ */
+
+.uni-student-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    max-height: 410px;
+
+    overflow-y: auto;
+
+    padding-right: 3px;
+}
+
+
+/* ============================================================
+   ITEM ALUMNO
+   ============================================================ */
+
+.alumno-item {
     display: flex;
 
     align-items: center;
 
     gap: 10px;
+
+    padding: 9px 10px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--uni-border);
+
+    border-radius: 7px;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+.alumno-item:hover {
+    border-color: #d6b8be;
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, .06);
+
+    transform: translateY(-1px);
 }
 
 
-.uni-help-icon,
-.uni-update-icon {
+/* ============================================================
+   NÚMERO ALUMNO
+   ============================================================ */
 
-    width: 31px;
-
-    height: 31px;
-
-    min-width: 31px;
-
-    background: var(--uni-blue-light);
-
-    color: var(--uni-blue);
-
-    border-radius: 4px;
+.alumno-numero {
+    width: 28px;
+    height: 28px;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    font-size: 12px;
+    flex-shrink: 0;
+
+    background: var(--uni-guinda-light);
+
+    border-radius: 50%;
+
+    color: var(--uni-guinda);
+
+    font-size: 9px;
+
+    font-weight: 800;
 }
 
 
-.uni-help-card strong {
+/* ============================================================
+   DATOS ALUMNO
+   ============================================================ */
 
-    display: block;
+.alumno-datos {
+    flex: 1;
 
-    color: var(--uni-blue-dark);
+    min-width: 0;
+}
+
+.alumno-nombre {
+    color: var(--uni-text);
 
     font-size: 10px;
 
-    margin-bottom: 3px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
+.alumno-correo {
+    margin-top: 2px;
 
-.uni-help-card p {
-
-    margin: 0;
-
-    color: var(--text-light);
-
-    font-size: 9px;
-
-    line-height: 1.4;
-}
-
-
-.uni-update-card > div:last-child {
-
-    display: flex;
-
-    flex-direction: column;
-}
-
-
-.uni-update-card span {
-
-    color: #778696;
+    color: var(--uni-text-muted);
 
     font-size: 8px;
 
-    font-weight: 700;
+    white-space: nowrap;
 
-    letter-spacing: .6px;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
+.alumno-extra {
+    display: flex;
 
-.uni-update-card strong {
-
-    color: var(--success);
-
-    font-size: 9px;
+    gap: 8px;
 
     margin-top: 3px;
 }
 
+.alumno-codigo {
+    color: var(--uni-text-muted);
 
-.uni-update-card strong i {
-
-    font-size: 6px;
-
-    margin-right: 3px;
+    font-size: 8px;
 }
 
 
-/* =========================================================
-   MODAL
-   ========================================================= */
+/* ============================================================
+   ESTADOS ALUMNOS
+   ============================================================ */
 
-.uni-modal {
-
-    border: none;
-
-    border-radius: 5px;
-
-    overflow: hidden;
-
-    box-shadow: 0 12px 35px rgba(0,0,0,.18);
-}
-
-
-.uni-modal-header {
-
-    padding: 14px 16px;
-
-    background: var(--uni-blue-dark);
-
-    color: white;
-}
-
-
-.uni-modal-icon {
-
-    width: 34px;
-
-    height: 34px;
-
-    margin-right: 10px;
-
-    background: rgba(255,255,255,.12);
-
-    border-radius: 4px;
-
-    display: flex;
+.estado-alumno {
+    display: inline-flex;
 
     align-items: center;
-
     justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    font-size: 7px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.estado-presente {
+    background: #dcefd7;
+
+    color: #34772c;
+}
+
+.estado-falto {
+    background: #f5d9dd;
+
+    color: #a21b2c;
+}
+
+.estado-tardanza {
+    background: #f5e3bd;
+
+    color: #956000;
+}
+
+.estado-justificado {
+    background: #eee5ca;
+
+    color: #77600f;
+}
+
+.estado-sin-registro {
+    background: #eceeef;
+
+    color: #646b71;
 }
 
 
-.uni-modal-header h5 {
+/* ============================================================
+   OBSERVACIÓN
+   ============================================================ */
 
-    margin: 0;
+.observacion-alumno {
+    margin-top: 3px;
 
-    color: white;
+    color: var(--uni-text-muted);
 
-    font-size: 13px;
+    font-size: 8px;
+
+    font-style: italic;
 }
 
 
-.uni-modal-header span {
-
-    color: rgba(255,255,255,.75);
-
-    font-size: 9px;
-}
-
-
-.uni-export-bar {
-
-    padding-bottom: 10px;
-
-    margin-bottom: 12px;
-
-    border-bottom: 1px solid var(--border);
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-}
-
-
-.uni-export-bar > span {
-
-    color: var(--text-light);
-
-    font-size: 9px;
-
-    font-weight: 600;
-}
-
-
-.uni-export-pdf,
-.uni-export-excel {
-
-    height: 29px;
-
-    padding: 0 10px;
-
-    background: white;
-
-    border-radius: 3px;
-
-    font-size: 9px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-}
-
-
-.uni-export-pdf {
-
-    border: 1px solid #b42318;
-
-    color: #a51d14;
-}
-
-
-.uni-export-excel {
-
-    border: 1px solid #287a4b;
-
-    color: #287a4b;
-}
-
+/* ============================================================
+   FOOTER MODAL
+   ============================================================ */
 
 .uni-modal-footer {
+    display: flex;
 
-    padding: 10px 14px;
+    justify-content: flex-end;
 
-    background: #f6f8fa;
+    padding: 11px 16px;
 
-    border-top: 1px solid var(--border);
+    background: #ffffff;
 
-    text-align: right;
+    border-top: 1px solid var(--uni-border);
 }
 
-
 .uni-btn-close {
-
-    height: 30px;
+    height: 32px;
 
     padding: 0 14px;
 
-    background: white;
+    background: #ffffff;
 
-    border: 1px solid #b9c3cc;
+    border: 1px solid var(--uni-border-dark);
 
-    border-radius: 3px;
+    border-radius: 5px;
 
-    color: #526272;
+    color: var(--uni-text-secondary);
 
     font-size: 9px;
 
-    font-weight: 700;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+
+.uni-btn-close:hover {
+    background: var(--uni-guinda-light);
+
+    border-color: #d7b4bb;
+
+    color: var(--uni-guinda);
 }
 
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
 
-@media (max-width: 900px) {
+.uni-table-container::-webkit-scrollbar,
+.uni-student-list::-webkit-scrollbar {
+    width: 6px;
 
-    .uni-info-wrapper {
+    height: 7px;
+}
 
-        grid-template-columns: 1fr;
+.uni-table-container::-webkit-scrollbar-track,
+.uni-student-list::-webkit-scrollbar-track {
+    background: #f0f2f4;
+}
+
+.uni-table-container::-webkit-scrollbar-thumb,
+.uni-student-list::-webkit-scrollbar-thumb {
+    background: #bdc3c8;
+
+    border-radius: 10px;
+}
+
+.uni-table-container::-webkit-scrollbar-thumb:hover,
+.uni-student-list::-webkit-scrollbar-thumb:hover {
+    background: var(--uni-guinda);
+}
+
+
+/* ============================================================
+   BOOTSTRAP MODAL BACKDROP
+   ============================================================ */
+
+.modal-backdrop.show {
+    opacity: .45;
+}
+
+
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+
+.uni-info-card,
+.uni-schedule-card,
+.uni-help-card,
+.uni-update-card {
+    animation:
+        uniFadeIn .35s ease both;
+}
+
+@keyframes uniFadeIn {
+    from {
+        opacity: 0;
+
+        transform: translateY(5px);
     }
 
-    .uni-bottom-info {
+    to {
+        opacity: 1;
 
-        grid-template-columns: 1fr;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================================
+   RESPONSIVE - TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+    .uni-info-wrapper {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .uni-info-card:last-child {
+        grid-column: span 2;
+    }
+
+    .uni-page-heading h1 {
+        font-size: 22px;
     }
 
     .uni-institution {
-
         display: none;
     }
-
 }
 
 
-@media (max-width: 700px) {
+/* ============================================================
+   RESPONSIVE - TABLET PEQUEÑA
+   ============================================================ */
 
-    .uni-page {
-
-        padding: 20px 12px 30px;
-    }
+@media (max-width: 800px) {
 
     .uni-page-heading {
+        align-items: flex-start;
 
         flex-direction: column;
-
-        align-items: flex-start;
     }
 
     .uni-btn-pdf {
+        width: 100%;
+    }
 
-        align-self: flex-start;
+    .uni-info-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .uni-info-card:last-child {
+        grid-column: auto;
     }
 
     .uni-schedule-header {
+        align-items: flex-start;
 
+        flex-direction: column;
+    }
+
+    .uni-schedule-info {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+    .uni-legend {
         align-items: flex-start;
 
         flex-direction: column;
@@ -1121,59 +1899,133 @@
         gap: 8px;
     }
 
-    .uni-schedule-info {
-
-        align-self: flex-start;
+    .uni-legend-note {
+        margin-left: 0;
     }
-
-    .tbl-horario {
-
-        min-width: 850px;
-    }
-
 }
 
 
-/* =========================================================
-   IMPRESIÓN
-   ========================================================= */
+/* ============================================================
+   RESPONSIVE - MÓVIL
+   ============================================================ */
+
+@media (max-width: 576px) {
+
+    .uni-page > .container-fluid {
+        padding-left: 10px !important;
+
+        padding-right: 10px !important;
+    }
+
+    .uni-page-heading h1 {
+        font-size: 20px;
+    }
+
+    .uni-page-heading p {
+        font-size: 10px;
+    }
+
+    .uni-info-card {
+        min-height: 82px;
+
+        padding: 13px;
+    }
+
+    .uni-info-icon {
+        width: 37px;
+        height: 37px;
+
+        margin-right: 10px;
+
+        font-size: 14px;
+    }
+
+    .uni-select {
+        width: 135px;
+    }
+
+    .uni-schedule-header {
+        padding: 13px;
+    }
+
+    .uni-calendar-icon {
+        width: 37px;
+        height: 37px;
+
+        font-size: 15px;
+    }
+
+    .uni-schedule-title h3 {
+        font-size: 13px;
+    }
+
+    .uni-schedule-title p {
+        font-size: 9px;
+    }
+
+    .uni-export-bar {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .uni-export-bar > div {
+        width: 100%;
+    }
+
+    .uni-export-bar button {
+        flex: 1;
+    }
+}
+
+
+/* ============================================================
+   IMPRESIÓN / PDF
+   ============================================================ */
 
 @media print {
 
+    body {
+        background: #ffffff !important;
+    }
+
     .uni-page {
-
-        padding: 0;
-
-        background: white;
+        background: #ffffff !important;
     }
 
-    .uni-container {
-
-        max-width: none;
+    .uni-btn-pdf,
+    .uni-schedule-info,
+    .uni-modal,
+    .modal,
+    .uni-help-card,
+    .uni-update-card {
+        display: none !important;
     }
 
-    .uni-btn-pdf {
-
-        display: none;
-    }
-
-    .uni-bottom-info {
-
-        display: none;
+    .uni-info-wrapper {
+        grid-template-columns:
+            repeat(3, 1fr);
     }
 
     .uni-schedule-card {
+        border: 1px solid #ccc !important;
 
-        box-shadow: none;
+        box-shadow: none !important;
+    }
 
-        border: 1px solid #999;
+    .tbl-horario {
+        min-width: 0 !important;
+    }
+
+    .tbl-horario thead th {
+        background: #eeeeee !important;
+
+        color: #333333 !important;
     }
 
     .bloque-clase {
+        print-color-adjust: exact;
 
         -webkit-print-color-adjust: exact;
-
-        print-color-adjust: exact;
     }
-
 }

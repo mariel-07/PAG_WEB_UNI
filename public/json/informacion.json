@@ -1,38 +1,6 @@
 {
-    "datos_personales": {
-        "codigo": "08161078",
-        "nombres": "OBREGON RAMOS, MAXIMO",
-        "sexo": "Masculino",
-        "fechaNacimiento": "1975-02-16",
-        "dni": "08161078",
-        "telefonoFijo": "5316292 | 5456454",
-        "celular": "951629294",
-        "ruc": "771",
-        "libMilitar": "177",
-        "brevete": "A-1",
-        "vehiculo": "AUS-588",
-        "estadoCivil": "Soltero",
-        "fechaMatrimonio": "2005-04-12",
-        "grupoSanguineo": "O+",
-        "paisNacimiento": "Perú"
-    },
-    "domicilios": [
-        {
-            "id": 1,
-            "pais": "Perú",
-            "direccionExt": "-",
-            "departamento": "Lima",
-            "provincia": "Lima",
-            "distrito": "Rímac",
-            "tipoVia": "Avenida",
-            "nombreVia": "Túpac Amaru",
-            "tipoInm": "Casa",
-            "nroInmueble": "210"
-        }
-    ],
     "familiares": [
         {
-            "id": 1,
             "nombre": "Obregon Perez, Lucía",
             "parentesco": "Hijo(a)",
             "fecNac": "2012-04-10",
@@ -41,20 +9,6 @@
             "ocupacion": "Estudiante",
             "celular": "987654321",
             "depende": "Si"
-        }
-    ],
-    "formacion_profesional": [
-        {
-            "id": 1,
-            "formacion": "Maestría",
-            "pais": "Perú",
-            "universidad": "Universidad Nacional de Ingeniería",
-            "especialidad": "Ingeniería de Sistemas",
-            "inicio": "2015-03-01",
-            "fin": "2017-12-15",
-            "grado": "Magíster",
-            "doc": "Diploma_UNI.pdf",
-            "obs": "Tesis sustentada con excelencia"
         }
     ]
 }

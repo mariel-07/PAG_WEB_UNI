@@ -1,24 +1,6 @@
-
 /* =========================================================
-   ASISTENCIA DOCENTE
-   =========================================================
-
-   RELACIÓN DE LOS JSON:
-
-   asistencia-docente.json
-          codHorario
-              ↓
-   horario.json
-          codHorario
-              ↓
-   alumnos.json
-          idHorario
-
-========================================================= */
-
-
-/* =========================================================
-   CONFIGURACIÓN
+   ASISTENCIA DOCENTE - FIM UNI
+   CALENDARIO + ALUMNOS + ASISTENCIA
 ========================================================= */
 
 const DIAS = [
@@ -31,45 +13,26 @@ const DIAS = [
     'DOMINGO'
 ];
 
-
 const MAPA_DIAS = {
-
-    'LU': 'LUNES',
-    'L': 'LUNES',
-
-    'MA': 'MARTES',
-    'M': 'MARTES',
-
-    'MI': 'MIÉRCOLES',
-    'X': 'MIÉRCOLES',
-
-    'JU': 'JUEVES',
-    'J': 'JUEVES',
-
-    'VI': 'VIERNES',
-    'V': 'VIERNES',
-
-    'SA': 'SÁBADO',
-    'S': 'SÁBADO',
-
-    'DO': 'DOMINGO',
-    'D': 'DOMINGO'
-
+    LUNES: 1,
+    MARTES: 2,
+    MIÉRCOLES: 3,
+    JUEVES: 4,
+    VIERNES: 5,
+    SÁBADO: 6,
+    DOMINGO: 0
 };
 
 
 /* =========================================================
-   VARIABLES GLOBALES
+   VARIABLES
 ========================================================= */
 
 let asistenciaData = [];
-
 let horarioData = [];
-
 let alumnosData = [];
 
-let semanaActual =
-    obtenerInicioSemana(new Date());
+let semanaActual = obtenerInicioSemana(new Date());
 
 let docenteActual = 87546374;
 
@@ -79,96 +42,57 @@ let registroSeleccionado = null;
 
 
 /* =========================================================
-   INICIALIZACIÓN
+   STORAGE
+========================================================= */
+
+const STORAGE_KEY =
+    'asistencia_alumnos_docente_v1';
+
+let asistenciasGuardadas =
+    cargarAsistenciasLocales();
+
+
+/* =========================================================
+   INICIO
 ========================================================= */
 
 document.addEventListener(
     'DOMContentLoaded',
     function () {
 
-        console.log(
-            '================================='
-        );
-
-        console.log(
-            'ASISTENCIA DOCENTE'
-        );
-
-        console.log(
-            'Inicializando módulo...'
-        );
-
-        console.log(
-            '================================='
-        );
-
-
-        /* -----------------------------------------
-           DOCENTE
-        ----------------------------------------- */
-
-        if (
-            window.codDocente
-        ) {
-
+        if (window.codDocente) {
             docenteActual =
-                Number(
-                    window.codDocente
-                );
-
+                Number(window.codDocente);
         }
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            SEMESTRE
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         const selectSemestre =
             document.getElementById(
                 'selectSemestre'
             );
 
-
         if (selectSemestre) {
 
             semestreActual =
-                String(
-                    selectSemestre.value
-                );
-
-        }
-
-
-        /* -----------------------------------------
-           CARGAR LOS 3 JSON
-        ----------------------------------------- */
-
-        cargarDatos();
-
-
-        /* -----------------------------------------
-           CAMBIO DE SEMESTRE
-        ----------------------------------------- */
-
-        if (selectSemestre) {
+                selectSemestre.value || '20262';
 
             selectSemestre.addEventListener(
                 'change',
                 function () {
 
                     semestreActual =
-                        String(
-                            this.value
-                        );
-
+                        this.value;
 
                     semanaActual =
                         obtenerInicioSemana(
                             new Date()
                         );
 
-
-                    cargarDatos();
+                    renderizarTodo();
 
                 }
             );
@@ -176,15 +100,14 @@ document.addEventListener(
         }
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            SEMANA ANTERIOR
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         const btnAnterior =
             document.getElementById(
                 'btnSemanaAnterior'
             );
-
 
         if (btnAnterior) {
 
@@ -198,7 +121,6 @@ document.addEventListener(
                             -7
                         );
 
-
                     renderizarTodo();
 
                 }
@@ -207,15 +129,14 @@ document.addEventListener(
         }
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            SEMANA SIGUIENTE
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         const btnSiguiente =
             document.getElementById(
                 'btnSemanaSiguiente'
             );
-
 
         if (btnSiguiente) {
 
@@ -229,7 +150,6 @@ document.addEventListener(
                             7
                         );
 
-
                     renderizarTodo();
 
                 }
@@ -238,15 +158,14 @@ document.addEventListener(
         }
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            SEMANA ACTUAL
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         const btnActual =
             document.getElementById(
                 'btnSemanaActual'
             );
-
 
         if (btnActual) {
 
@@ -259,7 +178,6 @@ document.addEventListener(
                             new Date()
                         );
 
-
                     renderizarTodo();
 
                 }
@@ -267,68 +185,66 @@ document.addEventListener(
 
         }
 
+
+        /* -----------------------------------------------
+           BOTONES DE ASISTENCIA
+        ----------------------------------------------- */
+
+        document.addEventListener(
+            'click',
+            manejarClickAsistencia
+        );
+
+
+        document.addEventListener(
+            'change',
+            manejarCambioObservacion
+        );
+
+
+        /* -----------------------------------------------
+           CARGAR DATOS
+        ----------------------------------------------- */
+
+        cargarDatos();
+
     }
 );
 
 
 /* =========================================================
-   1. CARGAR LOS 3 JSON
+   CARGAR DATOS
 ========================================================= */
 
 async function cargarDatos() {
 
     try {
 
-        console.log(
-            'Cargando JSON...'
-        );
+        mostrarCargaCalendario();
 
-
-        /* -----------------------------------------
-           URLs
-        ----------------------------------------- */
-
-        const urlAsistencia =
-            window.urlAsistenciaJson ||
-            '/json/asistencia-docente.json';
-
-
-        const urlHorario =
-            window.urlHorarioJson ||
-            '/json/horario.json';
-
-
-        const urlAlumnos =
-            window.urlAlumnosJson ||
-            '/json/alumnos.json';
-
-
-        /* -----------------------------------------
-           PETICIONES SIMULTÁNEAS
-        ----------------------------------------- */
 
         const [
-            responseAsistencia,
-            responseHorario,
-            responseAlumnos
+            respuestaAsistencia,
+            respuestaHorario,
+            respuestaAlumnos
         ] = await Promise.all([
 
             fetch(
-                urlAsistencia,
+                window.urlAsistenciaJson,
                 {
                     cache: 'no-store'
                 }
             ),
 
             fetch(
-                urlHorario,
+                window.urlHorarioJson,
                 {
                     cache: 'no-store'
                 }
             ),
 
             fetch(
-                urlAlumnos,
+                window.urlAlumnosJson,
                 {
                     cache: 'no-store'
                 }
@@ -337,117 +253,70 @@ async function cargarDatos() {
         ]);
 
 
-        /* -----------------------------------------
-           VALIDAR RESPUESTAS
-        ----------------------------------------- */
-
-        if (
-            !responseAsistencia.ok
-        ) {
-
+        if (!respuestaAsistencia.ok) {
             throw new Error(
                 'No se pudo cargar asistencia-docente.json'
             );
-
         }
 
 
-        if (
-            !responseHorario.ok
-        ) {
-
+        if (!respuestaHorario.ok) {
             throw new Error(
                 'No se pudo cargar horario.json'
             );
-
         }
 
 
-        if (
-            !responseAlumnos.ok
-        ) {
-
+        if (!respuestaAlumnos.ok) {
             throw new Error(
                 'No se pudo cargar alumnos.json'
             );
-
         }
 
-
-        /* -----------------------------------------
-           CONVERTIR JSON
-        ----------------------------------------- */
 
         asistenciaData =
-            await responseAsistencia.json();
-
+            await respuestaAsistencia.json();
 
         horarioData =
-            await responseHorario.json();
-
+            await respuestaHorario.json();
 
         alumnosData =
-            await responseAlumnos.json();
+            await respuestaAlumnos.json();
 
 
-        /* -----------------------------------------
-           VALIDAR ARRAYS
-        ----------------------------------------- */
-
-        if (
-            !Array.isArray(
-                asistenciaData
-            )
-        ) {
-
-            throw new Error(
-                'asistencia-docente.json debe ser un arreglo'
-            );
-
+        if (!Array.isArray(asistenciaData)) {
+            asistenciaData =
+                Object.values(
+                    asistenciaData || {}
+                );
         }
 
 
-        if (
-            !Array.isArray(
-                horarioData
-            )
-        ) {
-
-            throw new Error(
-                'horario.json debe ser un arreglo'
-            );
-
+        if (!Array.isArray(horarioData)) {
+            horarioData =
+                Object.values(
+                    horarioData || {}
+                );
         }
 
 
-        if (
-            !Array.isArray(
-                alumnosData
-            )
-        ) {
-
-            throw new Error(
-                'alumnos.json debe ser un arreglo'
-            );
-
+        if (!Array.isArray(alumnosData)) {
+            alumnosData =
+                Object.values(
+                    alumnosData || {}
+                );
         }
 
-
-        /* -----------------------------------------
-           CONSOLA
-        ----------------------------------------- */
 
         console.log(
-            'Asistencias:',
+            'Asistencia:',
             asistenciaData
         );
-
 
         console.log(
             'Horarios:',
             horarioData
         );
-
 
         console.log(
             'Alumnos:',
@@ -455,29 +324,15 @@ async function cargarDatos() {
         );
 
 
-        console.log(
-            'Total alumnos:',
-            alumnosData.length
-        );
-
-
-        /* -----------------------------------------
-           RENDERIZAR
-        ----------------------------------------- */
-
         renderizarTodo();
 
 
     } catch (error) {
 
-        console.error(
-            'Error cargando JSON:',
-            error
-        );
-
+        console.error(error);
 
         mostrarError(
-            error.message
+            'No se pudieron cargar los datos.'
         );
 
     }
@@ -486,162 +341,155 @@ async function cargarDatos() {
 
 
 /* =========================================================
-   2. RENDERIZACIÓN GENERAL
+   RENDERIZAR TODO
 ========================================================= */
 
 function renderizarTodo() {
 
-    /* -----------------------------------------
-       FILTRAR ASISTENCIA POR DOCENTE
-    ----------------------------------------- */
+    const registros =
+        obtenerRegistrosDocente();
 
-    let registrosDocente =
-        asistenciaData.filter(
-            registro => {
-
-                return Number(
-                    registro.codDocente
-                ) === Number(
-                    docenteActual
-                );
-
-            }
-        );
-
-
-    /* -----------------------------------------
-       FILTRAR POR SEMESTRE
-    ----------------------------------------- */
-
-    registrosDocente =
-        registrosDocente.filter(
-            registro => {
-
-                return String(
-                    registro.semestre
-                ) === String(
-                    semestreActual
-                );
-
-            }
-        );
-
-
-    console.log(
-        'Registros del docente:',
-        registrosDocente
-    );
-
-
-    /* -----------------------------------------
-       INFORMACIÓN
-    ----------------------------------------- */
 
     actualizarInformacion(
-        registrosDocente
+        registros
     );
 
-
-    /* -----------------------------------------
-       ESTADÍSTICAS
-    ----------------------------------------- */
 
     actualizarEstadisticas(
-        registrosDocente
+        registros
     );
 
 
-    /* -----------------------------------------
-       CALENDARIO
-    ----------------------------------------- */
-
     renderizarCalendario(
-        registrosDocente
+        registros
     );
 
 }
 
 
 /* =========================================================
-   3. INFORMACIÓN SUPERIOR
+   REGISTROS DEL DOCENTE
+========================================================= */
+
+function obtenerRegistrosDocente() {
+
+    return asistenciaData.filter(
+        function (registro) {
+
+            return (
+
+                Number(
+                    registro.codDocente
+                )
+
+                ===
+
+                Number(
+                    docenteActual
+                )
+
+                &&
+
+                String(
+                    registro.semestre
+                )
+
+                ===
+
+                String(
+                    semestreActual
+                )
+
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   INFORMACIÓN SUPERIOR
 ========================================================= */
 
 function actualizarInformacion(
     registros
 ) {
 
-    const clasesUnicas = [];
+    const lblDocente =
+        document.getElementById(
+            'lblDocente'
+        );
+
+
+    const lblCargaHoraria =
+        document.getElementById(
+            'lblCargaHoraria'
+        );
+
+
+    if (lblDocente) {
+
+        lblDocente.textContent =
+            window.nombreDocente ||
+            'Docente';
+
+    }
+
+
+    const horarios =
+        new Set();
 
 
     registros.forEach(
-        registro => {
+        function (registro) {
 
-            const clave =
-                `${registro.codHorario}|${registro.hora}`;
-
-
-            if (
-                !clasesUnicas.some(
-                    item =>
-                        item.clave === clave
+            horarios.add(
+                String(
+                    registro.codHorario || ''
                 )
-            ) {
-
-                clasesUnicas.push({
-
-                    clave: clave,
-
-                    hora: registro.hora
-
-                });
-
-            }
+                +
+                '|'
+                +
+                String(
+                    registro.hora || ''
+                )
+            );
 
         }
     );
 
 
-    let totalHoras = 0;
+    let horas = 0;
 
 
-    clasesUnicas.forEach(
-        clase => {
+    horarios.forEach(
+        function (clave) {
 
-            const rango =
-                convertirRangoHora(
-                    clase.hora
+            const partes =
+                clave.split('|');
+
+            horas +=
+                calcularHorasRango(
+                    partes[1]
                 );
 
-
-            totalHoras +=
-                rango.fin -
-                rango.inicio;
-
         }
     );
 
 
-    ponerTexto(
-        'lblCargaHoraria',
-        `${totalHoras} HRS`
-    );
+    if (lblCargaHoraria) {
 
+        lblCargaHoraria.textContent =
+            `${horas} HRS`;
 
-    const nombre =
-        window.nombreDocente ||
-        'Docente';
-
-
-    ponerTexto(
-        'lblDocente',
-        nombre
-    );
+    }
 
 }
 
 
 /* =========================================================
-   4. ESTADÍSTICAS
+   ESTADÍSTICAS
 ========================================================= */
 
 function actualizarEstadisticas(
@@ -649,20 +497,15 @@ function actualizarEstadisticas(
 ) {
 
     let programadas = 0;
-
     let puntuales = 0;
-
     let tardanzas = 0;
-
     let inasistencias = 0;
-
     let noAplica = 0;
-
     let proceso = 0;
 
 
     registros.forEach(
-        registro => {
+        function (registro) {
 
             const estado =
                 obtenerEstadoAsistencia(
@@ -673,44 +516,27 @@ function actualizarEstadisticas(
             switch (estado) {
 
                 case 'PUNTUAL':
-
                     puntuales++;
-
                     break;
-
 
                 case 'TARDANZA':
-
                     tardanzas++;
-
                     break;
-
 
                 case 'INASISTENCIA':
-
                     inasistencias++;
-
                     break;
-
 
                 case 'NO APLICA':
-
                     noAplica++;
-
                     break;
-
 
                 case 'EN PROCESO DE CAMBIO':
-
                     proceso++;
-
                     break;
 
-
                 default:
-
                     programadas++;
-
                     break;
 
             }
@@ -724,30 +550,25 @@ function actualizarEstadisticas(
         programadas
     );
 
-
     ponerTexto(
         'statPuntuales',
         puntuales
     );
-
 
     ponerTexto(
         'statTardanzas',
         tardanzas
     );
 
-
     ponerTexto(
         'statInasistencias',
         inasistencias
     );
 
-
     ponerTexto(
         'statNoAplica',
         noAplica
     );
-
 
     ponerTexto(
         'statProceso',
@@ -758,7 +579,9 @@ function actualizarEstadisticas(
 
 
 /* =========================================================
-   5. CALENDARIO
+   CALENDARIO
+   ---------------------------------------------------------
+   ESTA PARTE ES LA QUE CORRIGE EL DESORDEN.
 ========================================================= */
 
 function renderizarCalendario(
@@ -772,29 +595,54 @@ function renderizarCalendario(
 
 
     if (!tbody) {
-
-        console.error(
-            'No existe #tbodyAsistencia'
-        );
-
         return;
-
     }
 
 
     tbody.innerHTML = '';
 
 
-    actualizarTituloSemana();
+    actualizarEtiquetaSemana();
 
 
-    /* -----------------------------------------
-       HORAS 07:00 - 23:00
-    ----------------------------------------- */
+    /*
+     * Guardamos qué posiciones ya están ocupadas
+     * por un rowspan.
+     *
+     * Ejemplo:
+     *
+     * LUNES 09:00 - 11:00
+     *
+     * ocupa:
+     *
+     * LUNES 09
+     * LUNES 10
+     */
+
+    const ocupadas = {};
+
+
+    DIAS.forEach(
+        function (dia) {
+
+            ocupadas[dia] = {};
+
+        }
+    );
+
+
+    /*
+     * Horario visible
+     */
+
+    const HORA_INICIO = 7;
+
+    const HORA_FIN = 23;
+
 
     for (
-        let hora = 7;
-        hora < 23;
+        let hora = HORA_INICIO;
+        hora < HORA_FIN;
         hora++
     ) {
 
@@ -804,9 +652,9 @@ function renderizarCalendario(
             );
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            HORA
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         const tdHora =
             document.createElement(
@@ -818,21 +666,8 @@ function renderizarCalendario(
             'hora-cell';
 
 
-        tdHora.innerHTML = `
-
-            <div class="hora-inicio">
-                ${formatearHora(hora)}
-            </div>
-
-            <div class="hora-separador">
-                a
-            </div>
-
-            <div class="hora-fin">
-                ${formatearHora(hora + 1)}
-            </div>
-
-        `;
+        tdHora.textContent =
+            `${String(hora).padStart(2, '0')}:00`;
 
 
         tr.appendChild(
@@ -840,15 +675,26 @@ function renderizarCalendario(
         );
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            DÍAS
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         DIAS.forEach(
-            (
-                dia,
-                indiceDia
-            ) => {
+            function (dia) {
+
+                /*
+                 * Si la celda está ocupada por un
+                 * rowspan anterior, NO creamos otra celda.
+                 */
+
+                if (
+                    ocupadas[dia][hora]
+                ) {
+
+                    return;
+
+                }
+
 
                 const td =
                     document.createElement(
@@ -856,55 +702,30 @@ function renderizarCalendario(
                     );
 
 
-                const fecha =
-                    sumarDias(
-                        semanaActual,
-                        indiceDia
-                    );
+                td.className =
+                    'calendario-cell';
 
-
-                const fechaISO =
-                    formatearFechaISO(
-                        fecha
-                    );
-
-
-                /* Domingo */
 
                 if (
                     dia === 'DOMINGO'
                 ) {
 
                     td.classList.add(
-                        'domingo-cell'
+                        'domingo'
                     );
 
                 }
 
 
-                /* Feriado */
-
-                if (
-                    esFeriado(
-                        fechaISO
-                    )
-                ) {
-
-                    td.classList.add(
-                        'feriado-cell'
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   BUSCAR ASISTENCIA
-                ----------------------------------------- */
+                /*
+                 * Buscar clase que comienza
+                 * exactamente en esta hora.
+                 */
 
                 const registro =
-                    buscarRegistroPorFechaHora(
+                    buscarRegistroInicio(
                         registros,
-                        fechaISO,
+                        dia,
                         hora
                     );
 
@@ -912,40 +733,70 @@ function renderizarCalendario(
                 if (registro) {
 
                     const rango =
-                        convertirRangoHora(
+                        obtenerHorasRango(
                             registro.hora
                         );
 
 
-                    /* -----------------------------------------
-                       SOLO PRIMERA FILA DEL BLOQUE
-                    ----------------------------------------- */
+                    if (rango) {
 
-                    if (
-                        hora ===
-                        rango.inicio
-                    ) {
-
-                        const duracion =
-                            rango.fin -
-                            rango.inicio;
-
-
-                        td.rowSpan =
-                            duracion;
-
-
-                        td.innerHTML =
-                            crearBloqueAsistencia(
-                                registro,
-                                fechaISO,
-                                duracion
+                        const inicio =
+                            Math.floor(
+                                rango.inicio
                             );
 
 
-                    } else {
+                        const fin =
+                            Math.ceil(
+                                rango.fin
+                            );
 
-                        return;
+
+                        let filas =
+                            fin - inicio;
+
+
+                        if (filas < 1) {
+                            filas = 1;
+                        }
+
+
+                        /*
+                         * Marcar las siguientes filas
+                         * como ocupadas.
+                         */
+
+                        for (
+                            let h = inicio;
+                            h < fin;
+                            h++
+                        ) {
+
+                            if (
+                                h !== inicio
+                            ) {
+
+                                ocupadas[dia][h] =
+                                    true;
+
+                            }
+
+                        }
+
+
+                        if (filas > 1) {
+
+                            td.rowSpan =
+                                filas;
+
+                        }
+
+
+                        td.appendChild(
+                            crearBloqueAsistencia(
+                                registro
+                            )
+                        );
 
                     }
 
@@ -970,22 +821,38 @@ function renderizarCalendario(
 
 
 /* =========================================================
-   6. BUSCAR ASISTENCIA POR FECHA Y HORA
+   BUSCAR SOLO EL INICIO DEL REGISTRO
 ========================================================= */
 
-function buscarRegistroPorFechaHora(
+function buscarRegistroInicio(
     registros,
-    fecha,
+    dia,
     hora
 ) {
 
+    const fecha =
+        obtenerFechaParaDia(
+            semanaActual,
+            dia
+        );
+
+
     return registros.find(
-        registro => {
+        function (registro) {
+
+            if (!registro.fecha) {
+                return false;
+            }
+
 
             if (
-                String(
+                normalizarFecha(
                     registro.fecha
-                ) !== String(
+                )
+
+                !==
+
+                normalizarFecha(
                     fecha
                 )
             ) {
@@ -996,14 +863,30 @@ function buscarRegistroPorFechaHora(
 
 
             const rango =
-                convertirRangoHora(
+                obtenerHorasRango(
                     registro.hora
                 );
 
 
+            if (!rango) {
+                return false;
+            }
+
+
+            const inicio =
+                Math.floor(
+                    rango.inicio
+                );
+
+
+            /*
+             * SOLO devolver el registro
+             * cuando la fila corresponde
+             * a su inicio.
+             */
+
             return (
-                hora >= rango.inicio &&
-                hora < rango.fin
+                inicio === hora
             );
 
         }
@@ -1013,14 +896,18 @@ function buscarRegistroPorFechaHora(
 
 
 /* =========================================================
-   7. CREAR BLOQUE
+   BLOQUE DEL CALENDARIO
 ========================================================= */
 
 function crearBloqueAsistencia(
-    registro,
-    fecha,
-    duracion
+    registro
 ) {
+
+    const bloque =
+        document.createElement(
+            'div'
+        );
+
 
     const estado =
         obtenerEstadoAsistencia(
@@ -1034,91 +921,207 @@ function crearBloqueAsistencia(
         );
 
 
-    const altura =
-        Math.max(
-            53,
-            (duracion * 54) - 4
+    bloque.className =
+        `bloque-asistencia ${claseEstado}`;
+
+
+    /* -----------------------------------------------
+       CABECERA
+    ----------------------------------------------- */
+
+    const cabecera =
+        document.createElement(
+            'div'
         );
 
 
-    return `
-
-        <div
-            class="bloque-asistencia ${claseEstado}"
-            style="min-height:${altura}px"
-        >
-
-            <div class="bloque-curso">
-
-                <i class="fas fa-book-open me-1"></i>
-
-                ${escapeHTML(
-                    registro.codCurso ||
-                    'CURSO'
-                )}
-
-            </div>
+    cabecera.className =
+        'bloque-cabecera';
 
 
-            <div class="bloque-info">
+    /* -----------------------------------------------
+       CURSO
+    ----------------------------------------------- */
 
-                ${escapeHTML(
-                    registro.hora ||
-                    '--'
-                )}
-
-                &nbsp; | &nbsp;
-
-                Sección
-                ${escapeHTML(
-                    registro.secCurso ||
-                    '-'
-                )}
-
-            </div>
+    const curso =
+        document.createElement(
+            'div'
+        );
 
 
-            <div class="bloque-info">
-
-                <i class="fas fa-chalkboard me-1"></i>
-
-                ${escapeHTML(
-                    registro.teopra ||
-                    '-'
-                )}
-
-            </div>
+    curso.className =
+        'bloque-curso';
 
 
-            <div class="bloque-estado">
-
-                ${escapeHTML(
-                    estado
-                )}
-
-            </div>
+    curso.textContent =
+        registro.codCurso ||
+        'SIN CURSO';
 
 
-            <button
-                type="button"
-                class="bloque-ojo"
-                title="Ver alumnos y asistencia"
-                onclick="abrirDetalleAsistencia(${Number(registro.id)})"
-            >
+    cabecera.appendChild(
+        curso
+    );
 
-                <i class="fas fa-eye"></i>
 
-            </button>
+    /* -----------------------------------------------
+       SECCIÓN
+    ----------------------------------------------- */
 
-        </div>
+    if (registro.secCurso) {
 
-    `;
+        const seccion =
+            document.createElement(
+                'div'
+            );
+
+
+        seccion.className =
+            'bloque-seccion';
+
+
+        seccion.textContent =
+            `Sección ${registro.secCurso}`;
+
+
+        cabecera.appendChild(
+            seccion
+        );
+
+    }
+
+
+    bloque.appendChild(
+        cabecera
+    );
+
+
+    /* -----------------------------------------------
+       INFORMACIÓN
+    ----------------------------------------------- */
+
+    const informacion =
+        document.createElement(
+            'div'
+        );
+
+
+    informacion.className =
+        'bloque-informacion';
+
+
+    const hora =
+        document.createElement(
+            'div'
+        );
+
+
+    hora.innerHTML =
+        `<i class="fas fa-clock"></i> ${escapeHTML(
+            registro.hora || '--'
+        )}`;
+
+
+    informacion.appendChild(
+        hora
+    );
+
+
+    const estadoElemento =
+        document.createElement(
+            'div'
+        );
+
+
+    estadoElemento.className =
+        'bloque-estado';
+
+
+    estadoElemento.textContent =
+        estado;
+
+
+    informacion.appendChild(
+        estadoElemento
+    );
+
+
+    bloque.appendChild(
+        informacion
+    );
+
+
+    /* -----------------------------------------------
+       BOTÓN OJO
+    ----------------------------------------------- */
+
+    const acciones =
+        document.createElement(
+            'div'
+        );
+
+
+    acciones.className =
+        'bloque-acciones';
+
+
+    const boton =
+        document.createElement(
+            'button'
+        );
+
+
+    boton.type =
+        'button';
+
+
+    boton.className =
+        'bloque-ojo';
+
+
+    boton.title =
+        'Ver alumnos y marcar asistencia';
+
+
+    boton.innerHTML =
+        '<i class="fas fa-eye"></i>';
+
+
+    boton.addEventListener(
+        'click',
+        function (evento) {
+
+            evento.preventDefault();
+
+            evento.stopPropagation();
+
+
+            abrirDetalleAsistencia(
+                Number(
+                    registro.id
+                )
+            );
+
+        }
+    );
+
+
+    acciones.appendChild(
+        boton
+    );
+
+
+    bloque.appendChild(
+        acciones
+    );
+
+
+    return bloque;
 
 }
 
 
 /* =========================================================
-   8. ESTADO DOCENTE
+   ESTADO DOCENTE
 ========================================================= */
 
 function obtenerEstadoAsistencia(
@@ -1126,16 +1129,22 @@ function obtenerEstadoAsistencia(
 ) {
 
     if (!registro) {
-
         return 'PROGRAMADA';
-
     }
 
 
+    const estado =
+        String(
+            registro.estado || ''
+        )
+        .trim()
+        .toUpperCase();
+
+
     if (
-        Number(
-            registro.estado
-        ) !== 1
+        estado.includes('NO APLICA')
+        ||
+        estado === 'N/A'
     ) {
 
         return 'NO APLICA';
@@ -1144,8 +1153,20 @@ function obtenerEstadoAsistencia(
 
 
     if (
-        !registro.horEntrada &&
-        !registro.horSalida
+        estado.includes('PROCESO')
+        ||
+        estado.includes('CAMBIO')
+    ) {
+
+        return 'EN PROCESO DE CAMBIO';
+
+    }
+
+
+    if (
+        estado.includes('INASIST')
+        ||
+        estado.includes('FALTA')
     ) {
 
         return 'INASISTENCIA';
@@ -1154,40 +1175,8 @@ function obtenerEstadoAsistencia(
 
 
     if (
-        registro.horEntrada
+        estado.includes('TARD')
     ) {
-
-        const horaProgramada =
-            obtenerHoraInicio(
-                registro.hora
-            );
-
-
-        const entrada =
-            convertirHoraMinutos(
-                registro.horEntrada
-            );
-
-
-        const programada =
-            convertirHoraMinutos(
-                horaProgramada
-            );
-
-
-        const diferencia =
-            entrada -
-            programada;
-
-
-        if (
-            diferencia <= 10
-        ) {
-
-            return 'PUNTUAL';
-
-        }
-
 
         return 'TARDANZA';
 
@@ -1195,7 +1184,11 @@ function obtenerEstadoAsistencia(
 
 
     if (
-        registro.horSalida
+        estado.includes('PUNT')
+        ||
+        estado.includes('ASIST')
+        ||
+        estado.includes('PRESENT')
     ) {
 
         return 'PUNTUAL';
@@ -1203,56 +1196,80 @@ function obtenerEstadoAsistencia(
     }
 
 
-    return 'PROGRAMADA';
+    if (!registro.horEntrada) {
+
+        return 'PROGRAMADA';
+
+    }
+
+
+    const rango =
+        obtenerHorasRango(
+            registro.hora
+        );
+
+
+    if (!rango) {
+        return 'PROGRAMADA';
+    }
+
+
+    const entrada =
+        convertirHoraAMinutos(
+            registro.horEntrada
+        );
+
+
+    if (entrada === null) {
+        return 'PROGRAMADA';
+    }
+
+
+    const programada =
+        rango.inicio * 60;
+
+
+    if (
+        entrada <=
+        programada + 10
+    ) {
+
+        return 'PUNTUAL';
+
+    }
+
+
+    return 'TARDANZA';
 
 }
 
 
 /* =========================================================
-   9. CLASE CSS ESTADO
+   CLASE ESTADO
 ========================================================= */
 
 function obtenerClaseEstado(
     estado
 ) {
 
-    const valor =
-        String(
-            estado || ''
-        )
-        .trim()
-        .toUpperCase();
-
-
-    switch (valor) {
+    switch (estado) {
 
         case 'PUNTUAL':
-
             return 'bloque-puntual';
 
-
         case 'TARDANZA':
-
             return 'bloque-tardanza';
 
-
         case 'INASISTENCIA':
-
             return 'bloque-inasistencia';
 
-
         case 'NO APLICA':
-
             return 'bloque-no-aplica';
 
-
         case 'EN PROCESO DE CAMBIO':
-
             return 'bloque-proceso';
 
-
         default:
-
             return 'bloque-programada';
 
     }
@@ -1261,33 +1278,31 @@ function obtenerClaseEstado(
 
 
 /* =========================================================
-   10. ABRIR DETALLE
+   ABRIR MODAL
 ========================================================= */
 
 function abrirDetalleAsistencia(
     id
 ) {
 
-    /* -----------------------------------------
-       BUSCAR ASISTENCIA
-    ----------------------------------------- */
-
     const registro =
         asistenciaData.find(
-            item =>
-                Number(
-                    item.id
-                ) === Number(
-                    id
-                )
+            function (item) {
+
+                return (
+                    Number(item.id)
+                    ===
+                    Number(id)
+                );
+
+            }
         );
 
 
     if (!registro) {
 
-        console.error(
-            'No se encontró asistencia:',
-            id
+        mostrarError(
+            'No se encontró la clase seleccionada.'
         );
 
         return;
@@ -1299,188 +1314,154 @@ function abrirDetalleAsistencia(
         registro;
 
 
-    console.log(
-        'Registro seleccionado:',
-        registro
-    );
-
-
-    /* -----------------------------------------
-       BUSCAR HORARIO
-    ----------------------------------------- */
+    /* -----------------------------------------------
+       HORARIO
+    ----------------------------------------------- */
 
     const horario =
         horarioData.find(
-            item =>
-                Number(
-                    item.codHorario
-                ) === Number(
-                    registro.codHorario
-                )
+            function (item) {
+
+                return (
+
+                    String(
+                        item.codHorario
+                        ||
+                        item.idHorario
+                        ||
+                        ''
+                    )
+
+                    ===
+
+                    String(
+                        registro.codHorario
+                        ||
+                        ''
+                    )
+
+                );
+
+            }
         );
 
 
-    console.log(
-        'Horario relacionado:',
-        horario
-    );
-
-
-    /* -----------------------------------------
-       BUSCAR ALUMNOS
-       
-       ESTA ES LA RELACIÓN IMPORTANTE:
-
-       alumnos.idHorario
-              ===
-       asistencia.codHorario
-    ----------------------------------------- */
+    /* -----------------------------------------------
+       ALUMNOS
+    ----------------------------------------------- */
 
     const alumnos =
         alumnosData.filter(
-            alumno =>
-                Number(
-                    alumno.idHorario
-                ) === Number(
-                    registro.codHorario
-                )
+            function (alumno) {
+
+                return (
+
+                    String(
+                        alumno.idHorario
+                        ||
+                        ''
+                    )
+
+                    ===
+
+                    String(
+                        registro.codHorario
+                        ||
+                        ''
+                    )
+
+                );
+
+            }
         );
 
 
-    console.log(
-        'Alumnos encontrados:',
-        alumnos
+    alumnos.forEach(
+        function (alumno) {
+
+            aplicarAsistenciaGuardada(
+                alumno,
+                registro
+            );
+
+        }
     );
 
 
-    /* -----------------------------------------
-       INFORMACIÓN GENERAL
-    ----------------------------------------- */
-
-    const estado =
-        obtenerEstadoAsistencia(
-            registro
-        );
-
+    /* -----------------------------------------------
+       DATOS DEL MODAL
+    ----------------------------------------------- */
 
     ponerTexto(
         'modalTitulo',
-        'Control de asistencia'
+        'Asistencia de alumnos'
     );
 
 
     ponerTexto(
         'modalSubtitulo',
-        `${registro.codCurso || ''} | Sección ${registro.secCurso || ''}`
+        formatearFechaCompleta(
+            registro.fecha
+        )
     );
 
 
     ponerTexto(
         'modalCurso',
-        `${registro.codCurso || '--'} - Sección ${registro.secCurso || '--'}`
+        obtenerNombreCurso(
+            registro,
+            horario
+        )
     );
 
 
     ponerTexto(
         'modalHorario',
-        `${registro.fecha || '--'} | ${registro.hora || '--'}`
+        registro.hora || '--'
     );
 
 
     ponerTexto(
         'modalEstado',
-        estado
+        obtenerEstadoAsistencia(
+            registro
+        )
     );
 
-
-    /* -----------------------------------------
-       INFORMACIÓN DEL HORARIO
-    ----------------------------------------- */
-
-    const modalAula =
-        document.getElementById(
-            'modalAula'
-        );
-
-
-    if (modalAula) {
-
-        modalAula.textContent =
-            horario?.codAula ||
-            '--';
-
-    }
-
-
-    const modalTipo =
-        document.getElementById(
-            'modalTipo'
-        );
-
-
-    if (modalTipo) {
-
-        modalTipo.textContent =
-            horario?.teopra ||
-            registro.teopra ||
-            '--';
-
-    }
-
-
-    const modalTope =
-        document.getElementById(
-            'modalTope'
-        );
-
-
-    if (modalTope) {
-
-        modalTope.textContent =
-            horario?.tope ??
-            '--';
-
-    }
-
-
-    /* -----------------------------------------
-       RENDERIZAR ALUMNOS
-    ----------------------------------------- */
 
     renderizarAlumnos(
         alumnos
     );
 
 
-    /* -----------------------------------------
-       ABRIR MODAL
-    ----------------------------------------- */
+    /* -----------------------------------------------
+       MODAL BOOTSTRAP
+    ----------------------------------------------- */
 
-    const modalElement =
+    const modalElemento =
         document.getElementById(
             'modalAsistencia'
         );
 
 
+    if (!modalElemento) {
+        return;
+    }
+
+
     if (
-        modalElement &&
         typeof bootstrap !== 'undefined'
+        &&
+        bootstrap.Modal
     ) {
 
         const modal =
-            bootstrap.Modal
-                .getOrCreateInstance(
-                    modalElement
-                );
+            bootstrap.Modal.getOrCreateInstance(
+                modalElemento
+            );
 
 
         modal.show();
-
-    } else {
-
-        console.error(
-            'No se encontró modalAsistencia o Bootstrap no está cargado'
-        );
 
     }
 
@@ -1488,57 +1469,111 @@ function abrirDetalleAsistencia(
 
 
 /* =========================================================
-   11. RENDERIZAR ALUMNOS
+   NOMBRE CURSO
+========================================================= */
+
+function obtenerNombreCurso(
+    registro,
+    horario
+) {
+
+    if (
+        horario &&
+        horario.nombreCurso
+    ) {
+
+        return horario.nombreCurso;
+
+    }
+
+
+    if (
+        horario &&
+        horario.curso
+    ) {
+
+        return horario.curso;
+
+    }
+
+
+    if (
+        horario &&
+        horario.nomCurso
+    ) {
+
+        return horario.nomCurso;
+
+    }
+
+
+    if (
+        registro &&
+        registro.nombreCurso
+    ) {
+
+        return registro.nombreCurso;
+
+    }
+
+
+    if (
+        registro &&
+        registro.codCurso
+    ) {
+
+        return registro.codCurso;
+
+    }
+
+
+    return '--';
+
+}
+
+
+/* =========================================================
+   ALUMNOS
 ========================================================= */
 
 function renderizarAlumnos(
     alumnos
 ) {
 
-    const lista =
+    const contenedor =
         document.getElementById(
             'listaAlumnos'
         );
 
 
-    if (!lista) {
-
-        console.error(
-            'No existe #listaAlumnos'
-        );
-
+    if (!contenedor) {
         return;
-
     }
 
 
-    /* -----------------------------------------
-       SIN ALUMNOS
-    ----------------------------------------- */
+    contenedor.innerHTML = '';
+
 
     if (
+        !alumnos
+        ||
         alumnos.length === 0
     ) {
 
-        lista.innerHTML = `
+        contenedor.innerHTML = `
 
-            <div class="text-center py-5">
+            <div class="alumnos-vacio">
 
-                <i
-                    class="fas fa-user-slash fa-2x mb-3"
-                ></i>
+                <i class="fas fa-users-slash"></i>
 
                 <h6>
                     No hay alumnos registrados
                 </h6>
 
-                <small class="text-muted">
-
+                <p>
                     No se encontraron alumnos
-                    asociados al horario
-                    ${registroSeleccionado?.codHorario || '--'}.
-
-                </small>
+                    para este horario.
+                </p>
 
             </div>
 
@@ -1549,264 +1584,158 @@ function renderizarAlumnos(
     }
 
 
-    /* -----------------------------------------
-       ESTADÍSTICAS
-    ----------------------------------------- */
+    /* -----------------------------------------------
+       RESUMEN
+    ----------------------------------------------- */
 
-    const total =
-        alumnos.length;
-
-
-    const presentes =
-        alumnos.filter(
-            alumno =>
-                String(
-                    alumno.asistencia
-                ).toUpperCase() ===
-                'PRESENTE'
-        ).length;
+    const resumen =
+        obtenerResumenAlumnos(
+            alumnos
+        );
 
 
-    const faltas =
-        alumnos.filter(
-            alumno =>
-                String(
-                    alumno.asistencia
-                ).toUpperCase() ===
-                'FALTO'
-        ).length;
+    const resumenElemento =
+        document.createElement(
+            'div'
+        );
 
 
-    const tardanzas =
-        alumnos.filter(
-            alumno =>
-                String(
-                    alumno.asistencia
-                ).toUpperCase() ===
-                'TARDANZA'
-        ).length;
+    resumenElemento.className =
+        'alumnos-resumen';
 
 
-    /* -----------------------------------------
-       TABLA
-    ----------------------------------------- */
+    resumenElemento.innerHTML = `
 
-    let html = `
+        <div class="alumno-resumen-item total">
 
-        <div class="row g-3 mb-3">
+            <strong>${resumen.total}</strong>
 
-            <div class="col-md-3">
-
-                <div class="border rounded p-3">
-
-                    <small class="text-muted">
-                        TOTAL
-                    </small>
-
-                    <div class="fs-4 fw-bold">
-                        ${total}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-3">
-
-                <div class="border rounded p-3">
-
-                    <small class="text-muted">
-                        PRESENTES
-                    </small>
-
-                    <div class="fs-4 fw-bold">
-                        ${presentes}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-3">
-
-                <div class="border rounded p-3">
-
-                    <small class="text-muted">
-                        FALTAS
-                    </small>
-
-                    <div class="fs-4 fw-bold">
-                        ${faltas}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-3">
-
-                <div class="border rounded p-3">
-
-                    <small class="text-muted">
-                        TARDANZAS
-                    </small>
-
-                    <div class="fs-4 fw-bold">
-                        ${tardanzas}
-                    </div>
-
-                </div>
-
-            </div>
+            <span>TOTAL</span>
 
         </div>
 
 
+        <div class="alumno-resumen-item asistio">
+
+            <strong>${resumen.asistio}</strong>
+
+            <span>ASISTIERON</span>
+
+        </div>
+
+
+        <div class="alumno-resumen-item falta">
+
+            <strong>${resumen.falto}</strong>
+
+            <span>FALTAS</span>
+
+        </div>
+
+
+        <div class="alumno-resumen-item tardanza">
+
+            <strong>${resumen.tardanza}</strong>
+
+            <span>TARDANZAS</span>
+
+        </div>
+
+
+        <div class="alumno-resumen-item justificado">
+
+            <strong>${resumen.justificado}</strong>
+
+            <span>JUSTIFICADOS</span>
+
+        </div>
+
+
+        <div class="alumno-resumen-item sin-marcar">
+
+            <strong>${resumen.sinMarcar}</strong>
+
+            <span>SIN MARCAR</span>
+
+        </div>
+
+    `;
+
+
+    contenedor.appendChild(
+        resumenElemento
+    );
+
+
+    /* -----------------------------------------------
+       AVISO
+    ----------------------------------------------- */
+
+    const aviso =
+        document.createElement(
+            'div'
+        );
+
+
+    aviso.className =
+        'attendance-save-status';
+
+
+    aviso.innerHTML = `
+
+        <i class="fas fa-circle-check"></i>
+
+        <span>
+            La asistencia se guarda automáticamente.
+        </span>
+
+    `;
+
+
+    contenedor.appendChild(
+        aviso
+    );
+
+
+    /* -----------------------------------------------
+       TABLA
+    ----------------------------------------------- */
+
+    const wrapper =
+        document.createElement(
+            'div'
+        );
+
+
+    wrapper.className =
+        'alumnos-tabla-wrapper';
+
+
+    wrapper.innerHTML = `
+
         <div class="table-responsive">
 
-            <table class="table table-hover align-middle">
+            <table class="table alumnos-table">
 
                 <thead>
 
                     <tr>
 
-                        <th>
-                            #
-                        </th>
+                        <th>#</th>
 
-                        <th>
-                            Código
-                        </th>
+                        <th>CÓDIGO</th>
 
-                        <th>
-                            Alumno
-                        </th>
+                        <th>ALUMNO</th>
 
-                        <th>
-                            Correo
-                        </th>
+                        <th>ASISTENCIA</th>
 
-                        <th>
-                            Asistencia
-                        </th>
-
-                        <th>
-                            Observación
-                        </th>
+                        <th>OBSERVACIÓN</th>
 
                     </tr>
 
                 </thead>
 
-                <tbody>
-    `;
-
-
-    /* -----------------------------------------
-       GENERAR FILAS
-    ----------------------------------------- */
-
-    alumnos.forEach(
-        (
-            alumno,
-            index
-        ) => {
-
-            const asistencia =
-                String(
-                    alumno.asistencia ||
-                    'SIN REGISTRO'
-                )
-                .toUpperCase();
-
-
-            const clase =
-                obtenerClaseAsistenciaAlumno(
-                    asistencia
-                );
-
-
-            html += `
-
-                <tr>
-
-                    <td>
-                        ${index + 1}
-                    </td>
-
-
-                    <td>
-
-                        <strong>
-                            ${escapeHTML(
-                                alumno.codigoEstudiante ||
-                                '--'
-                            )}
-                        </strong>
-
-                    </td>
-
-
-                    <td>
-
-                        ${escapeHTML(
-                            alumno.nombres ||
-                            '--'
-                        )}
-
-                    </td>
-
-
-                    <td>
-
-                        <small>
-                            ${escapeHTML(
-                                alumno.correo ||
-                                '--'
-                            )}
-                        </small>
-
-                    </td>
-
-
-                    <td>
-
-                        <span
-                            class="badge ${clase}"
-                        >
-
-                            ${escapeHTML(
-                                asistencia
-                            )}
-
-                        </span>
-
-                    </td>
-
-
-                    <td>
-
-                        ${escapeHTML(
-                            alumno.observacion ||
-                            ''
-                        )}
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        }
-    );
-
-
-    html += `
-
-                </tbody>
+                <tbody></tbody>
 
             </table>
 
@@ -1815,246 +1744,892 @@ function renderizarAlumnos(
     `;
 
 
-    lista.innerHTML =
-        html;
+    contenedor.appendChild(
+        wrapper
+    );
+
+
+    const tbody =
+        wrapper.querySelector(
+            'tbody'
+        );
+
+
+    /* -----------------------------------------------
+       FILAS
+    ----------------------------------------------- */
+
+    alumnos.forEach(
+        function (
+            alumno,
+            index
+        ) {
+
+            const estado =
+                normalizarAsistencia(
+                    alumno.asistencia
+                );
+
+
+            const fila =
+                document.createElement(
+                    'tr'
+                );
+
+
+            fila.innerHTML = `
+
+                <td class="alumno-numero">
+
+                    ${index + 1}
+
+                </td>
+
+
+                <td>
+
+                    <span class="student-code">
+
+                        ${escapeHTML(
+                            alumno.codigoEstudiante
+                            || '--'
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <div class="student-name">
+
+                        ${escapeHTML(
+                            alumno.nombres
+                            || 'Sin nombre'
+                        )}
+
+                    </div>
+
+
+                    <div class="student-correo">
+
+                        ${escapeHTML(
+                            alumno.correo
+                            || ''
+                        )}
+
+                    </div>
+
+                </td>
+
+
+                <td class="columna-asistencia">
+
+                    <div class="estado-actual-alumno">
+
+                        <span
+                            class="badge ${obtenerClaseAsistenciaAlumno(estado)}"
+                        >
+
+                            ${obtenerTextoAsistencia(
+                                estado
+                            )}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="marcar-asistencia">
+
+                        <span class="marcar-titulo">
+
+                            MARCAR ASISTENCIA
+
+                        </span>
+
+
+                        <div class="asistencia-opciones">
+
+
+                            <button
+                                type="button"
+                                class="btn-marca btn-marca-asistio ${estado === 'ASISTIO' ? 'active' : ''}"
+                                data-accion-asistencia="ASISTIO"
+                                data-alumno-id="${escapeHTML(String(alumno.id))}"
+                            >
+
+                                <i class="fas fa-check"></i>
+
+                                ASISTIÓ
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn-marca btn-marca-falto ${estado === 'FALTO' ? 'active' : ''}"
+                                data-accion-asistencia="FALTO"
+                                data-alumno-id="${escapeHTML(String(alumno.id))}"
+                            >
+
+                                <i class="fas fa-xmark"></i>
+
+                                FALTÓ
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn-marca btn-marca-tardanza ${estado === 'TARDANZA' ? 'active' : ''}"
+                                data-accion-asistencia="TARDANZA"
+                                data-alumno-id="${escapeHTML(String(alumno.id))}"
+                            >
+
+                                <i class="fas fa-clock"></i>
+
+                                TARDANZA
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn-marca btn-marca-justificado ${estado === 'JUSTIFICADO' ? 'active' : ''}"
+                                data-accion-asistencia="JUSTIFICADO"
+                                data-alumno-id="${escapeHTML(String(alumno.id))}"
+                            >
+
+                                <i class="fas fa-file-circle-check"></i>
+
+                                JUSTIFICADO
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn-marca btn-marca-limpiar"
+                                data-accion-asistencia=""
+                                data-alumno-id="${escapeHTML(String(alumno.id))}"
+                            >
+
+                                <i class="fas fa-eraser"></i>
+
+                                LIMPIAR
+
+                            </button>
+
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    <input
+                        type="text"
+                        class="form-control form-control-sm alumno-observacion"
+                        data-observacion-alumno="${escapeHTML(String(alumno.id))}"
+                        value="${escapeAttribute(alumno.observacion || '')}"
+                        placeholder="Agregar observación..."
+                    >
+
+                </td>
+
+            `;
+
+
+            tbody.appendChild(
+                fila
+            );
+
+        }
+    );
 
 }
 
 
 /* =========================================================
-   12. CLASE ASISTENCIA ALUMNO
+   RESUMEN ALUMNOS
 ========================================================= */
 
-function obtenerClaseAsistenciaAlumno(
-    asistencia
+function obtenerResumenAlumnos(
+    alumnos
 ) {
 
-    switch (
-        String(
-            asistencia
-        )
-        .toUpperCase()
-    ) {
+    const resumen = {
 
-        case 'PRESENTE':
+        total: alumnos.length,
 
-            return 'bg-success';
+        asistio: 0,
 
+        falto: 0,
 
-        case 'FALTO':
+        tardanza: 0,
 
-            return 'bg-danger';
+        justificado: 0,
 
-
-        case 'TARDANZA':
-
-            return 'bg-warning text-dark';
-
-
-        case 'JUSTIFICADO':
-
-            return 'bg-info';
-
-
-        default:
-
-            return 'bg-secondary';
-
-    }
-
-}
-
-
-/* =========================================================
-   13. CONVERTIR RANGO
-========================================================= */
-
-function convertirRangoHora(
-    rango
-) {
-
-    if (!rango) {
-
-        return {
-
-            inicio: 0,
-
-            fin: 0
-
-        };
-
-    }
-
-
-    const partes =
-        String(
-            rango
-        )
-        .trim()
-        .split('-');
-
-
-    if (
-        partes.length < 2
-    ) {
-
-        return {
-
-            inicio: 0,
-
-            fin: 0
-
-        };
-
-    }
-
-
-    const inicio =
-        parseInt(
-            partes[0],
-            10
-        );
-
-
-    const fin =
-        parseInt(
-            partes[1],
-            10
-        );
-
-
-    return {
-
-        inicio:
-            isNaN(inicio)
-                ? 0
-                : inicio,
-
-        fin:
-            isNaN(fin)
-                ? 0
-                : fin
+        sinMarcar: 0
 
     };
 
+
+    alumnos.forEach(
+        function (alumno) {
+
+            const estado =
+                normalizarAsistencia(
+                    alumno.asistencia
+                );
+
+
+            switch (estado) {
+
+                case 'ASISTIO':
+                    resumen.asistio++;
+                    break;
+
+                case 'FALTO':
+                    resumen.falto++;
+                    break;
+
+                case 'TARDANZA':
+                    resumen.tardanza++;
+                    break;
+
+                case 'JUSTIFICADO':
+                    resumen.justificado++;
+                    break;
+
+                default:
+                    resumen.sinMarcar++;
+                    break;
+
+            }
+
+        }
+    );
+
+
+    return resumen;
+
 }
 
 
 /* =========================================================
-   14. HORA INICIAL
+   CLICK ASISTENCIA
 ========================================================= */
 
-function obtenerHoraInicio(
-    rango
+function manejarClickAsistencia(
+    evento
 ) {
 
-    const partes =
-        String(
-            rango || ''
-        )
-        .split('-');
+    const boton =
+        evento.target.closest(
+            '[data-accion-asistencia]'
+        );
+
+
+    if (!boton) {
+        return;
+    }
+
+
+    const estado =
+        boton.getAttribute(
+            'data-accion-asistencia'
+        );
+
+
+    const idAlumno =
+        boton.getAttribute(
+            'data-alumno-id'
+        );
+
+
+    marcarAsistenciaAlumno(
+        idAlumno,
+        estado
+    );
+
+}
+
+
+/* =========================================================
+   MARCAR ALUMNO
+========================================================= */
+
+function marcarAsistenciaAlumno(
+    idAlumno,
+    estado
+) {
+
+    if (!registroSeleccionado) {
+        return;
+    }
+
+
+    const alumno =
+        alumnosData.find(
+            function (item) {
+
+                return (
+
+                    String(item.id)
+                    ===
+                    String(idAlumno)
+
+                    &&
+
+                    String(
+                        item.idHorario || ''
+                    )
+
+                    ===
+
+                    String(
+                        registroSeleccionado.codHorario
+                        || ''
+                    )
+
+                );
+
+            }
+        );
+
+
+    if (!alumno) {
+        return;
+    }
+
+
+    estado =
+        normalizarAsistencia(
+            estado
+        );
+
+
+    alumno.asistencia =
+        estado;
+
+
+    guardarAsistenciaLocal(
+        alumno,
+        registroSeleccionado
+    );
+
+
+    const alumnos =
+        alumnosData.filter(
+            function (item) {
+
+                return (
+
+                    String(
+                        item.idHorario || ''
+                    )
+
+                    ===
+
+                    String(
+                        registroSeleccionado.codHorario
+                        || ''
+                    )
+
+                );
+
+            }
+        );
+
+
+    alumnos.forEach(
+        function (item) {
+
+            aplicarAsistenciaGuardada(
+                item,
+                registroSeleccionado
+            );
+
+        }
+    );
+
+
+    renderizarAlumnos(
+        alumnos
+    );
+
+}
+
+
+/* =========================================================
+   OBSERVACIÓN
+========================================================= */
+
+function manejarCambioObservacion(
+    evento
+) {
+
+    const input =
+        evento.target.closest(
+            '[data-observacion-alumno]'
+        );
+
+
+    if (!input) {
+        return;
+    }
+
+
+    if (!registroSeleccionado) {
+        return;
+    }
+
+
+    const idAlumno =
+        input.getAttribute(
+            'data-observacion-alumno'
+        );
+
+
+    const alumno =
+        alumnosData.find(
+            function (item) {
+
+                return (
+
+                    String(item.id)
+                    ===
+                    String(idAlumno)
+
+                    &&
+
+                    String(
+                        item.idHorario || ''
+                    )
+
+                    ===
+
+                    String(
+                        registroSeleccionado.codHorario
+                        || ''
+                    )
+
+                );
+
+            }
+        );
+
+
+    if (!alumno) {
+        return;
+    }
+
+
+    alumno.observacion =
+        input.value.trim();
+
+
+    guardarAsistenciaLocal(
+        alumno,
+        registroSeleccionado
+    );
+
+}
+
+
+/* =========================================================
+   NORMALIZAR ASISTENCIA
+========================================================= */
+
+function normalizarAsistencia(
+    valor
+) {
+
+    if (
+        valor === null
+        ||
+        valor === undefined
+    ) {
+
+        return '';
+
+    }
+
+
+    const estado =
+        String(valor)
+            .trim()
+            .toUpperCase();
+
+
+    if (!estado) {
+        return '';
+    }
 
 
     if (
-        partes.length === 0
+        estado === 'PRESENTE'
+        ||
+        estado === 'ASISTENCIA'
+        ||
+        estado === 'ASISTIÓ'
+        ||
+        estado === 'ASISTIO'
     ) {
 
-        return '00:00:00';
+        return 'ASISTIO';
 
     }
 
 
-    return (
-        partes[0]
-            .trim()
-            .padStart(
-                2,
-                '0'
-            )
-        + ':00:00'
-    );
+    if (
+        estado === 'FALTA'
+        ||
+        estado === 'AUSENTE'
+        ||
+        estado === 'FALTO'
+    ) {
+
+        return 'FALTO';
+
+    }
+
+
+    if (
+        estado === 'TARDE'
+        ||
+        estado === 'TARDIO'
+        ||
+        estado === 'TARDÍO'
+        ||
+        estado === 'TARDANZA'
+    ) {
+
+        return 'TARDANZA';
+
+    }
+
+
+    if (
+        estado === 'JUSTIFICADA'
+        ||
+        estado === 'JUSTIFICADO'
+    ) {
+
+        return 'JUSTIFICADO';
+
+    }
+
+
+    return estado;
 
 }
 
 
 /* =========================================================
-   15. CONVERTIR HORA A MINUTOS
+   TEXTO ASISTENCIA
 ========================================================= */
 
-function convertirHoraMinutos(
-    hora
+function obtenerTextoAsistencia(
+    estado
 ) {
 
-    if (!hora) {
-
-        return 0;
-
-    }
-
-
-    const partes =
-        String(
-            hora
+    switch (
+        normalizarAsistencia(
+            estado
         )
-        .split(':');
+    ) {
 
+        case 'ASISTIO':
+            return 'ASISTIÓ';
 
-    const horas =
-        parseInt(
-            partes[0] || 0,
-            10
-        );
+        case 'FALTO':
+            return 'FALTÓ';
 
+        case 'TARDANZA':
+            return 'TARDANZA';
 
-    const minutos =
-        parseInt(
-            partes[1] || 0,
-            10
-        );
+        case 'JUSTIFICADO':
+            return 'JUSTIFICADO';
 
+        default:
+            return 'SIN MARCAR';
 
-    return (
-        horas * 60 +
-        minutos
-    );
+    }
 
 }
 
 
 /* =========================================================
-   16. FORMATEAR HORA
+   CLASE ASISTENCIA
 ========================================================= */
 
-function formatearHora(
-    hora
+function obtenerClaseAsistenciaAlumno(
+    estado
 ) {
 
-    return String(
-        hora
-    )
-    .padStart(
-        2,
-        '0'
-    ) + ':00';
+    switch (
+        normalizarAsistencia(
+            estado
+        )
+    ) {
+
+        case 'ASISTIO':
+            return 'badge-presente';
+
+        case 'FALTO':
+            return 'badge-falta';
+
+        case 'TARDANZA':
+            return 'badge-tarde';
+
+        case 'JUSTIFICADO':
+            return 'badge-justificado';
+
+        default:
+            return 'badge-sin-registro';
+
+    }
 
 }
 
 
 /* =========================================================
-   17. INICIO DE SEMANA
+   STORAGE
+========================================================= */
+
+function cargarAsistenciasLocales() {
+
+    try {
+
+        const datos =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+
+        if (!datos) {
+            return {};
+        }
+
+
+        return JSON.parse(
+            datos
+        ) || {};
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        return {};
+
+    }
+
+}
+
+
+/* =========================================================
+   CLAVE STORAGE
+========================================================= */
+
+function crearClaveAsistenciaAlumno(
+    alumno,
+    registro
+) {
+
+    if (
+        !alumno
+        ||
+        !registro
+    ) {
+
+        return null;
+
+    }
+
+
+    return [
+
+        semestreActual,
+
+        normalizarFecha(
+            registro.fecha
+        ),
+
+        String(
+            registro.codHorario
+            ||
+            alumno.idHorario
+            ||
+            ''
+        ),
+
+        String(
+            alumno.id
+            ||
+            alumno.codigoEstudiante
+            ||
+            ''
+        )
+
+    ].join('|');
+
+}
+
+
+/* =========================================================
+   GUARDAR
+========================================================= */
+
+function guardarAsistenciaLocal(
+    alumno,
+    registro
+) {
+
+    const clave =
+        crearClaveAsistenciaAlumno(
+            alumno,
+            registro
+        );
+
+
+    if (!clave) {
+        return;
+    }
+
+
+    const asistencia =
+        normalizarAsistencia(
+            alumno.asistencia
+        );
+
+
+    const observacion =
+        String(
+            alumno.observacion || ''
+        ).trim();
+
+
+    if (
+        !asistencia
+        &&
+        !observacion
+    ) {
+
+        delete asistenciasGuardadas[
+            clave
+        ];
+
+    } else {
+
+        asistenciasGuardadas[
+            clave
+        ] = {
+
+            asistencia,
+
+            observacion,
+
+            actualizado:
+                new Date().toISOString()
+
+        };
+
+    }
+
+
+    try {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(
+                asistenciasGuardadas
+            )
+        );
+
+
+        console.log(
+            'Guardado:',
+            asistenciasGuardadas[clave]
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            'Error guardando asistencia:',
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   APLICAR STORAGE
+========================================================= */
+
+function aplicarAsistenciaGuardada(
+    alumno,
+    registro
+) {
+
+    const clave =
+        crearClaveAsistenciaAlumno(
+            alumno,
+            registro
+        );
+
+
+    if (!clave) {
+        return;
+    }
+
+
+    const guardado =
+        asistenciasGuardadas[
+            clave
+        ];
+
+
+    if (!guardado) {
+        return;
+    }
+
+
+    alumno.asistencia =
+        normalizarAsistencia(
+            guardado.asistencia
+        );
+
+
+    alumno.observacion =
+        guardado.observacion || '';
+
+}
+
+
+/* =========================================================
+   SEMANA
 ========================================================= */
 
 function obtenerInicioSemana(
     fecha
 ) {
 
-    const nuevaFecha =
-        new Date(
-            fecha
-        );
+    const resultado =
+        new Date(fecha);
 
 
-    nuevaFecha.setHours(
+    resultado.setHours(
         0,
         0,
         0,
@@ -2063,7 +2638,7 @@ function obtenerInicioSemana(
 
 
     const dia =
-        nuevaFecha.getDay();
+        resultado.getDay();
 
 
     const diferencia =
@@ -2072,85 +2647,270 @@ function obtenerInicioSemana(
             : 1 - dia;
 
 
-    nuevaFecha.setDate(
-        nuevaFecha.getDate() +
+    resultado.setDate(
+        resultado.getDate()
+        +
         diferencia
     );
 
 
-    return nuevaFecha;
+    return resultado;
 
 }
 
 
 /* =========================================================
-   18. SUMAR DÍAS
+   SUMAR DÍAS
 ========================================================= */
 
 function sumarDias(
     fecha,
-    cantidad
+    dias
 ) {
 
-    const nuevaFecha =
-        new Date(
+    const resultado =
+        new Date(fecha);
+
+
+    resultado.setDate(
+        resultado.getDate()
+        +
+        dias
+    );
+
+
+    return resultado;
+
+}
+
+
+/* =========================================================
+   FECHA POR DÍA
+========================================================= */
+
+function obtenerFechaParaDia(
+    semana,
+    dia
+) {
+
+    const fecha =
+        new Date(semana);
+
+
+    const numero =
+        MAPA_DIAS[dia];
+
+
+    const diferencia =
+        numero === 0
+            ? 6
+            : numero - 1;
+
+
+    fecha.setDate(
+        fecha.getDate()
+        +
+        diferencia
+    );
+
+
+    return fecha;
+
+}
+
+
+/* =========================================================
+   NORMALIZAR FECHA
+========================================================= */
+
+function normalizarFecha(
+    fecha
+) {
+
+    if (!fecha) {
+        return '';
+    }
+
+
+    if (fecha instanceof Date) {
+
+        return [
+
+            fecha.getFullYear(),
+
+            String(
+                fecha.getMonth() + 1
+            ).padStart(2, '0'),
+
+            String(
+                fecha.getDate()
+            ).padStart(2, '0')
+
+        ].join('-');
+
+    }
+
+
+    const texto =
+        String(fecha).trim();
+
+
+    const iso =
+        texto.match(
+            /^(\d{4})-(\d{1,2})-(\d{1,2})/
+        );
+
+
+    if (iso) {
+
+        return [
+
+            iso[1],
+
+            String(
+                iso[2]
+            ).padStart(2, '0'),
+
+            String(
+                iso[3]
+            ).padStart(2, '0')
+
+        ].join('-');
+
+    }
+
+
+    const latino =
+        texto.match(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})/
+        );
+
+
+    if (latino) {
+
+        return [
+
+            latino[3],
+
+            String(
+                latino[2]
+            ).padStart(2, '0'),
+
+            String(
+                latino[1]
+            ).padStart(2, '0')
+
+        ].join('-');
+
+    }
+
+
+    return texto;
+
+}
+
+
+/* =========================================================
+   FECHA COMPLETA
+========================================================= */
+
+function formatearFechaCompleta(
+    fecha
+) {
+
+    const normalizada =
+        normalizarFecha(
             fecha
         );
 
 
-    nuevaFecha.setDate(
-        nuevaFecha.getDate() +
-        cantidad
+    if (!normalizada) {
+        return '--';
+    }
+
+
+    const partes =
+        normalizada.split('-');
+
+
+    if (partes.length !== 3) {
+        return normalizada;
+    }
+
+
+    const date =
+        new Date(
+            Number(partes[0]),
+            Number(partes[1]) - 1,
+            Number(partes[2])
+        );
+
+
+    return date.toLocaleDateString(
+        'es-PE',
+        {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        }
     );
-
-
-    return nuevaFecha;
 
 }
 
 
 /* =========================================================
-   19. FECHA ISO
+   FECHA CORTA
 ========================================================= */
 
-function formatearFechaISO(
+function formatearFechaCorta(
     fecha
 ) {
 
-    const año =
-        fecha.getFullYear();
+    const date =
+        fecha instanceof Date
+            ? fecha
+            : new Date(fecha);
 
 
-    const mes =
-        String(
-            fecha.getMonth() + 1
+    if (
+        isNaN(
+            date.getTime()
         )
-        .padStart(
-            2,
-            '0'
-        );
+    ) {
+
+        return '--';
+
+    }
 
 
-    const dia =
-        String(
-            fecha.getDate()
-        )
-        .padStart(
-            2,
-            '0'
-        );
-
-
-    return `${año}-${mes}-${dia}`;
+    return date.toLocaleDateString(
+        'es-PE',
+        {
+            day: '2-digit',
+            month: '2-digit'
+        }
+    );
 
 }
 
 
 /* =========================================================
-   20. TÍTULO SEMANA
+   ETIQUETA SEMANA
 ========================================================= */
 
-function actualizarTituloSemana() {
+function actualizarEtiquetaSemana() {
+
+    const elemento =
+        document.getElementById(
+            'lblSemana'
+        );
+
+
+    if (!elemento) {
+        return;
+    }
+
 
     const inicio =
         semanaActual;
@@ -2163,110 +2923,264 @@ function actualizarTituloSemana() {
         );
 
 
-    const textoInicio =
-        inicio.toLocaleDateString(
-            'es-PE',
-            {
-                day: '2-digit',
-                month: 'short'
-            }
+    elemento.textContent =
+        `${formatearFechaCorta(inicio)} - ${formatearFechaCorta(fin)}`;
+
+}
+
+
+/* =========================================================
+   HORAS
+========================================================= */
+
+function obtenerHorasRango(
+    rango
+) {
+
+    if (!rango) {
+        return null;
+    }
+
+
+    const partes =
+        String(rango)
+            .trim()
+            .split(
+                /\s*(?:-|–|—|a|A|hasta)\s*/
+            );
+
+
+    if (partes.length < 2) {
+        return null;
+    }
+
+
+    const inicio =
+        convertirHoraDecimal(
+            partes[0]
         );
 
 
-    const textoFin =
-        fin.toLocaleDateString(
-            'es-PE',
-            {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            }
+    const fin =
+        convertirHoraDecimal(
+            partes[1]
         );
 
 
-    ponerTexto(
-        'lblSemana',
-        `${textoInicio} - ${textoFin}`
+    if (
+        inicio === null
+        ||
+        fin === null
+    ) {
+
+        return null;
+
+    }
+
+
+    return {
+        inicio,
+        fin
+    };
+
+}
+
+
+/* =========================================================
+   HORA DECIMAL
+========================================================= */
+
+function convertirHoraDecimal(
+    valor
+) {
+
+    if (
+        valor === null
+        ||
+        valor === undefined
+    ) {
+
+        return null;
+
+    }
+
+
+    const texto =
+        String(valor)
+            .trim()
+            .toUpperCase();
+
+
+    const match =
+        texto.match(
+            /^(\d{1,2})(?::(\d{1,2}))?\s*(AM|PM)?$/
+        );
+
+
+    if (!match) {
+        return null;
+    }
+
+
+    let horas =
+        Number(match[1]);
+
+
+    const minutos =
+        Number(match[2] || 0);
+
+
+    const periodo =
+        match[3];
+
+
+    if (
+        periodo === 'PM'
+        &&
+        horas < 12
+    ) {
+
+        horas += 12;
+
+    }
+
+
+    if (
+        periodo === 'AM'
+        &&
+        horas === 12
+    ) {
+
+        horas = 0;
+
+    }
+
+
+    return horas +
+        (minutos / 60);
+
+}
+
+
+/* =========================================================
+   HORA A MINUTOS
+========================================================= */
+
+function convertirHoraAMinutos(
+    valor
+) {
+
+    const decimal =
+        convertirHoraDecimal(
+            valor
+        );
+
+
+    if (decimal === null) {
+        return null;
+    }
+
+
+    return Math.round(
+        decimal * 60
     );
 
 }
 
 
 /* =========================================================
-   21. FERIADOS
+   CALCULAR HORAS
 ========================================================= */
 
-function esFeriado(
-    fecha
+function calcularHorasRango(
+    rango
 ) {
 
-    return false;
+    const horas =
+        obtenerHorasRango(
+            rango
+        );
+
+
+    if (!horas) {
+        return 0;
+    }
+
+
+    return Math.max(
+        0,
+        horas.fin - horas.inicio
+    );
 
 }
 
 
 /* =========================================================
-   22. MOSTRAR ERROR
+   ESCAPAR HTML
 ========================================================= */
 
-function mostrarError(
-    mensaje
+function escapeHTML(
+    valor
 ) {
 
-    const tbody =
-        document.getElementById(
-            'tbodyAsistencia'
-        );
+    if (
+        valor === null
+        ||
+        valor === undefined
+    ) {
 
-
-    if (!tbody) {
-
-        return;
+        return '';
 
     }
 
 
-    tbody.innerHTML = `
+    return String(valor)
 
-        <tr>
+        .replace(
+            /&/g,
+            '&amp;'
+        )
 
-            <td
-                colspan="8"
-                class="text-center py-5"
-            >
+        .replace(
+            /</g,
+            '&lt;'
+        )
 
-                <i
-                    class="fas fa-circle-exclamation fa-2x text-danger mb-2"
-                ></i>
+        .replace(
+            />/g,
+            '&gt;'
+        )
 
+        .replace(
+            /"/g,
+            '&quot;'
+        )
 
-                <div class="fw-bold text-danger">
-
-                    No se pudo cargar
-                    la información.
-
-                </div>
-
-
-                <small class="text-muted">
-
-                    ${escapeHTML(
-                        mensaje
-                    )}
-
-                </small>
-
-            </td>
-
-        </tr>
-
-    `;
+        .replace(
+            /'/g,
+            '&#039;'
+        );
 
 }
 
 
 /* =========================================================
-   23. PONER TEXTO
+   ESCAPAR ATRIBUTO
+========================================================= */
+
+function escapeAttribute(
+    valor
+) {
+
+    return escapeHTML(
+        valor
+    );
+
+}
+
+
+/* =========================================================
+   TEXTO
 ========================================================= */
 
 function ponerTexto(
@@ -2283,7 +3197,7 @@ function ponerTexto(
     if (elemento) {
 
         elemento.textContent =
-            texto;
+            texto ?? '';
 
     }
 
@@ -2291,124 +3205,115 @@ function ponerTexto(
 
 
 /* =========================================================
-   24. ESCAPAR HTML
+   CARGANDO
 ========================================================= */
 
-function escapeHTML(
-    valor
+function mostrarCargaCalendario() {
+
+    const tbody =
+        document.getElementById(
+            'tbodyAsistencia'
+        );
+
+
+    if (!tbody) {
+        return;
+    }
+
+
+    tbody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="8"
+                class="calendar-loading"
+            >
+
+                <i class="fas fa-spinner fa-spin"></i>
+
+                <span>
+                    Cargando programación...
+                </span>
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function mostrarError(
+    mensaje
 ) {
 
-    return String(
-        valor ?? ''
-    )
-    .replaceAll(
-        '&',
-        '&amp;'
-    )
-    .replaceAll(
-        '<',
-        '&lt;'
-    )
-    .replaceAll(
-        '>',
-        '&gt;'
-    )
-    .replaceAll(
-        '"',
-        '&quot;'
-    )
-    .replaceAll(
-        "'",
-        '&#039;'
+    console.error(
+        mensaje
+    );
+
+    alert(
+        mensaje
     );
 
 }
 
 
 /* =========================================================
-   25. DEBUG
+   DEBUG
 ========================================================= */
 
-window.asistenciaDocenteDebug =
-    function () {
+window.asistenciaDocenteDebug = {
 
-        console.log(
-            '========== DEBUG =========='
+    obtenerDatos: function () {
+
+        return {
+
+            asistenciaData,
+
+            horarioData,
+
+            alumnosData,
+
+            docenteActual,
+
+            semestreActual,
+
+            semanaActual,
+
+            registroSeleccionado,
+
+            asistenciasGuardadas
+
+        };
+
+    },
+
+
+    limpiarAsistenciasLocales: function () {
+
+        localStorage.removeItem(
+            STORAGE_KEY
         );
 
+        asistenciasGuardadas = {};
 
         console.log(
-            'Asistencia:',
-            asistenciaData
+            'Asistencias locales eliminadas.'
         );
 
-
-        console.log(
-            'Horarios:',
-            horarioData
-        );
+    },
 
 
-        console.log(
-            'Alumnos:',
-            alumnosData
-        );
+    recargar: function () {
 
+        cargarDatos();
 
-        console.log(
-            'Docente:',
-            docenteActual
-        );
+    }
 
-
-        console.log(
-            'Semestre:',
-            semestreActual
-        );
-
-
-        console.log(
-            'Semana:',
-            semanaActual
-        );
-
-
-        if (
-            registroSeleccionado
-        ) {
-
-            console.log(
-                'Registro seleccionado:',
-                registroSeleccionado
-            );
-
-
-            const alumnos =
-                alumnosData.filter(
-                    alumno =>
-                        Number(
-                            alumno.idHorario
-                        ) === Number(
-                            registroSeleccionado.codHorario
-                        )
-                );
-
-
-            console.log(
-                'Alumnos del horario:',
-                alumnos
-            );
-
-        }
-
-    };
-
-
-/* =========================================================
-   FIN
-========================================================= */
-
-console.log(
-    'asistencia.js cargado correctamente'
-);
-
+};
