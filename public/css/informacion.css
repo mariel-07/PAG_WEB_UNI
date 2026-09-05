@@ -802,7 +802,17 @@
     background: #fafafa;
 }
 
-
+.docente-field .form-control,
+.docente-field .form-select {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid #dfe2e5;
+    border-radius: 6px;
+    background: white;
+    color: #30353a;
+    font-size: 12px;
+    box-shadow: none;
+}
 /* =========================================================
    RESPONSIVE
 ========================================================= */

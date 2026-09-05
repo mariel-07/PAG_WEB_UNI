@@ -532,11 +532,18 @@
 
 <!-- Declaramos las rutas de Laravel para que JavaScript las lea sin errores -->
 <script>
-    window.urlHorarioJson = "{{ asset('json/horario.json') }}";
+    /*
+     * API Laravel
+     */
+    window.urlHorarioApi = "{{ url('/api/horarios') }}";
+
+    /*
+     * Mientras migramos alumnos,
+     * todavía utilizamos el JSON.
+     */
     window.urlAlumnosJson = "{{ asset('json/alumnos.json') }}";
 </script>
 
 <script src="{{ asset('js/horario.js') }}"></script>
-
    
 </x-app-layout>

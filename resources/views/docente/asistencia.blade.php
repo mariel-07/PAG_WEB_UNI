@@ -637,10 +637,10 @@
         CONFIGURACIÓN DE RUTAS JSON
     ====================================================== --}}
     <script>
-        window.urlAsistenciaJson = "{{ asset('json/asistencia-docente.json') }}";
-        window.urlHorarioJson = "{{ asset('json/horario.json') }}";
-        window.urlAlumnosJson = "{{ asset('json/alumnos.json') }}";
-    </script>
+    window.urlAsistenciaJson = "{{ asset('json/asistencia-docente.json') }}";
+    window.urlHorarioJson = "{{ asset('json/horario.json') }}";
+    window.urlAlumnosJson = "{{ asset('json/alumnos.json') }}";
+</script>
 
 
     {{-- =====================================================

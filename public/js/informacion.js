@@ -1,13 +1,7 @@
-/* ============================================================
-   DATOS UBIGEO
-============================================================ */
 
 const ubigeoData = {
-
     "Amazonas": {
-
         "Chachapoyas": [
-
             "Chachapoyas",
             "Asunción",
             "Balsas",
@@ -29,9 +23,7 @@ const ubigeoData = {
             "San Isidro de Maino",
             "Soloco",
             "Sonche"
-
         ]
-
     },
 
 "Ancash": {
@@ -271,457 +263,463 @@ const ubigeoData = {
             "Padre Abad": ["Aguaytía", "Irazola", "Curimaná", "Neshuya", "Alexander von Humboldt"],
             "Purús": ["Esperanza"]
         }
-
 };
 
-
-/* ============================================================
-   VARIABLES PRINCIPALES
-============================================================ */
+/* =========================================================
+VARIABLES GLOBALES
+========================================================= */
 
 let datosPersonales = {};
-
 let datosDomicilio = [];
-
 let datosFamiliares = [];
-
 let datosFormacion = [];
 
+let docenteId = null;
 
-/* ============================================================
-   INICIALIZACIÓN
-============================================================ */
+const API = window.informacionApi || {
+    informacion: "/api/docente/informacion",
+    domicilios: "/api/docente/domicilios",
+    familiares: "/api/docente/familiares",
+    formaciones: "/api/docente/formaciones"
+};
+
+/* =========================================================
+CSRF
+========================================================= */
+
+function obtenerCSRF() {
+
+    const meta = document.querySelector(
+        'meta[name="csrf-token"]'
+    );
+
+    return meta
+        ? meta.getAttribute("content")
+        : "";
+}
+
+/* =========================================================
+INICIO
+========================================================= */
 
 document.addEventListener(
-    'DOMContentLoaded',
+    "DOMContentLoaded",
     async function () {
 
-        await cargarDatosDesdeJSON();
+        try {
 
-        initPersistenciaInputs();
+            await cargarDatosDesdeLaravel();
 
-        initUbigeoPrincipal();
+            initUbigeoPrincipal();
+            initUbigeoModalDom();
 
-        initUbigeoModalDom();
+            renderDatosPersonales();
+            renderTablaDomicilio();
+            renderTablaFamiliares();
+            renderTablaFormacion();
 
-        renderDatosPersonales();
+            initEventosGuardado();
+            initPersistenciaInputs();
+            initBotonPDF();
+            initNavegacion();
 
-        renderTablaDomicilio();
+        } catch (error) {
 
-        renderTablaFamiliares();
+            console.error(
+                "Error inicializando información:",
+                error
+            );
 
-        renderTablaFormacion();
-
-        initEventosGuardado();
-
-        initBotonPDF();
-
+            mostrarMensaje(
+                "Error",
+                "No se pudo cargar la información del docente.<br><br>" +
+                escapeHTML(error.message),
+                "error"
+            );
+        }
     }
 );
 
 
-/* ============================================================
-   CARGAR DATOS DESDE JSON
-============================================================ */
+/* =========================================================
+CARGAR INFORMACIÓN DESDE LARAVEL / MYSQL
+========================================================= */
 
-async function cargarDatosDesdeJSON() {
+async function cargarDatosDesdeLaravel() {
+
+    const response = await fetch(
+        API.informacion,
+        {
+            method: "GET",
+
+            headers: {
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+
+            credentials: "same-origin"
+        }
+    );
+
+    let resultado = {};
 
     try {
 
-        const response =
-            await fetch(
-                '/json/informacion.json',
-                {
-                    cache: 'no-store'
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                `Error HTTP: ${response.status}`
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        /* ====================================================
-           DATOS PERSONALES
-        ==================================================== */
-
-        datosPersonales =
-            data.datos_personales || {};
-
-
-        /* ====================================================
-           DOMICILIOS
-        ==================================================== */
-
-        const domiciliosJSON =
-            (data.domicilios || [])
-                .map(
-                    (dom, index) => {
-
-                        return {
-
-                            id:
-                                dom.id ||
-                                Date.now() +
-                                index,
-
-                            pais:
-                                dom.pais ||
-                                '-',
-
-                            dirExt:
-                                dom.direccionExt ||
-                                '-',
-
-                            dep:
-                                dom.departamento ||
-                                '-',
-
-                            prov:
-                                dom.provincia ||
-                                '-',
-
-                            dist:
-                                dom.distrito ||
-                                '-',
-
-                            tipoVia:
-                                dom.tipoVia ||
-                                '-',
-
-                            nombreVia:
-                                dom.nombreVia ||
-                                '-',
-
-                            tipoInmueble:
-                                dom.tipoInm ||
-                                '-',
-
-                            numeroInmueble:
-                                dom.nroInmueble ||
-                                '-'
-
-                        };
-
-                    }
-                );
-
-
-        /* ====================================================
-           FAMILIARES
-        ==================================================== */
-
-        const familiaresJSON =
-            (data.familiares || [])
-                .map(
-                    (fam, index) => {
-
-                        return {
-
-                            id:
-                                fam.id ||
-                                Date.now() +
-                                index,
-
-                            nombre:
-                                fam.nombre ||
-                                '-',
-
-                            parentesco:
-                                fam.parentesco ||
-                                '-',
-
-                            fecNac:
-                                fam.fecNac ||
-                                '-',
-
-                            estCivil:
-                                fam.estCivil ||
-                                '-',
-
-                            estudios:
-                                fam.estudios ||
-                                '-',
-
-                            ocupacion:
-                                fam.ocupacion ||
-                                '-',
-
-                            celular:
-                                fam.celular ||
-                                '-',
-
-                            depende:
-                                fam.depende ||
-                                'No'
-
-                        };
-
-                    }
-                );
-
-
-        /* ====================================================
-           FORMACIÓN PROFESIONAL
-        ==================================================== */
-
-        const formacionJSON =
-            (data.formacion_profesional || [])
-                .map(
-                    (form, index) => {
-
-                        return {
-
-                            id:
-                                form.id ||
-                                Date.now() +
-                                index,
-
-                            nivel:
-                                form.formacion ||
-                                '-',
-
-                            pais:
-                                form.pais ||
-                                'Perú',
-
-                            universidad:
-                                form.universidad ||
-                                '-',
-
-                            especialidad:
-                                form.especialidad ||
-                                '-',
-
-                            fecInicio:
-                                form.inicio ||
-                                '-',
-
-                            fecFinal:
-                                form.fin ||
-                                '-',
-
-                            grado:
-                                form.grado ||
-                                '-',
-
-                            tieneDoc:
-                                !!form.doc,
-
-                            docBase64:
-                                '',
-
-                            nombreDoc:
-                                form.doc ||
-                                '',
-
-                            obs:
-                                form.obs ||
-                                '-'
-
-                        };
-
-                    }
-                );
-
-
-        /* ====================================================
-           LOCAL STORAGE
-        ==================================================== */
-
-        const familiaresGuardados =
-            localStorage.getItem(
-                'docente_familiares'
-            );
-
-
-        const domiciliosGuardados =
-            localStorage.getItem(
-                'docente_domicilios'
-            );
-
-
-        const formacionGuardada =
-            localStorage.getItem(
-                'docente_formacion'
-            );
-
-
-        const personalesGuardados =
-            localStorage.getItem(
-                'docente_personales'
-            );
-
-
-        /* ====================================================
-           DECIDIR DATOS
-        ==================================================== */
-
-        datosDomicilio =
-            domiciliosGuardados
-                ? JSON.parse(
-                    domiciliosGuardados
-                )
-                : domiciliosJSON;
-
-
-        datosFamiliares =
-            familiaresGuardados
-                ? JSON.parse(
-                    familiaresGuardados
-                )
-                : familiaresJSON;
-
-
-        datosFormacion =
-            formacionGuardada
-                ? JSON.parse(
-                    formacionGuardada
-                )
-                : formacionJSON;
-
-
-        if (personalesGuardados) {
-
-            datosPersonales = {
-
-                ...datosPersonales,
-
-                ...JSON.parse(
-                    personalesGuardados
-                )
-
-            };
-
-        }
-
-
-        console.log(
-            '===================================='
-        );
-
-        console.log(
-            'DATOS CARGADOS'
-        );
-
-        console.log(
-            '===================================='
-        );
-
-        console.log(
-            'Datos personales:',
-            datosPersonales
-        );
-
-        console.log(
-            'Domicilios:',
-            datosDomicilio
-        );
-
-        console.log(
-            'Familiares:',
-            datosFamiliares
-        );
-
-        console.log(
-            'Formación:',
-            datosFormacion
-        );
-
+        resultado = await response.json();
 
     } catch (error) {
 
-        console.error(
-            'No se pudo cargar informacion.json:',
-            error
+        throw new Error(
+            "Laravel no devolvió una respuesta JSON válida."
         );
-
-
-        alert(
-            'Error: No se pudo cargar el archivo de información JSON.'
-        );
-
     }
 
-}
+    if (!response.ok || !resultado.success) {
+
+        throw new Error(
+            resultado.message ||
+            resultado.error ||
+            "No se pudo obtener la información."
+        );
+    }
 
 
-/* ============================================================
-   GUARDAR DOMICILIOS
-============================================================ */
+    /*
+    ========================================================
+    SOPORTA LAS DOS FORMAS DE RESPUESTA DEL CONTROLLER
+    ========================================================
+    */
 
-function guardarDomiciliosLocalStorage() {
-
-    localStorage.setItem(
-        'docente_domicilios',
-        JSON.stringify(
-            datosDomicilio
-        )
-    );
-
-}
+    const fuente =
+        resultado.data &&
+        resultado.data.docente
+            ? resultado.data
+            : resultado;
 
 
-/* ============================================================
-   GUARDAR FAMILIARES
-============================================================ */
+    /* -----------------------------------------------------
+    DOCENTE
+    ----------------------------------------------------- */
 
-function guardarFamiliaresLocalStorage() {
+    docenteId =
+        fuente.docente?.id ?? null;
 
-    localStorage.setItem(
-        'docente_familiares',
-        JSON.stringify(
-            datosFamiliares
-        )
-    );
-
-}
+    datosPersonales =
+        fuente.docente || {};
 
 
-/* ============================================================
-   GUARDAR FORMACIÓN
-============================================================ */
+    /* -----------------------------------------------------
+    DOMICILIOS
+    ----------------------------------------------------- */
 
-function guardarFormacionLocalStorage() {
+    datosDomicilio =
+        (fuente.domicilios || []).map(
+            item => ({
 
-    localStorage.setItem(
-        'docente_formacion',
-        JSON.stringify(
+                id: item.id,
+
+                pais:
+                    item.pais || "",
+
+                dirExt:
+                    item.direccionExtranjera || "",
+
+                dep:
+                    item.departamento || "",
+
+                prov:
+                    item.provincia || "",
+
+                dist:
+                    item.distrito || "",
+
+                tipoVia:
+                    item.tipoVia || "-",
+
+                nombreVia:
+                    item.nombreVia || "",
+
+                tipoInmueble:
+                    item.tipoInmueble || "-",
+
+                numeroInmueble:
+                    item.numeroInmueble || ""
+            })
+        );
+
+
+    /* -----------------------------------------------------
+    FAMILIARES
+    ----------------------------------------------------- */
+
+    datosFamiliares =
+        (fuente.familiares || []).map(
+            item => ({
+
+                id:
+                    item.id,
+
+                nombre:
+                    item.apellidosNombres || "",
+
+                parentesco:
+                    item.parentesco || "",
+
+                fecNac:
+                    item.fecNacimiento || "",
+
+                estCivil:
+                    item.estadoCivil || "",
+
+                estudios:
+                    item.nivelEstudios || "",
+
+                ocupacion:
+                    item.ocupacion || "",
+
+                celular:
+                    item.celular || "",
+
+                depende:
+                    item.dependeEconomicamente || "No"
+            })
+        );
+
+
+    /* -----------------------------------------------------
+    FORMACIÓN
+    ----------------------------------------------------- */
+
+    datosFormacion =
+        (fuente.formaciones || []).map(
+            item => ({
+
+                id:
+                    item.id,
+
+                nivel:
+                    item.formacionProfesional || "-",
+
+                pais:
+                    item.pais || "",
+
+                universidad:
+                    item.universidad || "",
+
+                especialidad:
+                    item.especialidad || "",
+
+                fecInicio:
+                    item.fecInicio || "",
+
+                fecFinal:
+                    item.fecFinal || "",
+
+                grado:
+                    item.gradoObtenido || "",
+
+                tieneDoc:
+                    !!item.rutaDocumento,
+
+                docBase64:
+                    "",
+
+                nombreDoc:
+                    item.rutaDocumento || "",
+
+                obs:
+                    item.observacion || ""
+            })
+        );
+
+
+    console.log(
+        "Información cargada desde MySQL:",
+        {
+            docenteId,
+            datosPersonales,
+            datosDomicilio,
+            datosFamiliares,
             datosFormacion
-        )
+        }
     );
-
 }
 
 
-/* ============================================================
-   GUARDAR DATOS PERSONALES
-============================================================ */
+/* =========================================================
+RECARGAR TODO DESDE MYSQL
+========================================================= */
 
-function guardarPersonalesLocalStorage() {
+async function recargarInformacion() {
 
-    localStorage.setItem(
-        'docente_personales',
-        JSON.stringify(
-            datosPersonales
-        )
-    );
+    await cargarDatosDesdeLaravel();
 
+    renderDatosPersonales();
+    renderTablaDomicilio();
+    renderTablaFamiliares();
+    renderTablaFormacion();
 }
 
 
-/* ============================================================
-   MOSTRAR DATOS PERSONALES
-============================================================ */
+/* =========================================================
+FETCH GENERAL
+========================================================= */
+
+async function enviarSolicitud(
+    url,
+    metodo = "GET",
+    datos = null
+) {
+
+    const opciones = {
+
+        method: metodo,
+
+        headers: {
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN": obtenerCSRF()
+        },
+
+        credentials: "same-origin"
+    };
+
+
+    if (datos !== null) {
+
+        opciones.headers["Content-Type"] =
+            "application/json";
+
+        opciones.body =
+            JSON.stringify(datos);
+    }
+
+
+    const response =
+        await fetch(
+            url,
+            opciones
+        );
+
+
+    let resultado = {};
+
+    try {
+
+        resultado =
+            await response.json();
+
+    } catch (error) {
+
+        resultado = {};
+    }
+
+
+    if (!response.ok) {
+
+        let mensaje =
+            resultado.message ||
+            resultado.error ||
+            `Error HTTP ${response.status}`;
+
+
+        if (resultado.errors) {
+
+            mensaje =
+                Object.values(
+                    resultado.errors
+                )
+                .flat()
+                .join("<br>");
+        }
+
+
+        throw new Error(mensaje);
+    }
+
+
+    return resultado;
+}
+
+
+/* =========================================================
+FETCH PARA FORMDATA
+========================================================= */
+
+async function enviarFormData(
+    url,
+    formData
+) {
+
+    const response =
+        await fetch(
+            url,
+            {
+                method: "POST",
+
+                headers: {
+                    "Accept":
+                        "application/json",
+
+                    "X-Requested-With":
+                        "XMLHttpRequest",
+
+                    "X-CSRF-TOKEN":
+                        obtenerCSRF()
+                },
+
+                body:
+                    formData,
+
+                credentials:
+                    "same-origin"
+            }
+        );
+
+
+    let resultado = {};
+
+    try {
+
+        resultado =
+            await response.json();
+
+    } catch (error) {
+
+        resultado = {};
+    }
+
+
+    if (!response.ok) {
+
+        let mensaje =
+            resultado.message ||
+            resultado.error ||
+            "Ocurrió un error.";
+
+
+        if (resultado.errors) {
+
+            mensaje =
+                Object.values(
+                    resultado.errors
+                )
+                .flat()
+                .join("<br>");
+        }
+
+
+        throw new Error(mensaje);
+    }
+
+
+    return resultado;
+}
+
+
+/* =========================================================
+DATOS PERSONALES
+========================================================= */
 
 function renderDatosPersonales() {
 
@@ -729,3704 +727,3420 @@ function renderDatosPersonales() {
         datosPersonales || {};
 
 
-    const asignarValor =
-        (
-            id,
-            valor
-        ) => {
+    let sexo =
+        dp.sexo || "";
+
+
+    if (sexo === "M") {
+        sexo = "Masculino";
+    }
+
+
+    if (sexo === "F") {
+        sexo = "Femenino";
+    }
+
+
+    const elementos = {
+
+        "input-ape-paterno":
+            dp.apePaterno || "",
+
+        "input-ape-materno":
+            dp.apeMaterno || "",
+
+        "input-nombres":
+            dp.nombres || "",
+
+        "input-dni":
+            dp.dni || "",
+
+        "select-sexo":
+            sexo,
+
+        "input-fec-nac":
+            normalizarFechaInput(
+                dp.fecNacimiento
+            ),
+
+        "input-tel-fijo":
+            dp.telefono || "",
+
+        "input-celular":
+            dp.celular || "",
+
+        "input-ruc":
+            dp.ruc || "",
+
+        "input-lib-militar":
+            dp.libMilitar || "",
+
+        "input-brevete":
+            dp.breveteCategoria || "",
+
+        "input-vehiculo":
+            dp.vehiculoInfo || "",
+
+        "select-estado-civil":
+            dp.estadoCivil || "",
+
+        "input-fec-matrimonio":
+            normalizarFechaInput(
+                dp.fecMatrimonio
+            ),
+
+        "input-grupo-sanguineo":
+            dp.grupoSanguineo || "",
+
+        "select-pais":
+            dp.paisNacimiento || "",
+
+        "select-depa":
+            dp.departamentoNacimiento || "",
+
+        "select-prov":
+            dp.provinciaNacimiento || "",
+
+        "select-dist":
+            dp.distritoNacimiento || ""
+    };
+
+
+    Object.entries(
+        elementos
+    ).forEach(
+        ([id, valor]) => {
 
             const elemento =
-                document.getElementById(
-                    id
-                );
+                document.getElementById(id);
 
-
-            if (!elemento) {
-                return;
-            }
-
-
-            if (
-                valor !== undefined &&
-                valor !== null &&
-                valor !== ''
-            ) {
+            if (elemento) {
 
                 elemento.value =
-                    valor;
-
+                    valor ?? "";
             }
-
-        };
-
-
-    asignarValor(
-        'select-sexo',
-        dp.sexo
-    );
-
-
-    asignarValor(
-        'input-fec-nac',
-        dp.fechaNacimiento
-    );
-
-
-    asignarValor(
-        'input-dni',
-        dp.dni
-    );
-
-
-    asignarValor(
-        'input-tel-fijo',
-        dp.telefonoFijo
-    );
-
-
-    asignarValor(
-        'input-celular',
-        dp.celular
-    );
-
-
-    asignarValor(
-        'input-ruc',
-        dp.ruc
-    );
-
-
-    asignarValor(
-        'input-lib-militar',
-        dp.libMilitar
-    );
-
-
-    asignarValor(
-        'input-brevete',
-        dp.brevete
-    );
-
-
-    asignarValor(
-        'input-vehiculo',
-        dp.vehiculo
-    );
-
-
-    asignarValor(
-        'select-estado-civil',
-        dp.estadoCivil
-    );
-
-
-    asignarValor(
-        'input-fec-matrimonio',
-        dp.fechaMatrimonio
-    );
-
-
-    asignarValor(
-        'input-grupo-sanguineo',
-        dp.grupoSanguineo
+        }
     );
 
 
     controlarFechaMatrimonio();
 
+    cargarUbigeoPrincipalGuardado();
 }
 
 
-/* ============================================================
-   PERSISTENCIA VISUAL
-============================================================ */
+/* =========================================================
+GUARDAR DATOS PERSONALES
+========================================================= */
 
-function initPersistenciaInputs() {
+async function guardarDatosPersonales() {
 
-    const selectEstadoCivil =
+    let sexo =
         document.getElementById(
-            'select-estado-civil'
-        );
-
-
-    const contenedorFechaMatrimonio =
-        document.getElementById(
-            'contenedor-fecha-matrimonio'
-        );
+            "select-sexo"
+        )?.value || null;
 
 
     if (
-        selectEstadoCivil &&
-        contenedorFechaMatrimonio
+        sexo === "Masculino" ||
+        sexo === "M"
     ) {
 
-        selectEstadoCivil.addEventListener(
-            'change',
-            controlarFechaMatrimonio
-        );
+        sexo = "M";
 
-
-        controlarFechaMatrimonio();
-
-    }
-
-}
-
-
-/* ============================================================
-   CONTROL FECHA MATRIMONIO
-============================================================ */
-
-function controlarFechaMatrimonio() {
-
-    const selectEstadoCivil =
-        document.getElementById(
-            'select-estado-civil'
-        );
-
-
-    const contenedor =
-        document.getElementById(
-            'contenedor-fecha-matrimonio'
-        );
-
-
-    if (
-        !selectEstadoCivil ||
-        !contenedor
+    } else if (
+        sexo === "Femenino" ||
+        sexo === "F"
     ) {
 
-        return;
-
+        sexo = "F";
     }
 
 
-    const estadosCasados = [
-
-        'Casado',
-
-        'Casado(a)'
-
-    ];
-
-
-    if (
-        estadosCasados.includes(
-            selectEstadoCivil.value
-        )
-    ) {
-
-        contenedor.classList.remove(
-            'd-none'
-        );
-
-    } else {
-
-        contenedor.classList.add(
-            'd-none'
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   EVENTOS DE GUARDADO
-============================================================ */
-
-function initEventosGuardado() {
-
-
-    /* ========================================================
-       DATOS PERSONALES
-    ======================================================== */
-
-    const btnGuardarDatosPersonales =
-        document.getElementById(
-            'btnGuardarDatosPersonales'
-        );
-
-
-    if (btnGuardarDatosPersonales) {
-
-        btnGuardarDatosPersonales.addEventListener(
-            'click',
-            function () {
-
-                datosPersonales.sexo =
-                    document.getElementById(
-                        'select-sexo'
-                    )?.value || '';
-
-
-                datosPersonales.fechaNacimiento =
-                    document.getElementById(
-                        'input-fec-nac'
-                    )?.value || '';
-
-
-                datosPersonales.dni =
-                    document.getElementById(
-                        'input-dni'
-                    )?.value || '';
-
-
-                datosPersonales.telefonoFijo =
-                    document.getElementById(
-                        'input-tel-fijo'
-                    )?.value || '';
-
-
-                datosPersonales.celular =
-                    document.getElementById(
-                        'input-celular'
-                    )?.value || '';
-
-
-                datosPersonales.ruc =
-                    document.getElementById(
-                        'input-ruc'
-                    )?.value || '';
-
-
-                datosPersonales.libMilitar =
-                    document.getElementById(
-                        'input-lib-militar'
-                    )?.value || '';
-
-
-                datosPersonales.brevete =
-                    document.getElementById(
-                        'input-brevete'
-                    )?.value || '';
-
-
-                datosPersonales.vehiculo =
-                    document.getElementById(
-                        'input-vehiculo'
-                    )?.value || '';
-
-
-                datosPersonales.estadoCivil =
-                    document.getElementById(
-                        'select-estado-civil'
-                    )?.value || '';
-
-
-                datosPersonales.fechaMatrimonio =
-                    document.getElementById(
-                        'input-fec-matrimonio'
-                    )?.value || '';
-
-
-                datosPersonales.grupoSanguineo =
-                    document.getElementById(
-                        'input-grupo-sanguineo'
-                    )?.value || '';
-
-
-                /* ============================================
-                   UBICACIÓN PERSONAL
-                ============================================ */
-
-                datosPersonales.pais =
-                    document.getElementById(
-                        'select-pais'
-                    )?.value || '';
-
-
-                datosPersonales.departamento =
-                    document.getElementById(
-                        'select-depa'
-                    )?.value || '';
-
-
-                datosPersonales.provincia =
-                    document.getElementById(
-                        'select-prov'
-                    )?.value || '';
-
-
-                datosPersonales.distrito =
-                    document.getElementById(
-                        'select-dist'
-                    )?.value || '';
-
-
-                guardarPersonalesLocalStorage();
-
-
-                mostrarMensaje(
-                    '¡Datos Guardados!',
-                    'La información personal se actualizó correctamente.'
-                );
-
-            }
-        );
-
-    }
-
-
-    /* ========================================================
-       AGREGAR DOMICILIO
-    ======================================================== */
-
-    const btnGuardarDomicilio =
-        document.getElementById(
-            'btnGuardarDomicilio'
-        );
-
-
-    if (btnGuardarDomicilio) {
-
-        btnGuardarDomicilio.addEventListener(
-            'click',
-            function () {
-
-                const paisSelect =
-                    document.getElementById(
-                        'selectPaisDom'
-                    );
-
-
-                const paisText =
-                    paisSelect?.options[
-                        paisSelect.selectedIndex
-                    ]?.text || '-';
-
-
-                const nuevoDomicilio = {
-
-                    id:
-                        Date.now(),
-
-                    pais:
-                        paisText,
-
-                    dirExt:
-                        paisSelect?.value === 'EXT'
-                            ?
-                            document.getElementById(
-                                'inputDirExtDom'
-                            )?.value.trim() || '-'
-                            :
-                            '-',
-
-                    dep:
-                        paisSelect?.value === 'PE'
-                            ?
-                            document.getElementById(
-                                'selectDepartamentoDom'
-                            )?.value || '-'
-                            :
-                            '-',
-
-                    prov:
-                        paisSelect?.value === 'PE'
-                            ?
-                            document.getElementById(
-                                'selectProvinciaDom'
-                            )?.value || '-'
-                            :
-                            '-',
-
-                    dist:
-                        paisSelect?.value === 'PE'
-                            ?
-                            document.getElementById(
-                                'selectDistritoDom'
-                            )?.value || '-'
-                            :
-                            '-',
-
-                    tipoVia:
-                        document.getElementById(
-                            'selectTipoVia'
-                        )?.value || '-',
-
-                    nombreVia:
-                        document.getElementById(
-                            'nombreVia'
-                        )?.value.trim() || '-',
-
-                    tipoInmueble:
-                        document.getElementById(
-                            'selectTipoInmueble'
-                        )?.value || '-',
-
-                    numeroInmueble:
-                        document.getElementById(
-                            'numeroInmueble'
-                        )?.value.trim() || '-'
-
-                };
-
-
-                if (!paisSelect?.value) {
-
-                    alert(
-                        'Seleccione un país.'
-                    );
-
-                    return;
-
-                }
-
-
-                datosDomicilio.push(
-                    nuevoDomicilio
-                );
-
-
-                guardarDomiciliosLocalStorage();
-
-
-                renderTablaDomicilio();
-
-
-                const formulario =
-                    document.getElementById(
-                        'formDomicilio'
-                    );
-
-
-                if (formulario) {
-
-                    formulario.reset();
-
-                }
-
-
-                cerrarModal(
-                    'modalDomicilio'
-                );
-
-            }
-        );
-
-    }
-
-
-    /* ========================================================
-       AGREGAR FORMACIÓN
-    ======================================================== */
-
-    const btnGuardarFormacion =
-        document.getElementById(
-            'btnGuardarFormacion'
-        );
-
-
-    if (btnGuardarFormacion) {
-
-        btnGuardarFormacion.addEventListener(
-            'click',
-            function () {
-
-                const nivel =
-                    document.getElementById(
-                        'formacionNivel'
-                    )?.value || '-';
-
-
-                const paisSelect =
-                    document.getElementById(
-                        'formacionPais'
-                    );
-
-
-                const paisText =
-                    paisSelect?.options[
-                        paisSelect.selectedIndex
-                    ]?.text || 'Perú';
-
-
-                const universidad =
-                    document.getElementById(
-                        'formacionUniversidad'
-                    )?.value.trim() || '-';
-
-
-                const especialidad =
-                    document.getElementById(
-                        'formacionEspecialidad'
-                    )?.value.trim() || '-';
-
-
-                const fecInicio =
-                    document.getElementById(
-                        'formacionFecInicio'
-                    )?.value || '-';
-
-
-                const fecFinal =
-                    document.getElementById(
-                        'formacionFecFinal'
-                    )?.value || '-';
-
-
-                const grado =
-                    document.getElementById(
-                        'formacionGrado'
-                    )?.value.trim() || '-';
-
-
-                const obs =
-                    document.getElementById(
-                        'formacionObs'
-                    )?.value.trim() || '-';
-
-
-                const fileInput =
-                    document.getElementById(
-                        'formacionDoc'
-                    );
-
-
-                if (nivel === '-') {
-
-                    alert(
-                        'Seleccione el nivel de formación.'
-                    );
-
-                    return;
-
-                }
-
-
-                const guardarFormacion =
-                    (
-                        pdfBase64 = '',
-                        nombreDocumento = ''
-                    ) => {
-
-                        const nuevaFormacion = {
-
-                            id:
-                                Date.now(),
-
-                            nivel:
-                                nivel,
-
-                            pais:
-                                paisText,
-
-                            universidad:
-                                universidad,
-
-                            especialidad:
-                                especialidad,
-
-                            fecInicio:
-                                fecInicio,
-
-                            fecFinal:
-                                fecFinal,
-
-                            grado:
-                                grado,
-
-                            tieneDoc:
-                                pdfBase64 !== '',
-
-                            docBase64:
-                                pdfBase64,
-
-                            nombreDoc:
-                                nombreDocumento,
-
-                            obs:
-                                obs
-
-                        };
-
-
-                        datosFormacion.push(
-                            nuevaFormacion
-                        );
-
-
-                        guardarFormacionLocalStorage();
-
-
-                        renderTablaFormacion();
-
-
-                        const formulario =
-                            document.getElementById(
-                                'formFormacion'
-                            );
-
-
-                        if (formulario) {
-
-                            formulario.reset();
-
-                        }
-
-
-                        cerrarModal(
-                            'modalFormacion'
-                        );
-
-                    };
-
-
-                if (
-                    fileInput &&
-                    fileInput.files &&
-                    fileInput.files[0]
-                ) {
-
-                    const archivo =
-                        fileInput.files[0];
-
-
-                    const reader =
-                        new FileReader();
-
-
-                    reader.onload =
-                        function (e) {
-
-                            guardarFormacion(
-                                e.target.result,
-                                archivo.name
-                            );
-
-                        };
-
-
-                    reader.readAsDataURL(
-                        archivo
-                    );
-
-                } else {
-
-                    guardarFormacion();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /* ========================================================
-       AGREGAR FAMILIAR
-    ======================================================== */
-
-    const btnGuardarFamiliar =
-        document.getElementById(
-            'btnGuardarFamiliar'
-        );
-
-
-    if (btnGuardarFamiliar) {
-
-        btnGuardarFamiliar.addEventListener(
-            'click',
-            function () {
-
-                const nombre =
-                    document.getElementById(
-                        'familiarNombre'
-                    )?.value.trim() || '';
-
-
-                const parentesco =
-                    document.getElementById(
-                        'familiarParentesco'
-                    )?.value.trim() || '';
-
-
-                if (!nombre) {
-
-                    alert(
-                        'Ingrese los nombres y apellidos.'
-                    );
-
-                    return;
-
-                }
-
-
-                if (!parentesco) {
-
-                    alert(
-                        'Ingrese el parentesco.'
-                    );
-
-                    return;
-
-                }
-
-
-                const nuevoFamiliar = {
-
-                    id:
-                        Date.now(),
-
-                    nombre:
-                        nombre,
-
-                    parentesco:
-                        parentesco,
-
-                    fecNac:
-                        '-',
-
-                    estCivil:
-                        '-',
-
-                    estudios:
-                        '-',
-
-                    ocupacion:
-                        '-',
-
-                    celular:
-                        '-',
-
-                    depende:
-                        'No'
-
-                };
-
-
-                datosFamiliares.push(
-                    nuevoFamiliar
-                );
-
-
-                guardarFamiliaresLocalStorage();
-
-
-                renderTablaFamiliares();
-
-
-                const formulario =
-                    document.getElementById(
-                        'formFamiliar'
-                    );
-
-
-                if (formulario) {
-
-                    formulario.reset();
-
-                }
-
-
-                cerrarModal(
-                    'modalFamiliar'
-                );
-
-            }
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   CERRAR MODAL
-============================================================ */
-
-function cerrarModal(
-    id
-) {
-
-    const modalElement =
-        document.getElementById(
-            id
-        );
-
-
-    if (!modalElement) {
-        return;
-    }
-
-
-    const modal =
-        bootstrap.Modal.getInstance(
-            modalElement
-        );
-
-
-    if (modal) {
-
-        modal.hide();
-
-    }
-
-}
-
-
-/* ============================================================
-   UBIGEO PRINCIPAL
-============================================================ */
-
-function initUbigeoPrincipal() {
-
-    const selectPais =
-        document.getElementById(
-            'select-pais'
-        );
-
-
-    const selectDep =
-        document.getElementById(
-            'select-depa'
-        );
-
-
-    const selectProv =
-        document.getElementById(
-            'select-prov'
-        );
-
-
-    const selectDist =
-        document.getElementById(
-            'select-dist'
-        );
-
-
-    const campoDepa =
-        document.getElementById(
-            'campo-depa'
-        );
-
-
-    const campoProv =
-        document.getElementById(
-            'campo-prov'
-        );
-
-
-    const campoDist =
-        document.getElementById(
-            'campo-dist'
-        );
-
-
-    const contenedorExtranjero =
-        document.getElementById(
-            'contenedor-extranjero'
-        );
-
-
-    function resetSelect(
-        selectElement
-    ) {
-
-        if (selectElement) {
-
-            selectElement.innerHTML =
-                '<option value="">-- Seleccionar --</option>';
-
-        }
-
-    }
-
-
-    function cargarDepartamentos() {
-
-        if (!selectDep) {
-            return;
-        }
-
-
-        resetSelect(
-            selectDep
-        );
-
-
-        Object.keys(
-            ubigeoData
-        )
-            .sort()
-            .forEach(
-                dep => {
-
-                    const option =
-                        document.createElement(
-                            'option'
-                        );
-
-
-                    option.value =
-                        dep;
-
-
-                    option.textContent =
-                        dep;
-
-
-                    selectDep.appendChild(
-                        option
-                    );
-
-                }
-            );
-
-    }
-
-
-    function manejarCambioPais() {
-
-        if (!selectPais) {
-            return;
-        }
-
-
-        const valor =
-            selectPais.value
-                .trim()
-                .toUpperCase();
-
-
-        const esPeru =
-            [
-                'PE',
-                'PERU',
-                'PERÚ'
-            ].includes(
-                valor
-            );
-
-
-        if (esPeru) {
-
-            campoDepa?.classList.remove(
-                'd-none'
-            );
-
-
-            campoProv?.classList.remove(
-                'd-none'
-            );
-
-
-            campoDist?.classList.remove(
-                'd-none'
-            );
-
-
-            contenedorExtranjero?.classList.add(
-                'd-none'
-            );
-
-
-            if (
-                selectDep &&
-                selectDep.options.length <= 1
-            ) {
-
-                cargarDepartamentos();
-
-            }
-
-        }
-
-        else if (valor !== '') {
-
-            campoDepa?.classList.add(
-                'd-none'
-            );
-
-
-            campoProv?.classList.add(
-                'd-none'
-            );
-
-
-            campoDist?.classList.add(
-                'd-none'
-            );
-
-
-            contenedorExtranjero?.classList.remove(
-                'd-none'
-            );
-
-        }
-
-        else {
-
-            campoDepa?.classList.add(
-                'd-none'
-            );
-
-
-            campoProv?.classList.add(
-                'd-none'
-            );
-
-
-            campoDist?.classList.add(
-                'd-none'
-            );
-
-
-            contenedorExtranjero?.classList.add(
-                'd-none'
-            );
-
-        }
-
-    }
-
-
-    if (selectPais) {
-
-        selectPais.addEventListener(
-            'change',
-            manejarCambioPais
-        );
-
-
-        manejarCambioPais();
-
-    }
-
-
-    if (selectDep) {
-
-        selectDep.addEventListener(
-            'change',
-            function () {
-
-                resetSelect(
-                    selectProv
-                );
-
-
-                resetSelect(
-                    selectDist
-                );
-
-
-                if (
-                    this.value &&
-                    ubigeoData[this.value]
-                ) {
-
-                    selectProv.disabled =
-                        false;
-
-
-                    Object.keys(
-                        ubigeoData[this.value]
-                    )
-                        .sort()
-                        .forEach(
-                            provincia => {
-
-                                const option =
-                                    document.createElement(
-                                        'option'
-                                    );
-
-
-                                option.value =
-                                    provincia;
-
-
-                                option.textContent =
-                                    provincia;
-
-
-                                selectProv.appendChild(
-                                    option
-                                );
-
-                            }
-                        );
-
-                }
-
-                else {
-
-                    selectProv.disabled =
-                        true;
-
-
-                    selectDist.disabled =
-                        true;
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (selectProv) {
-
-        selectProv.addEventListener(
-            'change',
-            function () {
-
-                resetSelect(
-                    selectDist
-                );
-
-
-                const departamento =
-                    selectDep.value;
-
-
-                if (
-                    departamento &&
-                    this.value &&
-                    ubigeoData[
-                    departamento
-                    ]?.[
-                    this.value
-                    ]
-                ) {
-
-                    selectDist.disabled =
-                        false;
-
-
-                    ubigeoData[
-                        departamento
-                    ][
-                        this.value
-                    ]
-                        .sort()
-                        .forEach(
-                            distrito => {
-
-                                const option =
-                                    document.createElement(
-                                        'option'
-                                    );
-
-
-                                option.value =
-                                    distrito;
-
-
-                                option.textContent =
-                                    distrito;
-
-
-                                selectDist.appendChild(
-                                    option
-                                );
-
-                            }
-                        );
-
-                }
-
-                else {
-
-                    selectDist.disabled =
-                        true;
-
-                }
-
-            }
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   UBIGEO MODAL DOMICILIO
-============================================================ */
-
-function initUbigeoModalDom() {
-
-    const selectPais =
-        document.getElementById(
-            'selectPaisDom'
-        );
-
-
-    const selectDep =
-        document.getElementById(
-            'selectDepartamentoDom'
-        );
-
-
-    const selectProv =
-        document.getElementById(
-            'selectProvinciaDom'
-        );
-
-
-    const selectDist =
-        document.getElementById(
-            'selectDistritoDom'
-        );
-
-
-    const contenedorExt =
-        document.getElementById(
-            'contenedorDirExtDom'
-        );
-
-
-    function resetSelect(
-        selectElement,
-        disabled = true
-    ) {
-
-        if (!selectElement) {
-            return;
-        }
-
-
-        selectElement.innerHTML =
-            '<option value="">-- Seleccionar --</option>';
-
-
-        selectElement.disabled =
-            disabled;
-
-    }
-
-
-    if (selectPais) {
-
-        selectPais.addEventListener(
-            'change',
-            function () {
-
-                if (
-                    this.value === 'PE'
-                ) {
-
-                    resetSelect(
-                        selectDep,
-                        false
-                    );
-
-
-                    resetSelect(
-                        selectProv,
-                        true
-                    );
-
-
-                    resetSelect(
-                        selectDist,
-                        true
-                    );
-
-
-                    contenedorExt?.classList.add(
-                        'd-none'
-                    );
-
-
-                    Object.keys(
-                        ubigeoData
-                    )
-                        .sort()
-                        .forEach(
-                            dep => {
-
-                                const option =
-                                    document.createElement(
-                                        'option'
-                                    );
-
-
-                                option.value =
-                                    dep;
-
-
-                                option.textContent =
-                                    dep;
-
-
-                                selectDep.appendChild(
-                                    option
-                                );
-
-                            }
-                        );
-
-                }
-
-                else if (
-                    this.value === 'EXT'
-                ) {
-
-                    resetSelect(
-                        selectDep,
-                        true
-                    );
-
-
-                    resetSelect(
-                        selectProv,
-                        true
-                    );
-
-
-                    resetSelect(
-                        selectDist,
-                        true
-                    );
-
-
-                    contenedorExt?.classList.remove(
-                        'd-none'
-                    );
-
-                }
-
-                else {
-
-                    resetSelect(
-                        selectDep,
-                        true
-                    );
-
-
-                    resetSelect(
-                        selectProv,
-                        true
-                    );
-
-
-                    resetSelect(
-                        selectDist,
-                        true
-                    );
-
-
-                    contenedorExt?.classList.add(
-                        'd-none'
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (selectDep) {
-
-        selectDep.addEventListener(
-            'change',
-            function () {
-
-                resetSelect(
-                    selectProv,
-                    true
-                );
-
-
-                resetSelect(
-                    selectDist,
-                    true
-                );
-
-
-                if (
-                    this.value &&
-                    ubigeoData[this.value]
-                ) {
-
-                    selectProv.disabled =
-                        false;
-
-
-                    Object.keys(
-                        ubigeoData[this.value]
-                    )
-                        .sort()
-                        .forEach(
-                            provincia => {
-
-                                const option =
-                                    document.createElement(
-                                        'option'
-                                    );
-
-
-                                option.value =
-                                    provincia;
-
-
-                                option.textContent =
-                                    provincia;
-
-
-                                selectProv.appendChild(
-                                    option
-                                );
-
-                            }
-                        );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (selectProv) {
-
-        selectProv.addEventListener(
-            'change',
-            function () {
-
-                resetSelect(
-                    selectDist,
-                    true
-                );
-
-
-                const departamento =
-                    selectDep.value;
-
-
-                if (
-                    departamento &&
-                    this.value &&
-                    ubigeoData[
-                    departamento
-                    ]?.[
-                    this.value
-                    ]
-                ) {
-
-                    selectDist.disabled =
-                        false;
-
-
-                    ubigeoData[
-                        departamento
-                    ][
-                        this.value
-                    ]
-                        .sort()
-                        .forEach(
-                            distrito => {
-
-                                const option =
-                                    document.createElement(
-                                        'option'
-                                    );
-
-
-                                option.value =
-                                    distrito;
-
-
-                                option.textContent =
-                                    distrito;
-
-
-                                selectDist.appendChild(
-                                    option
-                                );
-
-                            }
-                        );
-
-                }
-
-            }
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   TABLA DOMICILIOS
-============================================================ */
-
-function renderTablaDomicilio() {
-
-    const tbody =
-        document.getElementById(
-            'tablaDomicilio'
-        );
-
-
-    if (!tbody) {
-        return;
-    }
-
-
-    tbody.innerHTML = '';
-
-
-    if (
-        datosDomicilio.length === 0
-    ) {
-
-        tbody.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="11"
-                    class="empty-row py-3 text-center"
-                >
-
-                    No hay domicilios registrados
-
-                </td>
-
-            </tr>
-
-        `;
-
-        return;
-
-    }
-
-
-    datosDomicilio.forEach(
-        (
-            item,
-            index
-        ) => {
-
-            const tr =
-                document.createElement(
-                    'tr'
-                );
-
-
-            tr.innerHTML = `
-
-                <td class="fw-bold">
-                    ${index + 1}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.pais)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.dirExt)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.dep)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.prov)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.dist)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.tipoVia)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.nombreVia)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.tipoInmueble)}
-                </td>
-
-                <td>
-                    ${escapeHTML(item.numeroInmueble)}
-                </td>
-
-                <td class="text-center">
-
-                    <button
-                        type="button"
-                        class="btn btn-outline-danger btn-sm border-0"
-                        onclick="eliminarDomicilio(${item.id})"
-                        title="Eliminar"
-                    >
-
-                        <i class="fas fa-trash"></i>
-
-                    </button>
-
-                </td>
-
-            `;
-
-
-            tbody.appendChild(
-                tr
-            );
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   ELIMINAR DOMICILIO
-   filter()
-============================================================ */
-
-window.eliminarDomicilio =
-    function (id) {
-
-        const domicilio =
-            datosDomicilio.find(
-                domicilio =>
-                    domicilio.id === id
-            );
-
-
-        if (!domicilio) {
-            return;
-        }
-
-
-        datosDomicilio =
-            datosDomicilio.filter(
-                domicilio =>
-                    domicilio.id !== id
-            );
-
-
-        guardarDomiciliosLocalStorage();
-
-
-        renderTablaDomicilio();
-
+    const datos = {
+
+        apePaterno:
+            document.getElementById(
+                "input-ape-paterno"
+            )?.value.trim() || null,
+
+        apeMaterno:
+            document.getElementById(
+                "input-ape-materno"
+            )?.value.trim() || null,
+
+        nombres:
+            document.getElementById(
+                "input-nombres"
+            )?.value.trim() || null,
+
+        dni:
+            document.getElementById(
+                "input-dni"
+            )?.value.trim() || null,
+
+        sexo,
+
+        fecNacimiento:
+            document.getElementById(
+                "input-fec-nac"
+            )?.value || null,
+
+        telefono:
+            document.getElementById(
+                "input-tel-fijo"
+            )?.value.trim() || null,
+
+        celular:
+            document.getElementById(
+                "input-celular"
+            )?.value.trim() || null,
+
+        ruc:
+            document.getElementById(
+                "input-ruc"
+            )?.value.trim() || null,
+
+        libMilitar:
+            document.getElementById(
+                "input-lib-militar"
+            )?.value.trim() || null,
+
+        breveteCategoria:
+            document.getElementById(
+                "input-brevete"
+            )?.value.trim() || null,
+
+        vehiculoInfo:
+            document.getElementById(
+                "input-vehiculo"
+            )?.value.trim() || null,
+
+        estadoCivil:
+            document.getElementById(
+                "select-estado-civil"
+            )?.value || null,
+
+        fecMatrimonio:
+            document.getElementById(
+                "input-fec-matrimonio"
+            )?.value || null,
+
+        grupoSanguineo:
+            document.getElementById(
+                "input-grupo-sanguineo"
+            )?.value || null,
+
+        paisNacimiento:
+            document.getElementById(
+                "select-pais"
+            )?.value || null,
+
+        departamentoNacimiento:
+            document.getElementById(
+                "select-depa"
+            )?.value || null,
+
+        provinciaNacimiento:
+            document.getElementById(
+                "select-prov"
+            )?.value || null,
+
+        distritoNacimiento:
+            document.getElementById(
+                "select-dist"
+            )?.value || null
     };
-
-
-/* ============================================================
-   BUSCAR DOMICILIO
-   find()
-============================================================ */
-
-function buscarDomicilio(
-    id
-) {
-
-    const domicilio =
-        datosDomicilio.find(
-            domicilio =>
-                domicilio.id === id
-        );
-
-
-    return domicilio;
-
-}
-
-
-/* ============================================================
-   TABLA FAMILIARES
-============================================================ */
-
-function renderTablaFamiliares() {
-
-    const tbody =
-        document.getElementById(
-            'tablaFamiliar'
-        );
-
-
-    if (!tbody) {
-        return;
-    }
-
-
-    tbody.innerHTML = '';
-
-
-    if (
-        datosFamiliares.length === 0
-    ) {
-
-        tbody.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="9"
-                    class="empty-row py-3 text-center"
-                >
-
-                    No hay familiares registrados
-
-                </td>
-
-            </tr>
-
-        `;
-
-        return;
-
-    }
-
-
-    datosFamiliares.forEach(
-        fam => {
-
-            tbody.innerHTML += `
-
-                <tr>
-
-                    <td>
-                        ${escapeHTML(
-                fam.nombre
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.parentesco
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.fecNac
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.estCivil
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.estudios
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.ocupacion
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.celular
-            )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                fam.depende || 'No'
-            )}
-                    </td>
-
-                    <td class="text-center">
-
-                        <button
-                            type="button"
-                            class="btn btn-outline-danger btn-sm border-0"
-                            onclick="eliminarFamiliar(${fam.id})"
-                            title="Eliminar"
-                        >
-
-                            <i class="fas fa-trash"></i>
-
-                        </button>
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   ELIMINAR FAMILIAR
-   filter()
-============================================================ */
-
-window.eliminarFamiliar =
-    function (id) {
-
-        const familiar =
-            datosFamiliares.find(
-                familiar =>
-                    familiar.id === id
-            );
-
-
-        if (!familiar) {
-            return;
-        }
-
-
-        datosFamiliares =
-            datosFamiliares.filter(
-                familiar =>
-                    familiar.id !== id
-            );
-
-
-        guardarFamiliaresLocalStorage();
-
-
-        renderTablaFamiliares();
-
-    };
-
-
-/* ============================================================
-   BUSCAR FAMILIAR
-   find()
-============================================================ */
-
-function buscarFamiliar(
-    id
-) {
-
-    const familiar =
-        datosFamiliares.find(
-            familiar =>
-                familiar.id === id
-        );
-
-
-    return familiar;
-
-}
-
-
-/* ============================================================
-   TABLA FORMACIÓN
-============================================================ */
-
-function renderTablaFormacion() {
-
-    const tbody =
-        document.getElementById(
-            'tablaFormacion'
-        );
-
-
-    if (!tbody) {
-        return;
-    }
-
-
-    tbody.innerHTML = '';
-
-
-    if (
-        datosFormacion.length === 0
-    ) {
-
-        tbody.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="11"
-                    class="empty-row py-3 text-center"
-                >
-
-                    No hay formación profesional registrada
-
-                </td>
-
-            </tr>
-
-        `;
-
-        return;
-
-    }
-
-
-    datosFormacion.forEach(
-        (
-            item,
-            index
-        ) => {
-
-            let iconDoc = '-';
-
-
-            if (
-                item.tieneDoc &&
-                item.docBase64
-            ) {
-
-                iconDoc = `
-
-                    <button
-                        type="button"
-                        class="btn btn-link p-0 text-danger"
-                        onclick="verPreviewDoc(${item.id})"
-                        title="Ver documento"
-                    >
-
-                        <i
-                            class="fas fa-file-pdf fs-4"
-                        ></i>
-
-                    </button>
-
-                `;
-
-            }
-
-            else if (
-                item.tieneDoc &&
-                item.nombreDoc
-            ) {
-
-                iconDoc = `
-
-                    <span
-                        class="text-danger"
-                        title="${escapeHTML(
-                    item.nombreDoc
-                )}"
-                    >
-
-                        <i
-                            class="fas fa-file-pdf fs-4"
-                        ></i>
-
-                    </span>
-
-                `;
-
-            }
-
-
-            const tr =
-                document.createElement(
-                    'tr'
-                );
-
-
-            tr.innerHTML = `
-
-                <td class="text-center fw-bold">
-                    ${index + 1}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                item.nivel
-            )}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                item.pais
-            )}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                item.universidad
-            )}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                item.especialidad
-            )}
-                </td>
-
-                <td class="text-center">
-                    ${escapeHTML(
-                item.fecInicio
-            )}
-                </td>
-
-                <td class="text-center">
-                    ${escapeHTML(
-                item.fecFinal
-            )}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                item.grado
-            )}
-                </td>
-
-                <td class="text-center">
-                    ${iconDoc}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                item.obs
-            )}
-                </td>
-
-                <td class="text-center">
-
-                    <button
-                        type="button"
-                        class="btn btn-outline-danger btn-sm border-0"
-                        onclick="eliminarFormacion(${item.id})"
-                        title="Eliminar"
-                    >
-
-                        <i class="fas fa-trash"></i>
-
-                    </button>
-
-                </td>
-
-            `;
-
-
-            tbody.appendChild(
-                tr
-            );
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   BUSCAR FORMACIÓN
-   find()
-============================================================ */
-
-function buscarFormacion(
-    id
-) {
-
-    const formacion =
-        datosFormacion.find(
-            formacion =>
-                formacion.id === id
-        );
-
-
-    return formacion;
-
-}
-
-
-/* ============================================================
-   PREVISUALIZAR DOCUMENTO
-============================================================ */
-
-window.verPreviewDoc =
-    function (id) {
-
-        const registro =
-            datosFormacion.find(
-                item =>
-                    item.id === id
-            );
-
-
-        if (
-            registro &&
-            registro.docBase64
-        ) {
-
-            const frame =
-                document.getElementById(
-                    'framePreviewPDF'
-                );
-
-
-            if (frame) {
-
-                frame.src =
-                    registro.docBase64;
-
-            }
-
-
-            const modalElement =
-                document.getElementById(
-                    'modalPreviewPDF'
-                );
-
-
-            if (modalElement) {
-
-                const modal =
-                    new bootstrap.Modal(
-                        modalElement
-                    );
-
-
-                modal.show();
-
-            }
-
-        }
-
-    };
-
-
-/* ============================================================
-   ELIMINAR FORMACIÓN
-   filter()
-============================================================ */
-
-window.eliminarFormacion =
-    function (id) {
-
-        const formacion =
-            datosFormacion.find(
-                formacion =>
-                    formacion.id === id
-            );
-
-
-        if (!formacion) {
-            return;
-        }
-
-
-        datosFormacion =
-            datosFormacion.filter(
-                formacion =>
-                    formacion.id !== id
-            );
-
-
-        guardarFormacionLocalStorage();
-
-
-        renderTablaFormacion();
-
-    };
-
-
-/* ============================================================
-   MENSAJES
-============================================================ */
-
-function mostrarMensaje(
-    titulo,
-    texto
-) {
-
-    if (
-        typeof Swal !== 'undefined'
-    ) {
-
-        Swal.fire({
-
-            icon:
-                'success',
-
-            title:
-                titulo,
-
-            text:
-                texto,
-
-            timer:
-                2000,
-
-            showConfirmButton:
-                false
-
-        });
-
-    }
-
-    else {
-
-        alert(
-            titulo +
-            '\n\n' +
-            texto
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   GENERACIÓN DE PDF
-============================================================ */
-
-function initBotonPDF() {
-
-    const btnGenerarPDF =
-        document.getElementById(
-            'btnGenerarPDF'
-        );
-
-
-    if (!btnGenerarPDF) {
-        return;
-    }
-
-
-    btnGenerarPDF.addEventListener(
-        'click',
-        generarPDFDocente
-    );
-
-}
-
-
-/* ============================================================
-   GENERAR PDF COMPLETO
-============================================================ */
-
-async function generarPDFDocente() {
-
-    if (
-        typeof html2pdf ===
-        'undefined'
-    ) {
-
-        alert(
-            'Error: La librería html2pdf.js no está disponible.'
-        );
-
-        return;
-
-    }
-
-
-    const boton =
-        document.getElementById(
-            'btnGenerarPDF'
-        );
-
-
-    if (boton) {
-
-        boton.disabled =
-            true;
-
-
-        boton.innerHTML = `
-
-            <i
-                class="fas fa-spinner fa-spin me-2"
-            ></i>
-
-            Generando ficha...
-
-        `;
-
-    }
 
 
     try {
 
-        /* ====================================================
-           OBTENER DATOS ACTUALES
-        ==================================================== */
-
-        const personales =
-            datosPersonales || {};
-
-
-        const domicilios =
-            datosDomicilio || [];
-
-
-        const familiares =
-            datosFamiliares || [];
-
-
-        const formaciones =
-            datosFormacion || [];
-
-
-        /* ====================================================
-           CREAR REPORTE
-        ==================================================== */
-
-        const reporte =
-            document.createElement(
-                'div'
+        const resultado =
+            await enviarSolicitud(
+                API.informacion,
+                "PUT",
+                datos
             );
 
 
-        reporte.id =
-            'reportePDFDocente';
+        if (resultado.docente) {
+
+            docenteId =
+                resultado.docente.id;
+
+            datosPersonales =
+                resultado.docente;
+        }
 
 
-        reporte.innerHTML =
-            construirReportePDF(
-                personales,
-                domicilios,
-                familiares,
-                formaciones
-            );
+        await cargarDatosDesdeLaravel();
 
+        renderDatosPersonales();
 
-        /* ====================================================
-           AGREGAR ESTILOS
-        ==================================================== */
-
-        agregarEstilosPDF();
-
-
-        /* ====================================================
-           INSERTAR
-        ==================================================== */
-
-        document.body.appendChild(
-            reporte
-        );
-
-
-        /* ====================================================
-           ESPERAR RENDERIZADO
-        ==================================================== */
-
-        await new Promise(
-            resolve =>
-                setTimeout(
-                    resolve,
-                    500
-                )
-        );
-
-
-        /* ====================================================
-           NOMBRE
-        ==================================================== */
-
-        const nombreDocente =
-            obtenerNombreDocente(
-                personales
-            );
-
-
-        const nombreArchivo =
-            `Ficha_Docente_UNI_${nombreDocente}.pdf`;
-
-
-        /* ====================================================
-           OPCIONES PDF
-        ==================================================== */
-
-        const opciones = {
-
-            margin: [
-                10,
-                10,
-                15,
-                10
-            ],
-
-
-            filename:
-                nombreArchivo,
-
-
-            image: {
-
-                type:
-                    'jpeg',
-
-                quality:
-                    0.98
-
-            },
-
-
-            html2canvas: {
-
-                scale:
-                    2,
-
-                useCORS:
-                    true,
-
-                allowTaint:
-                    true,
-
-                logging:
-                    false,
-
-                backgroundColor:
-                    '#ffffff'
-
-            },
-
-
-            pagebreak: {
-
-                mode: [
-                    'css',
-                    'legacy'
-                ],
-
-                avoid: [
-                    'tr',
-                    '.tarjeta-pdf',
-                    '.encabezado-seccion-pdf'
-                ]
-
-            },
-
-
-            jsPDF: {
-
-                unit:
-                    'mm',
-
-                format:
-                    'a4',
-
-                orientation:
-                    'portrait',
-
-                compress:
-                    true
-
-            }
-
-        };
-
-
-        /* ====================================================
-           GENERAR
-        ==================================================== */
-
-        await html2pdf()
-            .set(opciones)
-            .from(reporte)
-            .save();
-
-
-        /* ====================================================
-           ELIMINAR REPORTE TEMPORAL
-        ==================================================== */
-
-        reporte.remove();
-
-
-        /* ====================================================
-           MENSAJE
-        ==================================================== */
 
         mostrarMensaje(
-
-            'PDF generado correctamente',
-
-            'La ficha docente completa fue generada con las 4 secciones.'
-
+            "¡Datos guardados!",
+            "La información personal se guardó correctamente en MySQL.",
+            "success"
         );
 
 
     } catch (error) {
 
         console.error(
-            'Error al generar PDF:',
+            "Error guardando datos personales:",
             error
         );
 
-
-        const reporte =
-            document.getElementById(
-                'reportePDFDocente'
-            );
-
-
-        if (reporte) {
-
-            reporte.remove();
-
-        }
-
-
-        alert(
-            'Ocurrió un error al generar el PDF.'
+        mostrarMensaje(
+            "Error al guardar",
+            escapeHTML(error.message),
+            "error"
         );
-
     }
-
-
-    finally {
-
-        if (boton) {
-
-            boton.disabled =
-                false;
-
-
-            boton.innerHTML = `
-
-                <i
-                    class="fas fa-file-pdf me-2"
-                ></i>
-
-                Generar PDF
-
-            `;
-
-        }
-
-    }
-
 }
 
 
-/* ============================================================
-   CONSTRUIR REPORTE PDF
-============================================================ */
+/* =========================================================
+ESTADO CIVIL
+========================================================= */
 
-function construirReportePDF(
+function initPersistenciaInputs() {
 
-    personales,
+    const estadoCivil =
+        document.getElementById(
+            "select-estado-civil"
+        );
 
-    domicilios,
 
-    familiares,
+    if (estadoCivil) {
 
-    formaciones
+        estadoCivil.addEventListener(
+            "change",
+            controlarFechaMatrimonio
+        );
+    }
+}
 
-) {
 
-    const fecha =
-        new Date()
-            .toLocaleDateString(
-                'es-PE',
-                {
-                    day:
-                        '2-digit',
+function controlarFechaMatrimonio() {
 
-                    month:
-                        '2-digit',
+    const estado =
+        document.getElementById(
+            "select-estado-civil"
+        )?.value || "";
 
-                    year:
-                        'numeric'
+
+    const contenedor =
+        document.getElementById(
+            "contenedor-fecha-matrimonio"
+        );
+
+
+    if (!contenedor) return;
+
+
+    if (
+        estado === "Casado" ||
+        estado === "Casado(a)"
+    ) {
+
+        contenedor.classList.remove(
+            "d-none"
+        );
+
+    } else {
+
+        contenedor.classList.add(
+            "d-none"
+        );
+
+
+        const input =
+            document.getElementById(
+                "input-fec-matrimonio"
+            );
+
+
+        if (input) {
+            input.value = "";
+        }
+    }
+}
+
+
+/* =========================================================
+UBIGEO PRINCIPAL
+========================================================= */
+
+function initUbigeoPrincipal() {
+
+    const pais =
+        document.getElementById(
+            "select-pais"
+        );
+
+    const depa =
+        document.getElementById(
+            "select-depa"
+        );
+
+    const prov =
+        document.getElementById(
+            "select-prov"
+        );
+
+    const dist =
+        document.getElementById(
+            "select-dist"
+        );
+
+
+    if (
+        !pais ||
+        !depa ||
+        !prov ||
+        !dist
+    ) {
+        return;
+    }
+
+
+    pais.addEventListener(
+        "change",
+        function () {
+
+            limpiarSelect(depa);
+            limpiarSelect(prov);
+            limpiarSelect(dist);
+
+            ocultarUbigeoPrincipal();
+
+
+            if (this.value === "PE") {
+
+                document
+                    .getElementById(
+                        "campo-depa"
+                    )
+                    ?.classList.remove(
+                        "d-none"
+                    );
+
+
+                depa.disabled = false;
+
+
+                Object.keys(
+                    ubigeoData
+                ).forEach(
+                    departamento => {
+
+                        depa.innerHTML += `
+                            <option value="${escapeHTML(departamento)}">
+                                ${escapeHTML(departamento)}
+                            </option>
+                        `;
+                    }
+                );
+            }
+        }
+    );
+
+
+    depa.addEventListener(
+        "change",
+        function () {
+
+            limpiarSelect(prov);
+            limpiarSelect(dist);
+
+            if (!this.value) return;
+
+
+            document
+                .getElementById(
+                    "campo-prov"
+                )
+                ?.classList.remove(
+                    "d-none"
+                );
+
+
+            const provincias =
+                ubigeoData[
+                    this.value
+                ] || {};
+
+
+            Object.keys(
+                provincias
+            ).forEach(
+                provincia => {
+
+                    prov.innerHTML += `
+                        <option value="${escapeHTML(provincia)}">
+                            ${escapeHTML(provincia)}
+                        </option>
+                    `;
                 }
             );
 
 
-    const nombreDocente =
-        obtenerNombreDocente(
-            personales
+            prov.disabled = false;
+        }
+    );
+
+
+    prov.addEventListener(
+        "change",
+        function () {
+
+            limpiarSelect(dist);
+
+            if (!this.value) return;
+
+
+            document
+                .getElementById(
+                    "campo-dist"
+                )
+                ?.classList.remove(
+                    "d-none"
+                );
+
+
+            const distritos =
+                ubigeoData[
+                    depa.value
+                ]?.[
+                    this.value
+                ] || [];
+
+
+            distritos.forEach(
+                distrito => {
+
+                    dist.innerHTML += `
+                        <option value="${escapeHTML(distrito)}">
+                            ${escapeHTML(distrito)}
+                        </option>
+                    `;
+                }
+            );
+
+
+            dist.disabled = false;
+        }
+    );
+}
+
+
+/* =========================================================
+CARGAR UBIGEO GUARDADO
+========================================================= */
+
+function cargarUbigeoPrincipalGuardado() {
+
+    const pais =
+        document.getElementById(
+            "select-pais"
         );
 
 
-    return `
+    if (
+        !pais ||
+        pais.value !== "PE"
+    ) {
+        return;
+    }
 
-        <!-- ==================================================
-             PORTADA
-        ================================================== -->
 
-        <div class="portada-pdf">
+    const depaValor =
+        datosPersonales
+            .departamentoNacimiento;
 
-            <div class="barra-superior-pdf"></div>
 
+    const provValor =
+        datosPersonales
+            .provinciaNacimiento;
 
-            <div class="cabecera-institucional-pdf">
 
-                <div class="logo-uni-pdf">
+    const distValor =
+        datosPersonales
+            .distritoNacimiento;
 
-    <img
-        src="/img/logo-uni.png"
-        alt="Logo Universidad Nacional de Ingeniería"
-        class="logo-real-pdf"
-    >
 
-</div>
-                </div>
+    const depa =
+        document.getElementById(
+            "select-depa"
+        );
 
+    const prov =
+        document.getElementById(
+            "select-prov"
+        );
 
-                <div class="datos-institucionales-pdf">
+    const dist =
+        document.getElementById(
+            "select-dist"
+        );
 
-                    <div class="nombre-uni-pdf">
 
-                        UNIVERSIDAD NACIONAL DE INGENIERÍA
+    if (
+        !depa ||
+        !prov ||
+        !dist ||
+        !depaValor
+    ) {
+        return;
+    }
 
-                    </div>
 
+    depa.innerHTML = `
+        <option value="">
+            -- Seleccionar --
+        </option>
+    `;
 
-                    <div class="lema-uni-pdf">
 
-                        UNIVERSIDAD NACIONAL DE INGENIERÍA
+    Object.keys(
+        ubigeoData
+    ).forEach(
+        departamento => {
 
-                    </div>
-
-
-                    <div class="subtitulo-uni-pdf">
-
-                        SISTEMA DE GESTIÓN DE INFORMACIÓN DOCENTE
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="linea-institucional-pdf"></div>
-
-
-            <div class="titulo-ficha-pdf">
-
-                <div class="icono-ficha-pdf">
-
-                    <i class="fas fa-user-tie"></i>
-
-                </div>
-
-
-                <div>
-
-                    <h1>
-                        FICHA DE INFORMACIÓN DOCENTE
-                    </h1>
-
-                    <p>
-                        Registro y actualización de información institucional
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="identificacion-pdf">
-
-                <div class="identificacion-titulo-pdf">
-
-                    DOCENTE REGISTRADO
-
-                </div>
-
-
-                <div class="identificacion-nombre-pdf">
-
-                    ${escapeHTML(
-        nombreDocente
-    )}
-
-                </div>
-
-
-                <div class="identificacion-fecha-pdf">
-
-                    Fecha de generación:
-                    ${fecha}
-
-                </div>
-
-            </div>
-
-
-            <div class="indice-pdf">
-
-                <div class="indice-titulo-pdf">
-
-                    CONTENIDO DEL DOCUMENTO
-
-                </div>
-
-
-                <div class="indice-item-pdf">
-
-                    <span>
-                        01
-                    </span>
-
-                    Datos personales
-
-                </div>
-
-
-                <div class="indice-item-pdf">
-
-                    <span>
-                        02
-                    </span>
-
-                    Domicilios registrados
-
-                </div>
-
-
-                <div class="indice-item-pdf">
-
-                    <span>
-                        03
-                    </span>
-
-                    Información familiar
-
-                </div>
-
-
-                <div class="indice-item-pdf">
-
-                    <span>
-                        04
-                    </span>
-
-                    Formación profesional
-
-                </div>
-
-            </div>
-
-
-            <div class="nota-institucional-pdf">
-
-                <i class="fas fa-info-circle"></i>
-
-                Documento generado automáticamente desde el
-                sistema de gestión de información docente.
-
-            </div>
-
-        </div>
-
-
-        <!-- ==================================================
-             01 DATOS PERSONALES
-        ================================================== -->
-
-        <div class="seccion-pdf">
-
-            ${encabezadoSeccionPDF(
-        '01',
-        'Datos Personales',
-        'Información de identificación y datos generales del docente'
-    )}
-
-
-            <div class="datos-grid-pdf">
-
-                ${datoPDF(
-        'Sexo',
-        personales.sexo
-    )}
-
-                ${datoPDF(
-        'Fecha de nacimiento',
-        formatearFecha(
-            personales.fechaNacimiento
-        )
-    )}
-
-                ${datoPDF(
-        'DNI',
-        personales.dni
-    )}
-
-                ${datoPDF(
-        'Teléfono fijo',
-        personales.telefonoFijo
-    )}
-
-                ${datoPDF(
-        'Celular',
-        personales.celular
-    )}
-
-                ${datoPDF(
-        'RUC',
-        personales.ruc
-    )}
-
-                ${datoPDF(
-        'Libreta militar',
-        personales.libMilitar
-    )}
-
-                ${datoPDF(
-        'Brevete',
-        personales.brevete
-    )}
-
-                ${datoPDF(
-        'Vehículo',
-        personales.vehiculo
-    )}
-
-                ${datoPDF(
-        'Estado civil',
-        personales.estadoCivil
-    )}
-
-                ${datoPDF(
-        'Fecha de matrimonio',
-        formatearFecha(
-            personales.fechaMatrimonio
-        )
-    )}
-
-                ${datoPDF(
-        'Grupo sanguíneo',
-        personales.grupoSanguineo
-    )}
-
-            </div>
-
-
-            <div class="subtitulo-seccion-pdf">
-
-                Ubicación
-
-            </div>
-
-
-            <div class="datos-grid-pdf">
-
-                ${datoPDF(
-        'País',
-        personales.pais || 'Perú'
-    )}
-
-                ${datoPDF(
-        'Departamento',
-        personales.departamento
-    )}
-
-                ${datoPDF(
-        'Provincia',
-        personales.provincia
-    )}
-
-                ${datoPDF(
-        'Distrito',
-        personales.distrito
-    )}
-
-            </div>
-
-        </div>
-
-
-        <!-- ==================================================
-             02 DOMICILIOS
-        ================================================== -->
-
-        <div class="seccion-pdf">
-
-            ${encabezadoSeccionPDF(
-        '02',
-        'Domicilios',
-        'Direcciones registradas del docente'
-    )}
-
-
-            ${domicilios.length > 0
-
-            ?
-
-            domicilios.map(
-                (
-                    domicilio,
-                    index
-                ) => `
-
-                        <div class="tarjeta-pdf">
-
-                            <div class="tarjeta-header-pdf">
-
-                                <span>
-
-                                    DOMICILIO
-                                    ${index + 1}
-
-                                </span>
-
-
-                                <span class="badge-pdf">
-
-                                    REGISTRADO
-
-                                </span>
-
-                            </div>
-
-
-                            <table class="tabla-pdf">
-
-                                <tbody>
-
-                                    <tr>
-
-                                        <th>
-                                            País
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.pais
-                )}
-                                        </td>
-
-
-                                        <th>
-                                            Departamento
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.dep
-                )}
-                                        </td>
-
-                                    </tr>
-
-
-                                    <tr>
-
-                                        <th>
-                                            Provincia
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.prov
-                )}
-                                        </td>
-
-
-                                        <th>
-                                            Distrito
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.dist
-                )}
-                                        </td>
-
-                                    </tr>
-
-
-                                    <tr>
-
-                                        <th>
-                                            Tipo de vía
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.tipoVia
-                )}
-                                        </td>
-
-
-                                        <th>
-                                            Nombre de vía
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.nombreVia
-                )}
-                                        </td>
-
-                                    </tr>
-
-
-                                    <tr>
-
-                                        <th>
-                                            Tipo de inmueble
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.tipoInmueble
-                )}
-                                        </td>
-
-
-                                        <th>
-                                            N.º inmueble
-                                        </th>
-
-                                        <td>
-                                            ${escapeHTML(
-                    domicilio.numeroInmueble
-                )}
-                                        </td>
-
-                                    </tr>
-
-
-                                    <tr>
-
-                                        <th>
-                                            Dirección exterior
-                                        </th>
-
-                                        <td colspan="3">
-                                            ${escapeHTML(
-                    domicilio.dirExt
-                )}
-                                        </td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    `
-            ).join('')
-
-            :
-
-            mensajeVacioPDF(
-                'No hay domicilios registrados.'
-            )
-
+            depa.innerHTML += `
+                <option value="${escapeHTML(departamento)}">
+                    ${escapeHTML(departamento)}
+                </option>
+            `;
         }
+    );
 
-        </div>
 
+    depa.value =
+        depaValor;
 
-        <!-- ==================================================
-             03 FAMILIARES
-        ================================================== -->
 
-        <div class="seccion-pdf">
+    depa.disabled = false;
 
-            ${encabezadoSeccionPDF(
-            '03',
-            'Información Familiar',
-            'Registro de familiares declarados por el docente'
-        )}
 
+    document
+        .getElementById(
+            "campo-depa"
+        )
+        ?.classList.remove(
+            "d-none"
+        );
 
-            ${familiares.length > 0
 
-            ?
+    const provincias =
+        ubigeoData[
+            depaValor
+        ] || {};
 
-            `
 
-                    <table class="tabla-completa-pdf">
+    prov.innerHTML = `
+        <option value="">
+            -- Seleccionar --
+        </option>
+    `;
 
-                        <thead>
 
-                            <tr>
+    Object.keys(
+        provincias
+    ).forEach(
+        provincia => {
 
-                                <th>
-                                    N.º
-                                </th>
+            prov.innerHTML += `
+                <option value="${escapeHTML(provincia)}">
+                    ${escapeHTML(provincia)}
+                </option>
+            `;
+        }
+    );
 
-                                <th>
-                                    Nombre completo
-                                </th>
 
-                                <th>
-                                    Parentesco
-                                </th>
+    prov.disabled = false;
 
-                                <th>
-                                    Fecha nacimiento
-                                </th>
 
-                                <th>
-                                    Estado civil
-                                </th>
+    if (!provValor) return;
 
-                                <th>
-                                    Estudios
-                                </th>
 
-                                <th>
-                                    Ocupación
-                                </th>
+    prov.value =
+        provValor;
 
-                                <th>
-                                    Celular
-                                </th>
 
-                                <th>
-                                    Depende
-                                </th>
+    document
+        .getElementById(
+            "campo-prov"
+        )
+        ?.classList.remove(
+            "d-none"
+        );
 
-                            </tr>
 
-                        </thead>
+    const distritos =
+        ubigeoData[
+            depaValor
+        ]?.[
+            provValor
+        ] || [];
 
 
-                        <tbody>
+    dist.innerHTML = `
+        <option value="">
+            -- Seleccionar --
+        </option>
+    `;
 
-                            ${familiares
-                .map(
-                    (
-                        fam,
-                        index
-                    ) => `
 
-                                            <tr>
+    distritos.forEach(
+        distrito => {
 
-                                                <td class="centro">
+            dist.innerHTML += `
+                <option value="${escapeHTML(distrito)}">
+                    ${escapeHTML(distrito)}
+                </option>
+            `;
+        }
+    );
 
-                                                    ${index + 1}
 
-                                                </td>
+    dist.disabled = false;
 
 
-                                                <td>
+    if (distValor) {
 
-                                                    ${escapeHTML(
-                        fam.nombre
-                    )}
+        dist.value =
+            distValor;
+    }
+}
 
-                                                </td>
 
+function ocultarUbigeoPrincipal() {
 
-                                                <td>
+    [
+        "campo-depa",
+        "campo-prov",
+        "campo-dist"
+    ].forEach(
+        id => {
 
-                                                    ${escapeHTML(
-                        fam.parentesco
-                    )}
+            document
+                .getElementById(id)
+                ?.classList.add(
+                    "d-none"
+                );
+        }
+    );
+}
 
-                                                </td>
 
+function limpiarSelect(select) {
 
-                                                <td class="centro">
+    if (!select) return;
 
-                                                    ${formatearFecha(
-                        fam.fecNac
-                    )}
 
-                                                </td>
+    select.innerHTML = `
+        <option value="">
+            -- Seleccionar --
+        </option>
+    `;
 
 
-                                                <td>
+    select.disabled = true;
+}
 
-                                                    ${escapeHTML(
-                        fam.estCivil
-                    )}
 
-                                                </td>
+/* =========================================================
+UBIGEO MODAL DOMICILIO
+========================================================= */
 
+function initUbigeoModalDom() {
 
-                                                <td>
+    const pais =
+        document.getElementById(
+            "selectPaisDom"
+        );
 
-                                                    ${escapeHTML(
-                        fam.estudios
-                    )}
+    const depa =
+        document.getElementById(
+            "selectDepartamentoDom"
+        );
 
-                                                </td>
+    const prov =
+        document.getElementById(
+            "selectProvinciaDom"
+        );
 
+    const dist =
+        document.getElementById(
+            "selectDistritoDom"
+        );
 
-                                                <td>
 
-                                                    ${escapeHTML(
-                        fam.ocupacion
-                    )}
+    if (
+        !pais ||
+        !depa ||
+        !prov ||
+        !dist
+    ) {
+        return;
+    }
 
-                                                </td>
 
+    pais.addEventListener(
+        "change",
+        function () {
 
-                                                <td>
+            limpiarSelect(depa);
+            limpiarSelect(prov);
+            limpiarSelect(dist);
 
-                                                    ${escapeHTML(
-                        fam.celular
-                    )}
 
-                                                </td>
-
-
-                                                <td class="centro">
-
-                                                    ${escapeHTML(
-                        fam.depende ||
-                        'No'
-                    )}
-
-                                                </td>
-
-                                            </tr>
-
-                                        `
-                )
-                .join('')
+            if (this.value !== "PE") {
+                return;
             }
 
-                        </tbody>
 
-                    </table>
+            depa.disabled = false;
 
-                `
 
-            :
+            Object.keys(
+                ubigeoData
+            ).forEach(
+                departamento => {
 
-            mensajeVacioPDF(
-                'No hay familiares registrados.'
-            )
-
+                    depa.innerHTML += `
+                        <option value="${escapeHTML(departamento)}">
+                            ${escapeHTML(departamento)}
+                        </option>
+                    `;
+                }
+            );
         }
+    );
 
-        </div>
 
+    depa.addEventListener(
+        "change",
+        function () {
 
-        <!-- ==================================================
-             04 FORMACIÓN PROFESIONAL
-        ================================================== -->
+            limpiarSelect(prov);
+            limpiarSelect(dist);
 
-        <div class="seccion-pdf">
+            if (!this.value) return;
 
-            ${encabezadoSeccionPDF(
-            '04',
-            'Formación Profesional',
-            'Estudios superiores y grados académicos registrados'
-        )}
 
+            prov.disabled = false;
 
-            ${formaciones.length > 0
 
-            ?
+            const provincias =
+                ubigeoData[
+                    this.value
+                ] || {};
 
-            formaciones
-                .map(
-                    (
-                        formacion,
-                        index
-                    ) => `
 
-                            <div class="tarjeta-pdf">
+            Object.keys(
+                provincias
+            ).forEach(
+                provincia => {
 
-                                <div class="tarjeta-header-pdf">
+                    prov.innerHTML += `
+                        <option value="${escapeHTML(provincia)}">
+                            ${escapeHTML(provincia)}
+                        </option>
+                    `;
+                }
+            );
+        }
+    );
 
-                                    <span>
 
-                                        FORMACIÓN
-                                        ${index + 1}
+    prov.addEventListener(
+        "change",
+        function () {
 
-                                    </span>
+            limpiarSelect(dist);
 
+            if (!this.value) return;
 
-                                    <span class="badge-pdf">
 
-                                        ${escapeHTML(
-                        formacion.nivel
-                    )}
+            dist.disabled = false;
 
-                                    </span>
 
-                                </div>
+            const distritos =
+                ubigeoData[
+                    depa.value
+                ]?.[
+                    this.value
+                ] || [];
 
 
-                                <table class="tabla-pdf">
+            distritos.forEach(
+                distrito => {
 
-                                    <tbody>
+                    dist.innerHTML += `
+                        <option value="${escapeHTML(distrito)}">
+                            ${escapeHTML(distrito)}
+                        </option>
+                    `;
+                }
+            );
+        }
+    );
+}
 
-                                        <tr>
 
-                                            <th>
-                                                Nivel
-                                            </th>
+/* =========================================================
+EVENTOS
+========================================================= */
 
-                                            <td>
-                                                ${escapeHTML(
-                        formacion.nivel
-                    )}
-                                            </td>
+function initEventosGuardado() {
 
+    const btnPersonal =
+        document.getElementById(
+            "btnGuardarDatosPersonales"
+        );
 
-                                            <th>
-                                                País
-                                            </th>
 
-                                            <td>
-                                                ${escapeHTML(
-                        formacion.pais
-                    )}
-                                            </td>
+    if (btnPersonal) {
 
-                                        </tr>
+        btnPersonal.addEventListener(
+            "click",
+            guardarDatosPersonales
+        );
+    }
 
 
-                                        <tr>
+    const btnDomicilio =
+        document.getElementById(
+            "btnGuardarDomicilio"
+        );
 
-                                            <th>
-                                                Universidad
-                                            </th>
 
-                                            <td colspan="3">
+    if (btnDomicilio) {
 
-                                                ${escapeHTML(
-                        formacion.universidad
-                    )}
+        btnDomicilio.addEventListener(
+            "click",
+            guardarDomicilio
+        );
+    }
 
-                                            </td>
 
-                                        </tr>
+    const btnFormacion =
+        document.getElementById(
+            "btnGuardarFormacion"
+        );
 
 
-                                        <tr>
+    if (btnFormacion) {
 
-                                            <th>
-                                                Especialidad
-                                            </th>
+        btnFormacion.addEventListener(
+            "click",
+            guardarFormacion
+        );
+    }
 
-                                            <td colspan="3">
 
-                                                ${escapeHTML(
-                        formacion.especialidad
-                    )}
+    const btnFamiliar =
+        document.getElementById(
+            "btnGuardarFamiliar"
+        );
 
-                                            </td>
 
-                                        </tr>
+    if (btnFamiliar) {
 
+        btnFamiliar.addEventListener(
+            "click",
+            guardarFamiliar
+        );
+    }
+}
 
-                                        <tr>
 
-                                            <th>
-                                                Fecha de inicio
-                                            </th>
+/* =========================================================
+DOMICILIO - GUARDAR
+========================================================= */
 
-                                            <td>
+async function guardarDomicilio() {
 
-                                                ${formatearFecha(
-                        formacion.fecInicio
-                    )}
+    const pais =
+        document.getElementById(
+            "selectPaisDom"
+        )?.value || "";
 
-                                            </td>
 
+    if (!pais) {
 
-                                            <th>
-                                                Fecha de finalización
-                                            </th>
+        mostrarMensaje(
+            "Falta información",
+            "Seleccione el país.",
+            "warning"
+        );
 
-                                            <td>
+        return;
+    }
 
-                                                ${formatearFecha(
-                        formacion.fecFinal
-                    )}
 
-                                            </td>
+    const departamento =
+        document.getElementById(
+            "selectDepartamentoDom"
+        )?.value || null;
 
-                                        </tr>
 
+    const provincia =
+        document.getElementById(
+            "selectProvinciaDom"
+        )?.value || null;
 
-                                        <tr>
 
-                                            <th>
-                                                Grado obtenido
-                                            </th>
+    const distrito =
+        document.getElementById(
+            "selectDistritoDom"
+        )?.value || null;
 
-                                            <td colspan="3">
 
-                                                ${escapeHTML(
-                        formacion.grado
-                    )}
+    const direccionExtranjera =
+        document.getElementById(
+            "inputDirExtDom"
+        )?.value.trim() || null;
 
-                                            </td>
 
-                                        </tr>
+    const tipoVia =
+        document.getElementById(
+            "selectTipoVia"
+        )?.value || null;
 
 
-                                        <tr>
+    const nombreVia =
+        document.getElementById(
+            "nombreVia"
+        )?.value.trim() || null;
 
-                                            <th>
-                                                Documento
-                                            </th>
 
-                                            <td colspan="3">
+    const tipoInmueble =
+        document.getElementById(
+            "selectTipoInmueble"
+        )?.value || null;
 
-                                                ${formacion.tieneDoc
 
-                            ?
+    const numeroInmueble =
+        document.getElementById(
+            "numeroInmueble"
+        )?.value.trim() || null;
 
-                            `
-                                                        <span class="documento-pdf">
 
-                                                            <i class="fas fa-file-pdf"></i>
+    const datos = {
 
-                                                            Documento adjunto
+        pais,
 
-                                                        </span>
-                                                    `
+        departamento:
+            pais === "PE"
+                ? departamento
+                : null,
 
-                            :
+        provincia:
+            pais === "PE"
+                ? provincia
+                : null,
 
-                            'No adjuntado'
-                        }
+        distrito:
+            pais === "PE"
+                ? distrito
+                : null,
 
-                                            </td>
+        direccionExtranjera:
+            pais === "EXT"
+                ? direccionExtranjera
+                : null,
 
-                                        </tr>
+        tipoVia,
 
+        nombreVia,
 
-                                        <tr>
+        tipoInmueble,
 
-                                            <th>
-                                                Observaciones
-                                            </th>
+        numeroInmueble
+    };
 
-                                            <td colspan="3">
 
-                                                ${escapeHTML(
-                            formacion.obs
-                        )}
+    try {
 
-                                            </td>
+        await enviarSolicitud(
+            API.domicilios,
+            "POST",
+            datos
+        );
 
-                                        </tr>
 
-                                    </tbody>
+        await recargarInformacion();
 
-                                </table>
 
-                            </div>
+        document
+            .getElementById(
+                "formDomicilio"
+            )
+            ?.reset();
 
-                        `
+
+        bootstrap.Modal
+            .getInstance(
+                document.getElementById(
+                    "modalDomicilio"
                 )
-                .join('')
-
-            :
-
-            mensajeVacioPDF(
-                'No hay formación profesional registrada.'
             )
+            ?.hide();
 
+
+        mostrarMensaje(
+            "Domicilio guardado",
+            "El domicilio se guardó permanentemente en MySQL.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error guardando domicilio:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "Error",
+            escapeHTML(error.message),
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+TABLA DOMICILIOS
+========================================================= */
+
+function renderTablaDomicilio() {
+
+    const tabla =
+        document.getElementById(
+            "tablaDomicilio"
+        );
+
+
+    if (!tabla) return;
+
+
+    if (!datosDomicilio.length) {
+
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center">
+                    No hay domicilios registrados.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    tabla.innerHTML =
+        datosDomicilio.map(
+            (item, index) => `
+
+        <tr>
+
+            <td>
+                ${index + 1}
+            </td>
+
+            <td>
+                ${escapeHTML(item.pais)}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.dirExt || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.dep || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.prov || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.dist || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.tipoVia || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.nombreVia || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.tipoInmueble || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.numeroInmueble || "-"
+                )}
+            </td>
+
+            <td>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    onclick="eliminarDomicilio(${item.id})">
+
+                    <i class="fas fa-trash"></i>
+
+                </button>
+
+            </td>
+
+        </tr>
+
+    `
+        ).join("");
+}
+
+
+/* =========================================================
+DOMICILIO - ELIMINAR
+========================================================= */
+
+window.eliminarDomicilio =
+async function (id) {
+
+    if (!id) {
+
+        mostrarMensaje(
+            "Error",
+            "No se encontró el ID del domicilio.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const confirmar =
+        await confirmarEliminacion(
+            "¿Eliminar domicilio?",
+            "El registro será eliminado permanentemente."
+        );
+
+
+    if (!confirmar) return;
+
+
+    try {
+
+        await enviarSolicitud(
+            `${API.domicilios}/${encodeURIComponent(id)}`,
+            "DELETE"
+        );
+
+
+        await recargarInformacion();
+
+
+        mostrarMensaje(
+            "Eliminado",
+            "El domicilio fue eliminado correctamente.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error eliminando domicilio:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "Error",
+            escapeHTML(
+                error.message ||
+                "No se pudo eliminar el domicilio."
+            ),
+            "error"
+        );
+    }
+};
+
+
+/* =========================================================
+FORMACIÓN - GUARDAR
+========================================================= */
+
+async function guardarFormacion() {
+
+    const nivel =
+        document.getElementById(
+            "formacionNivel"
+        )?.value || "";
+
+
+    if (
+        !nivel ||
+        nivel === "-"
+    ) {
+
+        mostrarMensaje(
+            "Falta información",
+            "Seleccione el nivel de formación.",
+            "warning"
+        );
+
+        return;
+    }
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "formacionProfesional",
+        nivel
+    );
+
+
+    formData.append(
+        "pais",
+        document.getElementById(
+            "formacionPais"
+        )?.value || ""
+    );
+
+
+    formData.append(
+        "universidad",
+        document.getElementById(
+            "formacionUniversidad"
+        )?.value.trim() || ""
+    );
+
+
+    formData.append(
+        "especialidad",
+        document.getElementById(
+            "formacionEspecialidad"
+        )?.value.trim() || ""
+    );
+
+
+    formData.append(
+        "fecInicio",
+        document.getElementById(
+            "formacionFecInicio"
+        )?.value || ""
+    );
+
+
+    formData.append(
+        "fecFinal",
+        document.getElementById(
+            "formacionFecFinal"
+        )?.value || ""
+    );
+
+
+    formData.append(
+        "gradoObtenido",
+        document.getElementById(
+            "formacionGrado"
+        )?.value.trim() || ""
+    );
+
+
+    formData.append(
+        "observacion",
+        document.getElementById(
+            "formacionObs"
+        )?.value.trim() || ""
+    );
+
+
+    const archivo =
+        document.getElementById(
+            "formacionDoc"
+        )?.files?.[0];
+
+
+    if (archivo) {
+
+        formData.append(
+            "documento",
+            archivo
+        );
+    }
+
+
+    try {
+
+        await enviarFormData(
+            API.formaciones,
+            formData
+        );
+
+
+        await recargarInformacion();
+
+
+        document
+            .getElementById(
+                "formFormacion"
+            )
+            ?.reset();
+
+
+        bootstrap.Modal
+            .getInstance(
+                document.getElementById(
+                    "modalFormacion"
+                )
+            )
+            ?.hide();
+
+
+        mostrarMensaje(
+            "Formación guardada",
+            "La formación profesional se guardó correctamente en MySQL.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error guardando formación:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "Error",
+            escapeHTML(error.message),
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+TABLA FORMACIÓN
+========================================================= */
+
+function renderTablaFormacion() {
+
+    const tabla =
+        document.getElementById(
+            "tablaFormacion"
+        );
+
+
+    if (!tabla) return;
+
+
+    if (!datosFormacion.length) {
+
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center">
+                    No hay formación profesional registrada.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    tabla.innerHTML =
+        datosFormacion.map(
+            (item, index) => `
+
+        <tr>
+
+            <td>
+                ${index + 1}
+            </td>
+
+            <td>
+                ${escapeHTML(item.nivel)}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.pais || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.universidad || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.especialidad || "-"
+                )}
+            </td>
+
+            <td>
+                ${formatearFecha(
+                    item.fecInicio
+                )}
+            </td>
+
+            <td>
+                ${formatearFecha(
+                    item.fecFinal
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.grado || "-"
+                )}
+            </td>
+
+            <td>
+                ${
+                    item.tieneDoc
+                        ? `
+                            <i
+                                class="fas fa-file-pdf text-danger"
+                                title="Documento PDF registrado">
+                            </i>
+                        `
+                        : "-"
+                }
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.obs || "-"
+                )}
+            </td>
+
+            <td>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    onclick="eliminarFormacion(${item.id})">
+
+                    <i class="fas fa-trash"></i>
+
+                </button>
+
+            </td>
+
+        </tr>
+
+    `
+        ).join("");
+}
+
+
+/* =========================================================
+FORMACIÓN - ELIMINAR
+========================================================= */
+
+async function eliminarFormacion(id) {
+
+    if (!id) {
+        alert('No se encontró el ID de la formación.');
+        return;
+    }
+
+    const confirmar = confirm(
+        '¿Está seguro de eliminar esta formación profesional?'
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(
+            `${window.informacionApi.formaciones}/${id}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute('content')
+                }
+            }
+        );
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok || !resultado.success) {
+            throw new Error(
+                resultado.message ||
+                'No se pudo eliminar la formación.'
+            );
         }
 
-        </div>
+        alert('Formación profesional eliminada correctamente.');
+
+        // Recargar información desde MySQL
+        await cargarDatosDesdeLaravel();
+
+        // Actualizar la tabla
+        if (typeof renderizarFormaciones === 'function') {
+            renderizarFormaciones();
+        }
+
+    } catch (error) {
+        console.error('Error al eliminar formación:', error);
+
+        alert(
+            error.message ||
+            'Ocurrió un error al eliminar la formación.'
+        );
+    }
+}
+
+window.eliminarFormacion = eliminarFormacion;
 
 
-        <!-- ==================================================
-             CIERRE
-        ================================================== -->
-
-        <div class="cierre-pdf">
-
-            <div class="firma-pdf">
-
-                <div class="linea-firma-pdf"></div>
 
 
-                <strong>
-                    Firma del docente
-                </strong>
+/* =========================================================
+FAMILIAR - GUARDAR
+========================================================= */
+
+async function guardarFamiliar() {
+
+    const nombre =
+        document.getElementById(
+            "familiarNombre"
+        )?.value.trim() || "";
 
 
-                <span>
-
-                    ${escapeHTML(
-            nombreDocente
-        )}
-
-                </span>
-
-            </div>
+    const parentesco =
+        document.getElementById(
+            "familiarParentesco"
+        )?.value.trim() || "";
 
 
-            <div class="sello-pdf">
+    if (!nombre) {
 
-                <div class="sello-circulo-pdf">
+        mostrarMensaje(
+            "Falta información",
+            "Ingrese los nombres y apellidos.",
+            "warning"
+        );
 
-                    UNI
-
-                </div>
-
-
-                <span>
-
-                    REGISTRO INSTITUCIONAL
-
-                </span>
-
-            </div>
-
-        </div>
+        return;
+    }
 
 
-        <div class="pie-documento-pdf">
+    if (!parentesco) {
 
-            <span>
+        mostrarMensaje(
+            "Falta información",
+            "Ingrese el parentesco.",
+            "warning"
+        );
 
-                UNIVERSIDAD NACIONAL DE INGENIERÍA
-
-            </span>
-
-
-            <span>
-
-                Ficha de Información Docente
-
-            </span>
+        return;
+    }
 
 
-            <span>
+    const datos = {
 
-                ${fecha}
+        apellidosNombres:
+            nombre,
 
-            </span>
+        parentesco,
 
-        </div>
+        fecNacimiento:
+            document.getElementById(
+                "familiarFecNac"
+            )?.value || null,
 
-    `;
+        estadoCivil:
+            document.getElementById(
+                "familiarEstadoCivil"
+            )?.value || null,
 
+        nivelEstudios:
+            document.getElementById(
+                "familiarEstudios"
+            )?.value.trim() || null,
+
+        ocupacion:
+            document.getElementById(
+                "familiarOcupacion"
+            )?.value.trim() || null,
+
+        celular:
+            document.getElementById(
+                "familiarCelular"
+            )?.value.trim() || null,
+
+        dependeEconomicamente:
+            document.getElementById(
+                "familiarDepende"
+            )?.value || "No"
+    };
+
+
+    try {
+
+        await enviarSolicitud(
+            API.familiares,
+            "POST",
+            datos
+        );
+
+
+        await recargarInformacion();
+
+
+        document
+            .getElementById(
+                "formFamiliar"
+            )
+            ?.reset();
+
+
+        bootstrap.Modal
+            .getInstance(
+                document.getElementById(
+                    "modalFamiliar"
+                )
+            )
+            ?.hide();
+
+
+        mostrarMensaje(
+            "Familiar guardado",
+            "El familiar se guardó correctamente en MySQL.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error guardando familiar:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "Error",
+            escapeHTML(error.message),
+            "error"
+        );
+    }
 }
 
 
-/* ============================================================
-   ENCABEZADO DE SECCIÓN
-============================================================ */
+/* =========================================================
+TABLA FAMILIARES
+========================================================= */
 
-function encabezadoSeccionPDF(
+function renderTablaFamiliares() {
 
-    numero,
+    const tabla =
+        document.getElementById(
+            "tablaFamiliar"
+        );
 
-    titulo,
 
-    descripcion
+    if (!tabla) return;
 
+
+    if (!datosFamiliares.length) {
+
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center">
+                    No hay familiares registrados.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    tabla.innerHTML =
+        datosFamiliares.map(
+            item => `
+
+        <tr>
+
+            <td>
+                ${escapeHTML(
+                    item.nombre
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.parentesco
+                )}
+            </td>
+
+            <td>
+                ${formatearFecha(
+                    item.fecNac
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.estCivil || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.estudios || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.ocupacion || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.celular || "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    item.depende || "No"
+                )}
+            </td>
+
+            <td>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    onclick="eliminarFamiliar(${item.id})">
+
+                    <i class="fas fa-trash"></i>
+
+                </button>
+
+            </td>
+
+        </tr>
+
+    `
+        ).join("");
+}
+
+
+/* =========================================================
+FAMILIAR - ELIMINAR
+========================================================= */
+
+window.eliminarFamiliar =
+async function (id) {
+
+    const confirmar =
+        await confirmarEliminacion(
+            "¿Eliminar familiar?",
+            "El registro será eliminado permanentemente."
+        );
+
+
+    if (!confirmar) return;
+
+
+    try {
+
+        await enviarSolicitud(
+            `${API.familiares}/${encodeURIComponent(id)}`,
+            "DELETE"
+        );
+
+
+        await recargarInformacion();
+
+
+        mostrarMensaje(
+            "Eliminado",
+            "El familiar fue eliminado correctamente.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        mostrarMensaje(
+            "Error",
+            escapeHTML(error.message),
+            "error"
+        );
+    }
+};
+
+
+/* =========================================================
+NAVEGACIÓN
+========================================================= */
+
+function initNavegacion() {
+
+    const botones =
+        document.querySelectorAll(
+            ".seccion-nav"
+        );
+
+
+    const secciones =
+        document.querySelectorAll(
+            ".seccion-docente"
+        );
+
+
+    const btnAnterior =
+        document.getElementById(
+            "btnAnterior"
+        );
+
+
+    const btnSiguiente =
+        document.getElementById(
+            "btnSiguiente"
+        );
+
+
+    const seccionActual =
+        document.getElementById(
+            "seccionActual"
+        );
+
+
+    let actual = 1;
+
+    const total = 4;
+
+
+    function mostrarSeccion(numero) {
+
+        actual = numero;
+
+
+        secciones.forEach(
+            seccion => {
+
+                seccion.classList.remove(
+                    "seccion-activa"
+                );
+            }
+        );
+
+
+        document
+            .getElementById(
+                `seccion-${numero}`
+            )
+            ?.classList.add(
+                "seccion-activa"
+            );
+
+
+        botones.forEach(
+            btn => {
+
+                btn.classList.remove(
+                    "activo"
+                );
+
+
+                if (
+                    Number(
+                        btn.dataset.seccion
+                    ) === numero
+                ) {
+
+                    btn.classList.add(
+                        "activo"
+                    );
+                }
+            }
+        );
+
+
+        if (seccionActual) {
+
+            seccionActual.textContent =
+                String(numero)
+                    .padStart(2, "0");
+        }
+
+
+        if (btnAnterior) {
+
+            btnAnterior.disabled =
+                numero === 1;
+        }
+
+
+        if (btnSiguiente) {
+
+            btnSiguiente.disabled =
+                numero === total;
+        }
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+
+    botones.forEach(
+        btn => {
+
+            btn.addEventListener(
+                "click",
+                function () {
+
+                    mostrarSeccion(
+                        Number(
+                            this.dataset.seccion
+                        )
+                    );
+                }
+            );
+        }
+    );
+
+
+    if (btnAnterior) {
+
+        btnAnterior.addEventListener(
+            "click",
+            function () {
+
+                if (actual > 1) {
+
+                    mostrarSeccion(
+                        actual - 1
+                    );
+                }
+            }
+        );
+    }
+
+
+    if (btnSiguiente) {
+
+        btnSiguiente.addEventListener(
+            "click",
+            function () {
+
+                if (actual < total) {
+
+                    mostrarSeccion(
+                        actual + 1
+                    );
+                }
+            }
+        );
+    }
+
+
+    mostrarSeccion(1);
+}
+
+
+/* =========================================================
+PDF - ÚNICO SISTEMA
+========================================================= */
+
+function initBotonPDF() {
+
+    const boton =
+        document.getElementById(
+            "btnGenerarPDF"
+        );
+
+
+    if (!boton) {
+
+        console.warn(
+            "No se encontró btnGenerarPDF"
+        );
+
+        return;
+    }
+
+
+    /*
+    Evitamos que se registre
+    más de una vez.
+    */
+
+    boton.removeEventListener(
+        "click",
+        generarPDFCompleto
+    );
+
+
+    boton.addEventListener(
+        "click",
+        generarPDFCompleto
+    );
+}
+
+
+/* =========================================================
+GENERAR PDF COMPLETO - 4 PÁGINAS
+========================================================= */
+
+async function generarPDFCompleto() {
+
+    try {
+
+        /*
+        ====================================================
+        VERIFICAR jsPDF
+        ====================================================
+        */
+
+        if (
+            typeof window.jspdf ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "jsPDF no está cargado. Verifique que la librería jsPDF esté incluida en el Blade."
+            );
+        }
+
+
+        /*
+        ====================================================
+        ACTUALIZAR DATOS DESDE MYSQL
+        ====================================================
+        */
+
+        await cargarDatosDesdeLaravel();
+
+
+        const {
+            jsPDF
+        } = window.jspdf;
+
+
+        /*
+        ====================================================
+        CREAR DOCUMENTO
+        ====================================================
+        */
+
+        const doc =
+            new jsPDF({
+                orientation:
+                    "portrait",
+
+                unit:
+                    "mm",
+
+                format:
+                    "a4"
+            });
+
+
+        /*
+        ====================================================
+        CONFIGURACIÓN
+        ====================================================
+        */
+
+        const GUINDA =
+            [122, 23, 50];
+
+        const GRIS =
+            [90, 90, 90];
+
+        const GRIS_CLARO =
+            [245, 245, 245];
+
+        const NEGRO =
+            [35, 35, 35];
+
+
+        /*
+        ====================================================
+        FUNCIONES PDF
+        ====================================================
+        */
+
+        function texto(valor) {
+
+            if (
+                valor === null ||
+                valor === undefined ||
+                valor === ""
+            ) {
+
+                return "-";
+            }
+
+            return String(valor);
+        }
+
+
+        function fecha(valor) {
+
+            if (!valor) {
+                return "-";
+            }
+
+
+            const partes =
+                String(valor)
+                    .substring(0, 10)
+                    .split("-");
+
+
+            if (
+                partes.length === 3
+            ) {
+
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+
+
+            return String(valor);
+        }
+
+
+        function encabezado(
+            numeroPagina
+        ) {
+
+            /*
+            Barra superior
+            */
+
+            doc.setFillColor(
+                ...GUINDA
+            );
+
+
+            doc.rect(
+                0,
+                0,
+                210,
+                20,
+                "F"
+            );
+
+
+            /*
+            Universidad
+            */
+
+            doc.setTextColor(
+                255,
+                255,
+                255
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "bold"
+            );
+
+
+            doc.setFontSize(
+                13
+            );
+
+
+            doc.text(
+                "UNIVERSIDAD NACIONAL DE INGENIERÍA",
+                105,
+                8,
+                {
+                    align:
+                        "center"
+                }
+            );
+
+
+            doc.setFontSize(
+                9
+            );
+
+
+            doc.text(
+                "FACULTAD DE INGENIERÍA MECÁNICA",
+                105,
+                14,
+                {
+                    align:
+                        "center"
+                }
+            );
+
+
+            /*
+            Página
+            */
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setFontSize(
+                8
+            );
+
+
+            doc.text(
+                `Página ${numeroPagina}`,
+                196,
+                287,
+                {
+                    align:
+                        "right"
+                }
+            );
+        }
+
+
+        function tituloPrincipal(
+            titulo,
+            subtitulo
+        ) {
+
+            doc.setTextColor(
+                ...GUINDA
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "bold"
+            );
+
+
+            doc.setFontSize(
+                16
+            );
+
+
+            doc.text(
+                titulo,
+                105,
+                31,
+                {
+                    align:
+                        "center"
+                }
+            );
+
+
+            doc.setTextColor(
+                ...GRIS
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setFontSize(
+                9
+            );
+
+
+            doc.text(
+                subtitulo,
+                105,
+                38,
+                {
+                    align:
+                        "center"
+                }
+            );
+        }
+
+
+        function tituloSeccion(
+            titulo,
+            y
+        ) {
+
+            doc.setFillColor(
+                ...GUINDA
+            );
+
+
+            doc.rect(
+                14,
+                y,
+                182,
+                8,
+                "F"
+            );
+
+
+            doc.setTextColor(
+                255,
+                255,
+                255
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "bold"
+            );
+
+
+            doc.setFontSize(
+                10
+            );
+
+
+            doc.text(
+                titulo,
+                18,
+                y + 5.5
+            );
+
+
+            return y + 12;
+        }
+
+
+        function fila(
+            label,
+            valor,
+            y
+        ) {
+
+            doc.setFont(
+                "helvetica",
+                "bold"
+            );
+
+
+            doc.setFontSize(
+                8.5
+            );
+
+
+            doc.setTextColor(
+                ...GRIS
+            );
+
+
+            doc.text(
+                label,
+                20,
+                y
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setTextColor(
+                ...NEGRO
+            );
+
+
+            const valorTexto =
+                texto(valor);
+
+
+            const lineas =
+                doc.splitTextToSize(
+                    valorTexto,
+                    120
+                );
+
+
+            doc.text(
+                lineas,
+                72,
+                y
+            );
+
+
+            return y +
+                Math.max(
+                    6,
+                    lineas.length * 4.5
+                );
+        }
+
+
+        function mensajeVacio(
+            mensaje,
+            y
+        ) {
+
+            doc.setTextColor(
+                ...GRIS
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setFontSize(
+                9
+            );
+
+
+            doc.text(
+                mensaje,
+                20,
+                y
+            );
+
+
+            return y + 8;
+        }
+
+
+        function piePagina() {
+
+            doc.setDrawColor(
+                ...GUINDA
+            );
+
+
+            doc.line(
+                14,
+                280,
+                196,
+                280
+            );
+
+
+            doc.setTextColor(
+                110,
+                110,
+                110
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setFontSize(
+                7
+            );
+
+
+            doc.text(
+                "Sistema de Gestión Académica - Registro del Personal Docente",
+                105,
+                286,
+                {
+                    align:
+                        "center"
+                }
+            );
+        }
+
+
+        /*
+        ====================================================
+        PÁGINA 1
+        DATOS PERSONALES
+        ====================================================
+        */
+
+        encabezado(1);
+
+
+        tituloPrincipal(
+            "INFORMACIÓN DEL DOCENTE",
+            "Registro de información personal"
+        );
+
+
+        let y = 48;
+
+
+        y =
+            tituloSeccion(
+                "DATOS PERSONALES",
+                y
+            );
+
+
+        const dp =
+            datosPersonales || {};
+
+
+        y =
+            fila(
+                "Apellido paterno:",
+                dp.apePaterno,
+                y
+            );
+
+
+        y =
+            fila(
+                "Apellido materno:",
+                dp.apeMaterno,
+                y
+            );
+
+
+        y =
+            fila(
+                "Nombres:",
+                dp.nombres,
+                y
+            );
+
+
+        y =
+            fila(
+                "DNI:",
+                dp.dni,
+                y
+            );
+
+
+        y =
+            fila(
+                "Sexo:",
+                obtenerSexoTexto(
+                    dp.sexo
+                ),
+                y
+            );
+
+
+        y =
+            fila(
+                "Fecha de nacimiento:",
+                fecha(
+                    dp.fecNacimiento
+                ),
+                y
+            );
+
+
+        y =
+            fila(
+                "Teléfono:",
+                dp.telefono,
+                y
+            );
+
+
+        y =
+            fila(
+                "Celular:",
+                dp.celular,
+                y
+            );
+
+
+        y =
+            fila(
+                "RUC:",
+                dp.ruc,
+                y
+            );
+
+
+        y =
+            fila(
+                "Libreta militar:",
+                dp.libMilitar,
+                y
+            );
+
+
+        y =
+            fila(
+                "Brevete:",
+                dp.breveteCategoria,
+                y
+            );
+
+
+        y =
+            fila(
+                "Vehículo:",
+                dp.vehiculoInfo,
+                y
+            );
+
+
+        y =
+            fila(
+                "Estado civil:",
+                dp.estadoCivil,
+                y
+            );
+
+
+        y =
+            fila(
+                "Fecha de matrimonio:",
+                fecha(
+                    dp.fecMatrimonio
+                ),
+                y
+            );
+
+
+        y =
+            fila(
+                "Grupo sanguíneo:",
+                dp.grupoSanguineo,
+                y
+            );
+
+
+        y += 3;
+
+
+        y =
+            tituloSeccion(
+                "LUGAR DE NACIMIENTO",
+                y
+            );
+
+
+        y =
+            fila(
+                "País:",
+                dp.paisNacimiento,
+                y
+            );
+
+
+        y =
+            fila(
+                "Departamento:",
+                dp.departamentoNacimiento,
+                y
+            );
+
+
+        y =
+            fila(
+                "Provincia:",
+                dp.provinciaNacimiento,
+                y
+            );
+
+
+        y =
+            fila(
+                "Distrito:",
+                dp.distritoNacimiento,
+                y
+            );
+
+
+        piePagina();
+
+
+        /*
+        ====================================================
+        PÁGINA 2
+        DOMICILIOS
+        ====================================================
+        */
+
+        doc.addPage();
+
+
+        encabezado(2);
+
+
+        tituloPrincipal(
+            "DOMICILIO",
+            "Domicilios registrados del docente"
+        );
+
+
+        y = 48;
+
+
+        const domicilios =
+            datosDomicilio || [];
+
+
+        if (
+            domicilios.length === 0
+        ) {
+
+            mensajeVacio(
+                "No se ha registrado información de domicilio.",
+                y
+            );
+
+        } else {
+
+            domicilios.forEach(
+                (dom, index) => {
+
+                    /*
+                    Si se acerca al final,
+                    crear nueva página
+                    */
+
+                    if (
+                        y > 245
+                    ) {
+
+                        doc.addPage();
+
+                        encabezado(2);
+
+                        y = 48;
+                    }
+
+
+                    y =
+                        tituloSeccion(
+                            `DOMICILIO ${index + 1}`,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "País:",
+                            dom.pais,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Departamento:",
+                            dom.dep,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Provincia:",
+                            dom.prov,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Distrito:",
+                            dom.dist,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Dirección:",
+                            dom.dirExt,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Tipo de vía:",
+                            dom.tipoVia,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Nombre de vía:",
+                            dom.nombreVia,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Tipo de inmueble:",
+                            dom.tipoInmueble,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Número:",
+                            dom.numeroInmueble,
+                            y
+                        );
+
+
+                    y += 5;
+                }
+            );
+        }
+
+
+        piePagina();
+
+
+        /*
+        ====================================================
+        PÁGINA 3
+        FORMACIÓN PROFESIONAL
+        ====================================================
+        */
+
+        doc.addPage();
+
+
+        encabezado(3);
+
+
+        tituloPrincipal(
+            "FORMACIÓN PROFESIONAL",
+            "Registro de formación académica y profesional"
+        );
+
+
+        y = 48;
+
+
+        const formaciones =
+            datosFormacion || [];
+
+
+        if (
+            formaciones.length === 0
+        ) {
+
+            mensajeVacio(
+                "No se ha registrado formación profesional.",
+                y
+            );
+
+        } else {
+
+            formaciones.forEach(
+                (formacion, index) => {
+
+                    if (
+                        y > 240
+                    ) {
+
+                        doc.addPage();
+
+                        encabezado(3);
+
+                        y = 48;
+                    }
+
+
+                    y =
+                        tituloSeccion(
+                            `FORMACIÓN ${index + 1}`,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Nivel / formación:",
+                            formacion.nivel,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "País:",
+                            formacion.pais,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Universidad:",
+                            formacion.universidad,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Especialidad:",
+                            formacion.especialidad,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Fecha de inicio:",
+                            fecha(
+                                formacion.fecInicio
+                            ),
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Fecha de finalización:",
+                            fecha(
+                                formacion.fecFinal
+                            ),
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Grado obtenido:",
+                            formacion.grado,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Documento:",
+                            formacion.nombreDoc,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Observación:",
+                            formacion.obs,
+                            y
+                        );
+
+
+                    y += 5;
+                }
+            );
+        }
+
+
+        piePagina();
+
+
+        /*
+        ====================================================
+        PÁGINA 4
+        CARGA FAMILIAR
+        ====================================================
+        */
+
+        doc.addPage();
+
+
+        encabezado(4);
+
+
+        tituloPrincipal(
+            "CARGA FAMILIAR",
+            "Información adicional y carga familiar"
+        );
+
+
+        y = 48;
+
+
+        const familiares =
+            datosFamiliares || [];
+
+
+        if (
+            familiares.length === 0
+        ) {
+
+            mensajeVacio(
+                "No se ha registrado carga familiar.",
+                y
+            );
+
+        } else {
+
+            familiares.forEach(
+                (familiar, index) => {
+
+                    if (
+                        y > 245
+                    ) {
+
+                        doc.addPage();
+
+                        encabezado(4);
+
+                        y = 48;
+                    }
+
+
+                    y =
+                        tituloSeccion(
+                            `FAMILIAR ${index + 1}`,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Apellidos y nombres:",
+                            familiar.nombre,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Parentesco:",
+                            familiar.parentesco,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Fecha de nacimiento:",
+                            fecha(
+                                familiar.fecNac
+                            ),
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Estado civil:",
+                            familiar.estCivil,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Nivel de estudios:",
+                            familiar.estudios,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Ocupación:",
+                            familiar.ocupacion,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Celular:",
+                            familiar.celular,
+                            y
+                        );
+
+
+                    y =
+                        fila(
+                            "Depende económicamente:",
+                            familiar.depende,
+                            y
+                        );
+
+
+                    y += 5;
+                }
+            );
+        }
+
+
+        /*
+        FIRMA
+        */
+
+        if (
+            y < 245
+        ) {
+
+            y += 15;
+
+
+            doc.setDrawColor(
+                80,
+                80,
+                80
+            );
+
+
+            doc.line(
+                65,
+                y,
+                145,
+                y
+            );
+
+
+            doc.setTextColor(
+                ...GRIS
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setFontSize(
+                8
+            );
+
+
+            doc.text(
+                "Firma del docente",
+                105,
+                y + 6,
+                {
+                    align:
+                        "center"
+                }
+            );
+        }
+
+
+        piePagina();
+
+
+        /*
+        ====================================================
+        NÚMERO REAL DE PÁGINAS
+        ====================================================
+        */
+
+        const totalPaginas =
+            doc.internal.getNumberOfPages();
+
+
+        /*
+        Actualizar número de página
+        si se crearon páginas adicionales.
+        */
+
+        for (
+            let pagina = 1;
+            pagina <= totalPaginas;
+            pagina++
+        ) {
+
+            doc.setPage(
+                pagina
+            );
+
+
+            doc.setTextColor(
+                255,
+                255,
+                255
+            );
+
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+
+            doc.setFontSize(
+                7
+            );
+
+
+            /*
+            Quitamos el texto anterior
+            de página para colocar el
+            definitivo.
+            */
+
+            doc.setFillColor(
+                ...GUINDA
+            );
+
+
+            doc.rect(
+                182,
+                0,
+                28,
+                20,
+                "F"
+            );
+
+
+            doc.text(
+                `Pág. ${pagina}/${totalPaginas}`,
+                196,
+                18,
+                {
+                    align:
+                        "right"
+                }
+            );
+        }
+
+
+        /*
+        ====================================================
+        NOMBRE DEL ARCHIVO
+        ====================================================
+        */
+
+        const nombre =
+            obtenerNombreDocente()
+                .replace(
+                    /\s+/g,
+                    "_"
+                )
+                .replace(
+                    /[^a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ-]/g,
+                    ""
+                );
+
+
+        /*
+        ====================================================
+        GUARDAR PDF
+        ====================================================
+        */
+
+        doc.save(
+            `Ficha_Docente_UNI_${nombre || "Registro"}.pdf`
+        );
+
+
+        mostrarMensaje(
+            "PDF generado",
+            "La ficha completa del docente se generó correctamente.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error generando PDF:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "Error al generar PDF",
+            escapeHTML(
+                error.message ||
+                "No se pudo generar el PDF."
+            ),
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+UTILIDADES
+========================================================= */
+
+function normalizarFechaInput(
+    fecha
 ) {
 
-    return `
+    if (
+        !fecha ||
+        fecha === "-" ||
+        fecha === "null"
+    ) {
 
-        <div class="encabezado-seccion-pdf">
-
-            <div class="numero-seccion-pdf">
-
-                ${numero}
-
-            </div>
-
-
-            <div>
-
-                <h2>
-
-                    ${escapeHTML(
-        titulo
-    )}
-
-                </h2>
+        return "";
+    }
 
 
-                <p>
-
-                    ${escapeHTML(
-        descripcion
-    )}
-
-                </p>
-
-            </div>
-
-        </div>
-
-    `;
-
+    return String(fecha)
+        .substring(0, 10);
 }
 
-
-/* ============================================================
-   DATO
-============================================================ */
-
-function datoPDF(
-
-    etiqueta,
-
-    valor
-
-) {
-
-    return `
-
-        <div class="dato-pdf">
-
-            <div class="dato-label-pdf">
-
-                ${escapeHTML(
-        etiqueta
-    )}
-
-            </div>
-
-
-            <div class="dato-valor-pdf">
-
-                ${escapeHTML(
-        valor || '-'
-    )}
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-/* ============================================================
-   MENSAJE VACÍO
-============================================================ */
-
-function mensajeVacioPDF(
-    mensaje
-) {
-
-    return `
-
-        <div class="vacio-pdf">
-
-            <i
-                class="fas fa-folder-open"
-            ></i>
-
-
-            <span>
-
-                ${escapeHTML(
-        mensaje
-    )}
-
-            </span>
-
-        </div>
-
-    `;
-
-}
-
-
-/* ============================================================
-   FORMATEAR FECHA
-============================================================ */
 
 function formatearFecha(
     fecha
@@ -4434,106 +4148,95 @@ function formatearFecha(
 
     if (
         !fecha ||
-        fecha === '-' ||
-        fecha === 'null' ||
-        fecha === 'undefined'
+        fecha === "-" ||
+        fecha === "null"
     ) {
 
-        return '-';
-
+        return "-";
     }
 
 
     const partes =
-        String(fecha).split('-');
+        String(fecha)
+            .substring(0, 10)
+            .split("-");
 
 
     if (
         partes.length === 3
     ) {
 
-        return `
-            ${partes[2]}/
-            ${partes[1]}/
-            ${partes[0]}
-        `;
-
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
 
     return fecha;
-
 }
 
 
-/* ============================================================
-   OBTENER NOMBRE DOCENTE
-============================================================ */
-
-function obtenerNombreDocente(
-    personales
+function obtenerSexoTexto(
+    sexo
 ) {
 
-    const nombre =
-        personales.nombreCompleto ||
-        personales.nombre ||
-        personales.nombres ||
-        '';
-
-
-    const apellidos =
-        personales.apellidos ||
-        '';
-
-
     if (
-        nombre ||
-        apellidos
+        sexo === "M" ||
+        sexo === "Masculino"
     ) {
 
-        return `${nombre} ${apellidos}`
-            .trim()
-            .replace(
-                /\s+/g,
-                '_'
-            )
-            .replace(
-                /[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g,
-                ''
-            );
-
+        return "Masculino";
     }
 
 
     if (
-        personales.dni
+        sexo === "F" ||
+        sexo === "Femenino"
     ) {
 
-        return `DNI_${personales.dni}`;
-
+        return "Femenino";
     }
 
 
-    return 'Docente';
-
+    return sexo || "-";
 }
 
 
-/* ============================================================
-   ESCAPAR HTML
-============================================================ */
+function obtenerNombreDocente() {
+
+    const nombres =
+        datosPersonales.nombres ||
+        "";
+
+
+    const apePaterno =
+        datosPersonales.apePaterno ||
+        "";
+
+
+    const apeMaterno =
+        datosPersonales.apeMaterno ||
+        "";
+
+
+    const nombreCompleto =
+        `${apePaterno} ${apeMaterno}, ${nombres}`
+            .trim();
+
+
+    return nombreCompleto ||
+        "Docente";
+}
+
 
 function escapeHTML(
     valor
 ) {
 
     if (
-        valor === undefined ||
-        valor === null
+        valor === null ||
+        valor === undefined
     ) {
 
-        return '-';
-
+        return "";
     }
 
 
@@ -4541,1078 +4244,117 @@ function escapeHTML(
 
         .replace(
             /&/g,
-            '&amp;'
+            "&amp;"
         )
 
         .replace(
             /</g,
-            '&lt;'
+            "&lt;"
         )
 
         .replace(
             />/g,
-            '&gt;'
+            "&gt;"
         )
 
         .replace(
             /"/g,
-            '&quot;'
+            "&quot;"
         )
 
         .replace(
             /'/g,
-            '&#039;'
+            "&#039;"
         );
-
 }
 
 
-/* ============================================================
-   ESTILOS PDF
-============================================================ */
+/* =========================================================
+SWEET ALERT
+========================================================= */
 
-function agregarEstilosPDF() {
+function mostrarMensaje(
+    titulo,
+    texto,
+    icono = "success"
+) {
 
-    const estilosExistentes =
-        document.getElementById(
-            'estilosReportePDF'
+    if (
+        typeof Swal !==
+        "undefined"
+    ) {
+
+        Swal.fire({
+
+            title:
+                titulo,
+
+            html:
+                texto,
+
+            icon:
+                icono,
+
+            confirmButtonText:
+                "Aceptar",
+
+            confirmButtonColor:
+                "#7b1e2b"
+        });
+
+    } else {
+
+        alert(
+            `${titulo}\n\n${texto}`
         );
+    }
+}
 
 
-    if (estilosExistentes) {
-        return;
+async function confirmarEliminacion(
+    titulo,
+    texto
+) {
+
+    if (
+        typeof Swal ===
+        "undefined"
+    ) {
+
+        return confirm(
+            `${titulo}\n\n${texto}`
+        );
     }
 
 
-    const style =
-        document.createElement(
-            'style'
-        );
+    const resultado =
+        await Swal.fire({
 
+            title,
 
-    style.id =
-        'estilosReportePDF';
+            text:
+                texto,
 
+            icon:
+                "warning",
 
-    style.textContent = `
+            showCancelButton:
+                true,
 
-        /* ==================================================
-           CONTENEDOR GENERAL
-        ================================================== */
+            confirmButtonText:
+                "Sí, eliminar",
 
-        /* ==================================================
-   CONTENEDOR GENERAL
-================================================== */
+            cancelButtonText:
+                "Cancelar",
 
-#reportePDFDocente {
+            confirmButtonColor:
+                "#7b1e2b",
 
-    width: 190mm;
-
-    margin: 0 auto;
-
-    background: #ffffff;
-
-    color: #252525;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    font-size: 10px;
-
-    line-height: 1.45;
-
-}
-
-#reportePDFDocente * {
-
-    box-sizing: border-box;
-
-}
-
-
-/* ==================================================
-   COLORES INSTITUCIONALES
-================================================== */
-
-:root {
-
-    --guinda: #7A1732;
-
-    --guinda-oscuro: #5B1025;
-
-    --guinda-claro: #F6EDF0;
-
-    --gris: #6B7280;
-
-    --gris-claro: #F5F5F5;
-
-    --borde: #D8D8D8;
-
-}
-
-
-/* ==================================================
-   BARRA SUPERIOR
-================================================== */
-
-.barra-superior-pdf {
-
-    height: 8px;
-
-    background: #7A1732;
-
-    margin-bottom: 20px;
-
-}
-
-
-/* ==================================================
-   CABECERA INSTITUCIONAL
-================================================== */
-
-.cabecera-institucional-pdf {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 18px;
-
-    padding:
-        0 8px 16px 8px;
-
-}
-
-
-/* ==================================================
-   LOGO
-================================================== */
-
-.logo-uni-pdf {
-
-    width: 75px;
-
-    min-width: 75px;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-}
-
-
-.logo-real-pdf {
-
-    width: 68px;
-
-    height: 68px;
-
-    object-fit: contain;
-
-    display: block;
-
-}
-
-
-/* ==================================================
-   DATOS INSTITUCIONALES
-================================================== */
-
-.datos-institucionales-pdf {
-
-    flex: 1;
-
-}
-
-
-.nombre-uni-pdf {
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    color: #5B1025;
-
-    letter-spacing: .3px;
-
-}
-
-
-.lema-uni-pdf {
-
-    font-size: 8px;
-
-    color: #666666;
-
-    margin-top: 3px;
-
-}
-
-
-.subtitulo-uni-pdf {
-
-    font-size: 9px;
-
-    font-weight: 700;
-
-    color: #333333;
-
-    margin-top: 8px;
-
-    letter-spacing: 1px;
-
-}
-
-
-/* ==================================================
-   LÍNEA INSTITUCIONAL
-================================================== */
-
-.linea-institucional-pdf {
-
-    height: 2px;
-
-    background: #7A1732;
-
-    margin-bottom: 20px;
-
-}
-
-
-/* ==================================================
-   TÍTULO PRINCIPAL
-================================================== */
-
-.titulo-ficha-pdf {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 14px;
-
-    padding:
-        10px 8px 18px;
-
-}
-
-
-.icono-ficha-pdf {
-
-    width: 42px;
-
-    height: 42px;
-
-    border-radius: 4px;
-
-    background: #7A1732;
-
-    color: #ffffff;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    font-size: 18px;
-
-}
-
-
-.titulo-ficha-pdf h1 {
-
-    margin: 0;
-
-    font-size: 19px;
-
-    color: #5B1025;
-
-    font-weight: 800;
-
-    letter-spacing: .2px;
-
-}
-
-
-.titulo-ficha-pdf p {
-
-    margin:
-        3px 0 0;
-
-    color: #777777;
-
-    font-size: 9px;
-
-}
-
-
-/* ==================================================
-   IDENTIFICACIÓN DEL DOCENTE
-================================================== */
-
-.identificacion-pdf {
-
-    margin-top: 10px;
-
-    padding: 17px 18px;
-
-    background: #F6EDF0;
-
-    border-left:
-        5px solid #7A1732;
-
-    border-radius: 2px;
-
-}
-
-
-.identificacion-titulo-pdf {
-
-    font-size: 8px;
-
-    font-weight: 700;
-
-    color: #777777;
-
-    letter-spacing: 1px;
-
-}
-
-
-.identificacion-nombre-pdf {
-
-    font-size: 17px;
-
-    font-weight: 800;
-
-    color: #5B1025;
-
-    margin-top: 4px;
-
-}
-
-
-.identificacion-fecha-pdf {
-
-    margin-top: 5px;
-
-    color: #6B7280;
-
-    font-size: 8px;
-
-}
-
-
-/* ==================================================
-   ÍNDICE
-================================================== */
-
-.indice-pdf {
-
-    margin-top: 24px;
-
-    border:
-        1px solid #D8D8D8;
-
-    border-radius: 3px;
-
-    overflow: hidden;
-
-}
-
-
-.indice-titulo-pdf {
-
-    background: #7A1732;
-
-    color: #ffffff;
-
-    font-size: 9px;
-
-    font-weight: 700;
-
-    padding: 9px 12px;
-
-    letter-spacing: .8px;
-
-}
-
-
-.indice-item-pdf {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 8px 12px;
-
-    border-bottom:
-        1px solid #E5E5E5;
-
-    color: #333333;
-
-    font-size: 9px;
-
-}
-
-
-.indice-item-pdf:last-child {
-
-    border-bottom: none;
-
-}
-
-
-.indice-item-pdf span {
-
-    display: inline-flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    width: 25px;
-
-    height: 25px;
-
-    background: #F6EDF0;
-
-    color: #7A1732;
-
-    font-weight: 800;
-
-    border-radius: 3px;
-
-}
-
-
-/* ==================================================
-   NOTA INSTITUCIONAL
-================================================== */
-
-.nota-institucional-pdf {
-
-    margin-top: 22px;
-
-    padding: 10px 12px;
-
-    background: #F8F8F8;
-
-    border-top:
-        1px solid #D8D8D8;
-
-    color: #777777;
-
-    font-size: 8px;
-
-}
-
-
-/* ==================================================
-   SECCIONES
-================================================== */
-
-.seccion-pdf {
-
-    margin-top: 25px;
-
-    page-break-inside: avoid;
-
-}
-
-
-.encabezado-seccion-pdf {
-
-    border-left:
-        5px solid #7A1732;
-
-    background: #F6EDF0;
-
-    padding:
-        10px 12px;
-
-    margin-bottom: 14px;
-
-}
-
-
-.encabezado-seccion-pdf h2 {
-
-    margin: 0;
-
-    color: #5B1025;
-
-    font-size: 14px;
-
-    font-weight: 800;
-
-}
-
-
-.encabezado-seccion-pdf p {
-
-    margin:
-        3px 0 0;
-
-    color: #6B7280;
-
-    font-size: 8px;
-
-}
-
-
-/* ==================================================
-   SUBTÍTULOS
-================================================== */
-
-.subtitulo-seccion-pdf {
-
-    margin-top: 18px;
-
-    margin-bottom: 8px;
-
-    padding-bottom: 5px;
-
-    border-bottom:
-        1px solid #7A1732;
-
-    color: #5B1025;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-}
-
-
-/* ==================================================
-   DATOS
-================================================== */
-
-.datos-grid-pdf {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 8px;
-
-}
-
-
-.dato-pdf {
-
-    padding: 8px 10px;
-
-    background: #FAFAFA;
-
-    border:
-        1px solid #E1E1E1;
-
-    border-radius: 2px;
-
-}
-
-
-.dato-label-pdf {
-
-    display: block;
-
-    color: #777777;
-
-    font-size: 7px;
-
-    font-weight: 700;
-
-    text-transform: uppercase;
-
-    letter-spacing: .5px;
-
-}
-
-
-.dato-valor-pdf {
-
-    display: block;
-
-    margin-top: 3px;
-
-    color: #222222;
-
-    font-size: 9px;
-
-    font-weight: 600;
-
-}
-
-
-/* ==================================================
-   TARJETAS
-================================================== */
-
-.tarjeta-pdf {
-
-    margin-bottom: 12px;
-
-    border:
-        1px solid #D8D8D8;
-
-    border-radius: 3px;
-
-    overflow: hidden;
-
-    page-break-inside: avoid;
-
-}
-
-
-.tarjeta-header-pdf {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    padding: 8px 10px;
-
-    background: #F6EDF0;
-
-    border-bottom:
-        1px solid #D8D8D8;
-
-    color: #5B1025;
-
-    font-size: 9px;
-
-    font-weight: 800;
-
-}
-
-
-.badge-pdf {
-
-    padding:
-        3px 7px;
-
-    background: #7A1732;
-
-    color: #ffffff;
-
-    border-radius: 2px;
-
-    font-size: 7px;
-
-    font-weight: 700;
-
-}
-
-
-/* ==================================================
-   TABLAS
-================================================== */
-
-.tabla-pdf {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    font-size: 8px;
-
-}
-
-
-.tabla-pdf th {
-
-    background: #7A1732;
-
-    color: #ffffff;
-
-    font-weight: 700;
-
-    padding: 7px;
-
-    text-align: left;
-
-}
-
-
-.tabla-pdf td {
-
-    padding: 6px 7px;
-
-    border-bottom:
-        1px solid #E1E1E1;
-
-    color: #333333;
-
-}
-
-
-.tabla-pdf tr:nth-child(even) td {
-
-    background: #FAFAFA;
-
-}
-
-
-/* ==================================================
-   PIE / ELEMENTOS DE DOCUMENTO
-================================================== */
-
-.firma-pdf {
-
-    margin-top: 35px;
-
-    text-align: center;
-
-}
-
-
-.linea-firma-pdf {
-
-    width: 180px;
-
-    margin:
-        0 auto 6px;
-
-    border-top:
-        1px solid #555555;
-
-}
-
-
-.texto-firma-pdf {
-
-    font-size: 8px;
-
-    color: #555555;
-
-} `;
-
-
-    document.head.appendChild(
-        style
-    );
-
-}
-
-
-/* ============================================================
-   RESTAURAR DATOS INICIALES DEL JSON
-============================================================ */
-
-function restaurarDatosIniciales() {
-
-    localStorage.removeItem(
-        'docente_personales'
-    );
-
-
-    localStorage.removeItem(
-        'docente_domicilios'
-    );
-
-
-    localStorage.removeItem(
-        'docente_familiares'
-    );
-
-
-    localStorage.removeItem(
-        'docente_formacion'
-    );
-
-
-    location.reload();
-
-}
-
-
-window.restaurarDatosIniciales =
-    restaurarDatosIniciales;
-
-
-    /* ============================================================
-   NAVEGACIÓN ENTRE LAS 4 SECCIONES
-============================================================ */
-
-document.addEventListener('DOMContentLoaded', function () {
-
-    const botones =
-        document.querySelectorAll(
-            '.seccion-nav[data-seccion]'
-        );
-
-    const secciones =
-        document.querySelectorAll(
-            '.seccion-docente'
-        );
-
-    const btnAnterior =
-        document.getElementById(
-            'btnAnterior'
-        );
-
-    const btnSiguiente =
-        document.getElementById(
-            'btnSiguiente'
-        );
-
-    const indicador =
-        document.getElementById(
-            'seccionActual'
-        );
-
-
-    let seccionActual = 1;
-
-    const totalSecciones = 4;
-
-
-    /* ========================================================
-       MOSTRAR SECCIÓN
-    ======================================================== */
-
-    function mostrarSeccion(numero) {
-
-        if (
-            numero < 1 ||
-            numero > totalSecciones
-        ) {
-            return;
-        }
-
-
-        seccionActual = numero;
-
-
-        /* ----------------------------------------------------
-           OCULTAR TODAS LAS SECCIONES
-        ---------------------------------------------------- */
-
-        secciones.forEach(function (seccion) {
-
-            seccion.classList.remove(
-                'seccion-activa'
-            );
-
+            cancelButtonColor:
+                "#6c757d"
         });
 
 
-        /* ----------------------------------------------------
-           MOSTRAR LA SECCIÓN SELECCIONADA
-        ---------------------------------------------------- */
+    return resultado.isConfirmed;
+}
 
-        const seccionSeleccionada =
-            document.getElementById(
-                'seccion-' + numero
-            );
-
-
-        if (seccionSeleccionada) {
-
-            seccionSeleccionada.classList.add(
-                'seccion-activa'
-            );
-
-        }
-
-
-        /* ----------------------------------------------------
-           ACTUALIZAR BOTÓN ACTIVO
-        ---------------------------------------------------- */
-
-        botones.forEach(function (boton) {
-
-            boton.classList.remove(
-                'activo'
-            );
-
-
-            const numeroBoton =
-                parseInt(
-                    boton.dataset.seccion
-                );
-
-
-            if (
-                numeroBoton === numero
-            ) {
-
-                boton.classList.add(
-                    'activo'
-                );
-
-            }
-
-        });
-
-
-        /* ----------------------------------------------------
-           ACTUALIZAR BOTÓN ANTERIOR
-        ---------------------------------------------------- */
-
-        if (btnAnterior) {
-
-            btnAnterior.disabled =
-                numero === 1;
-
-        }
-
-
-        /* ----------------------------------------------------
-           ACTUALIZAR BOTÓN SIGUIENTE
-        ---------------------------------------------------- */
-
-        if (btnSiguiente) {
-
-            btnSiguiente.disabled =
-                numero === totalSecciones;
-
-        }
-
-
-        /* ----------------------------------------------------
-           ACTUALIZAR INDICADOR
-        ---------------------------------------------------- */
-
-        if (indicador) {
-
-            indicador.textContent =
-                String(numero).padStart(
-                    2,
-                    '0'
-                );
-
-        }
-
-
-        /* ----------------------------------------------------
-           SUBIR AL CONTENIDO
-        ---------------------------------------------------- */
-
-        const contenido =
-            document.getElementById(
-                'contenidoReporte'
-            );
-
-
-        if (contenido) {
-
-            const posicion =
-                contenido.getBoundingClientRect().top
-                + window.scrollY
-                - 25;
-
-
-            window.scrollTo({
-                top: posicion,
-                behavior: 'smooth'
-            });
-
-        }
-
-    }
-
-
-    /* ========================================================
-       BOTONES 01 - 02 - 03 - 04
-    ======================================================== */
-
-    botones.forEach(function (boton) {
-
-        boton.addEventListener(
-            'click',
-            function (event) {
-
-                event.preventDefault();
-
-                event.stopPropagation();
-
-
-                const numero =
-                    parseInt(
-                        this.dataset.seccion
-                    );
-
-
-                mostrarSeccion(
-                    numero
-                );
-
-            }
-        );
-
-    });
-
-
-    /* ========================================================
-       BOTÓN ANTERIOR
-    ======================================================== */
-
-    if (btnAnterior) {
-
-        btnAnterior.addEventListener(
-            'click',
-            function () {
-
-                if (
-                    seccionActual > 1
-                ) {
-
-                    mostrarSeccion(
-                        seccionActual - 1
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /* ========================================================
-       BOTÓN SIGUIENTE
-    ======================================================== */
-
-    if (btnSiguiente) {
-
-        btnSiguiente.addEventListener(
-            'click',
-            function () {
-
-                if (
-                    seccionActual <
-                    totalSecciones
-                ) {
-
-                    mostrarSeccion(
-                        seccionActual + 1
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /* ========================================================
-       INICIAR EN SECCIÓN 01
-    ======================================================== */
-
-    mostrarSeccion(1);
-
-});

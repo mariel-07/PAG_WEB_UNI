@@ -1,11 +1,12 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DocenteFamiliarController;
+use App\Http\Controllers\InformacionController;
 
 
 /*
@@ -56,72 +57,195 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | FAMILIARES DEL DOCENTE
+    | ========================================================================
+    | MÓDULO INFORMACIÓN DOCENTE
+    | ========================================================================
+    |
+    | El docente autenticado se identifica mediante:
+    |
+    | users.email → docentes.email
+    |
     |--------------------------------------------------------------------------
     */
 
-    // Obtener familiares
+
+    /*
+    |--------------------------------------------------------------------------
+    | PÁGINA INFORMACIÓN DOCENTE
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/docente/informacion', function () {
+        return view('docente.informacion');
+    })->name('docente.informacion');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INFORMACIÓN GENERAL DEL DOCENTE
+    |--------------------------------------------------------------------------
+    |
+    | GET  → Obtener información desde MySQL
+    | PUT  → Actualizar datos personales
+    |
+    |--------------------------------------------------------------------------
+    */
+
     Route::get(
-        '/api/docentes/{docenteId}/familiares',
-        [DocenteFamiliarController::class, 'getFamiliares']
+        '/api/docente/informacion',
+        [InformacionController::class, 'index']
     );
 
-    // Registrar familiar
+    Route::put(
+        '/api/docente/informacion',
+        [InformacionController::class, 'actualizarInformacion']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DOMICILIOS
+    |--------------------------------------------------------------------------
+    |
+    | POST   → Registrar domicilio
+    | PUT    → Editar domicilio
+    | DELETE → Eliminar domicilio
+    |
+    |--------------------------------------------------------------------------
+    */
+
     Route::post(
-        '/api/docentes/familiares',
-        [DocenteFamiliarController::class, 'store']
+        '/api/docente/domicilios',
+        [InformacionController::class, 'guardarDomicilio']
     );
 
-    // Eliminar familiar
+    Route::put(
+        '/api/docente/domicilios/{id}',
+        [InformacionController::class, 'actualizarDomicilio']
+    );
+
     Route::delete(
-        '/api/docentes/familiares/{id}',
-        [DocenteFamiliarController::class, 'destroy']
+        '/api/docente/domicilios/{id}',
+        [InformacionController::class, 'eliminarDomicilio']
     );
 
-    // Exportar familiares a PDF
-    Route::get(
-        '/docentes/{docenteId}/familiares/pdf',
-        [DocenteFamiliarController::class, 'exportPdf']
-    )->name('familiares.pdf');
-
 
     /*
     |--------------------------------------------------------------------------
-    | MÓDULO DOCENTE
-    |--------------------------------------------------------------------------
-    */
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1. INFORMACIÓN DOCENTE
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/docente/informacion',
-        [DocenteController::class, 'index']
-    )->name('docente.informacion');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 2. ASISTENCIA DOCENTE
+    | FAMILIARES / CARGA FAMILIAR
     |--------------------------------------------------------------------------
     |
-    | Esta página trabaja directamente con los archivos JSON
-    | ubicados en public/json/.
+    | POST   → Registrar familiar
+    | PUT    → Editar familiar
+    | DELETE → Eliminar familiar
     |
+    |--------------------------------------------------------------------------
     */
 
-    Route::get('/docente/asistencia', function () {
-        return view('docente.asistencia');
-    })->name('docente.asistencia');
+    Route::post(
+        '/api/docente/familiares',
+        [InformacionController::class, 'guardarFamiliar']
+    );
+
+    Route::put(
+        '/api/docente/familiares/{id}',
+        [InformacionController::class, 'actualizarFamiliar']
+    );
+
+    Route::delete(
+        '/api/docente/familiares/{id}',
+        [InformacionController::class, 'eliminarFamiliar']
+    );
 
 
     /*
     |--------------------------------------------------------------------------
-    | 3. HORARIO DOCENTE
+    | FORMACIÓN PROFESIONAL
+    |--------------------------------------------------------------------------
+    |
+    | POST   → Registrar formación + PDF
+    | PUT    → Editar formación
+    | DELETE → Eliminar formación + PDF
+    |
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/api/docente/formaciones',
+        [InformacionController::class, 'guardarFormacion']
+    );
+
+    Route::put(
+        '/api/docente/formaciones/{id}',
+        [InformacionController::class, 'actualizarFormacion']
+    );
+
+    Route::delete(
+    '/api/docente/formaciones/{id}',
+    [InformacionController::class, 'eliminarFormacion']
+);
+
+    /*
+    |--------------------------------------------------------------------------
+    | ========================================================================
+    | MÓDULO ASISTENCIA DOCENTE
+    | ========================================================================
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/docente/asistencia',
+        function () {
+            return view('docente.asistencia');
+        }
+    )->name('docente.asistencia');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | API ASISTENCIA DOCENTE
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('api/asistencias')->group(function () {
+
+        // LISTAR
+        Route::get('/', [
+            AsistenciaController::class,
+            'index'
+        ]);
+
+        // CREAR
+        Route::post('/', [
+            AsistenciaController::class,
+            'store'
+        ]);
+
+        // VER UNA
+        Route::get('/{id}', [
+            AsistenciaController::class,
+            'show'
+        ]);
+
+        // ACTUALIZAR
+        Route::put('/{id}', [
+            AsistenciaController::class,
+            'update'
+        ]);
+
+        // ELIMINAR
+        Route::delete('/{id}', [
+            AsistenciaController::class,
+            'destroy'
+        ]);
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ========================================================================
+    | MÓDULO HORARIO DOCENTE
+    | ========================================================================
     |--------------------------------------------------------------------------
     */
 
@@ -135,15 +259,22 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | API HORARIOS
     |--------------------------------------------------------------------------
-    |
-    | Estas rutas son utilizadas por JavaScript mediante fetch().
-    |
     */
 
     Route::get(
         '/api/horarios',
         [HorarioController::class, 'getHorarios']
     );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RUTA ALTERNATIVA HORARIOS
+    |--------------------------------------------------------------------------
+    |
+    | Compatible con versiones anteriores del JavaScript.
+    |
+    */
 
     Route::get(
         '/docente/api/horarios',
@@ -153,18 +284,24 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | API ALUMNOS
+    | API ALUMNOS MATRICULADOS
     |--------------------------------------------------------------------------
-    |
-    | Obtiene los alumnos matriculados para mostrarlos
-    | en el frontend/modal.
-    |
     */
 
     Route::get(
         '/api/alumnos',
         [HorarioController::class, 'getAlumnosMatriculados']
     );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RUTA ALTERNATIVA ALUMNOS
+    |--------------------------------------------------------------------------
+    |
+    | Compatible con versiones anteriores del JavaScript.
+    |
+    */
 
     Route::get(
         '/docente/api/alumnos',

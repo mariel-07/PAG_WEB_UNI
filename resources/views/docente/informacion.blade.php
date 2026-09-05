@@ -1,3 +1,4 @@
+
 <x-app-layout>
 
     {{-- =========================================================
@@ -5,8 +6,11 @@
     ========================================================== --}}
 
     <x-slot name="header">
+
         <div class="docente-page-header">
+
             <div>
+
                 <span class="docente-page-header__eyebrow">
                     GESTIÓN ACADÉMICA
                 </span>
@@ -18,10 +22,13 @@
                 <p class="docente-page-header__subtitle">
                     Registro y administración de información del personal docente
                 </p>
+
             </div>
 
             <div class="docente-header-line"></div>
+
         </div>
+
     </x-slot>
 
 
@@ -45,6 +52,7 @@
                 </div>
 
                 <div>
+
                     <span class="docente-profile__label">
                         REGISTRO DEL PERSONAL
                     </span>
@@ -56,6 +64,7 @@
                     <p>
                         Complete y mantenga actualizada la información registrada.
                     </p>
+
                 </div>
 
             </div>
@@ -80,13 +89,12 @@
 
 
         {{-- =====================================================
-             NAVEGACIÓN DE SECCIONES
+             NAVEGACIÓN
         ====================================================== --}}
 
         <section class="docente-progress">
 
             <div id="navegacionSecciones">
-
 
                 <button
                     type="button"
@@ -197,16 +205,15 @@
         </section>
 
 
-
         {{-- =====================================================
-             CONTENIDO DE LAS 4 SECCIONES
+             CONTENIDO
         ====================================================== --}}
 
         <main id="contenidoReporte">
 
 
             {{-- =================================================
-                 SECCIÓN 01 - DATOS PERSONALES
+                 SECCIÓN 01
             ================================================== --}}
 
             <section
@@ -248,240 +255,346 @@
                     <div class="docente-section-body">
 
                         <form id="formDatosPersonales">
+                          
+<div class="docente-form-grid">
 
-                            <div class="docente-form-grid">
+    {{-- =====================================================
+         APELLIDO PATERNO
+    ====================================================== --}}
 
+    <div class="docente-field">
 
-                                {{-- SEXO --}}
+        <label for="input-ape-paterno">
+            Apellido paterno
+        </label>
 
-                                <div class="docente-field">
+        <input
+            type="text"
+            id="input-ape-paterno"
+            name="apePaterno"
+            class="form-control persistir-input"
+            maxlength="100"
+            placeholder="Ingrese apellido paterno">
 
-                                    <label for="select-sexo">
-                                        Sexo
-                                    </label>
+    </div>
 
-                                    <select
-                                        id="select-sexo"
-                                        class="form-select persistir-input">
 
-                                        <option value="Masculino">
-                                            Masculino
-                                        </option>
+    {{-- =====================================================
+         APELLIDO MATERNO
+    ====================================================== --}}
 
-                                        <option value="Femenino">
-                                            Femenino
-                                        </option>
+    <div class="docente-field">
 
-                                    </select>
+        <label for="input-ape-materno">
+            Apellido materno
+        </label>
 
-                                </div>
+        <input
+            type="text"
+            id="input-ape-materno"
+            name="apeMaterno"
+            class="form-control persistir-input"
+            maxlength="100"
+            placeholder="Ingrese apellido materno">
 
+    </div>
 
-                                {{-- FECHA NACIMIENTO --}}
 
-                                <div class="docente-field">
+    {{-- =====================================================
+         NOMBRES
+    ====================================================== --}}
 
-                                    <label for="input-fec-nac">
-                                        Fecha de nacimiento
-                                    </label>
+    <div class="docente-field docente-field--wide">
 
-                                    <input
-                                        type="date"
-                                        id="input-fec-nac"
-                                        class="form-control persistir-input">
+        <label for="input-nombres">
+            Nombres
+        </label>
 
-                                </div>
+        <input
+            type="text"
+            id="input-nombres"
+            name="nombres"
+            class="form-control persistir-input"
+            maxlength="100"
+            placeholder="Ingrese sus nombres">
 
+    </div>
 
-                                {{-- DNI --}}
 
-                                <div class="docente-field">
+    {{-- =====================================================
+         SEXO
+    ====================================================== --}}
 
-                                    <label for="input-dni">
+    <div class="docente-field">
 
-                                        DNI
+        <label for="select-sexo">
+            Sexo
+        </label>
 
-                                        <i class="fas fa-check-circle field-valid"></i>
+        <select
+            id="select-sexo"
+            class="form-select persistir-input">
 
-                                    </label>
+            <option value="">
+                -- Seleccionar --
+            </option>
 
-                                    <input
-                                        type="text"
-                                        id="input-dni"
-                                        class="form-control"
-                                        readonly>
+            <option value="Masculino">
+                Masculino
+            </option>
 
-                                </div>
+            <option value="Femenino">
+                Femenino
+            </option>
 
+        </select>
 
-                                {{-- TELEFONO --}}
+    </div>
 
-                                <div class="docente-field">
 
-                                    <label for="input-tel-fijo">
-                                        Teléfono fijo
-                                    </label>
+    {{-- =====================================================
+         FECHA DE NACIMIENTO
+    ====================================================== --}}
 
-                                    <input
-                                        type="text"
-                                        id="input-tel-fijo"
-                                        class="form-control persistir-input"
-                                        placeholder="Teléfono fijo">
+    <div class="docente-field">
 
-                                </div>
+        <label for="input-fec-nac">
+            Fecha de nacimiento
+        </label>
 
+        <input
+            type="date"
+            id="input-fec-nac"
+            class="form-control persistir-input">
 
-                                {{-- CELULAR --}}
+    </div>
 
-                                <div class="docente-field">
 
-                                    <label for="input-celular">
-                                        Celular
-                                    </label>
+    {{-- =====================================================
+         DNI
+    ====================================================== --}}
 
-                                    <input
-                                        type="text"
-                                        id="input-celular"
-                                        class="form-control persistir-input"
-                                        placeholder="Celular">
+    <div class="docente-field">
 
-                                </div>
+        <label for="input-dni">
 
+            DNI
 
-                                {{-- RUC --}}
+            <i class="fas fa-check-circle field-valid"></i>
 
-                                <div class="docente-field">
+        </label>
 
-                                    <label for="input-ruc">
-                                        RUC
-                                    </label>
+        <input
+            type="text"
+            id="input-dni"
+            name="dni"
+            class="form-control persistir-input"
+            maxlength="15"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Ingrese su DNI">
 
-                                    <input
-                                        type="text"
-                                        id="input-ruc"
-                                        class="form-control persistir-input">
+    </div>
 
-                                </div>
 
+    {{-- =====================================================
+         TELÉFONO
+    ====================================================== --}}
 
-                                {{-- LIBRETA --}}
+    <div class="docente-field">
 
-                                <div class="docente-field">
+        <label for="input-tel-fijo">
+            Teléfono fijo
+        </label>
 
-                                    <label for="input-lib-militar">
-                                        Libreta militar
-                                    </label>
+        <input
+            type="text"
+            id="input-tel-fijo"
+            class="form-control persistir-input"
+            placeholder="Teléfono fijo">
 
-                                    <input
-                                        type="text"
-                                        id="input-lib-militar"
-                                        class="form-control persistir-input">
+    </div>
 
-                                </div>
 
+    {{-- =====================================================
+         CELULAR
+    ====================================================== --}}
 
-                                {{-- BREVETE --}}
+    <div class="docente-field">
 
-                                <div class="docente-field">
+        <label for="input-celular">
+            Celular
+        </label>
 
-                                    <label for="input-brevete">
-                                        Brevete y categoría
-                                    </label>
+        <input
+            type="text"
+            id="input-celular"
+            class="form-control persistir-input"
+            placeholder="Celular">
 
-                                    <input
-                                        type="text"
-                                        id="input-brevete"
-                                        class="form-control persistir-input">
+    </div>
 
-                                </div>
 
+    {{-- =====================================================
+         RUC
+    ====================================================== --}}
 
-                                {{-- VEHICULO --}}
+    <div class="docente-field">
 
-                                <div class="docente-field docente-field--wide">
+        <label for="input-ruc">
+            RUC
+        </label>
 
-                                    <label for="input-vehiculo">
-                                        Vehículo
-                                    </label>
+        <input
+            type="text"
+            id="input-ruc"
+            class="form-control persistir-input">
 
-                                    <input
-                                        type="text"
-                                        id="input-vehiculo"
-                                        class="form-control persistir-input"
-                                        placeholder="Modelo, placa, año y color">
+    </div>
 
-                                </div>
 
+    {{-- =====================================================
+         LIBRETA MILITAR
+    ====================================================== --}}
 
-                                {{-- ESTADO CIVIL --}}
+    <div class="docente-field">
 
-                                <div class="docente-field">
+        <label for="input-lib-militar">
+            Libreta militar
+        </label>
 
-                                    <label for="select-estado-civil">
-                                        Estado civil
-                                    </label>
+        <input
+            type="text"
+            id="input-lib-militar"
+            class="form-control persistir-input">
 
-                                    <select
-                                        id="select-estado-civil"
-                                        class="form-select persistir-input">
+    </div>
 
-                                        <option value="Soltero">
-                                            Soltero(a)
-                                        </option>
 
-                                        <option value="Casado">
-                                            Casado(a)
-                                        </option>
+    {{-- =====================================================
+         BREVETE
+    ====================================================== --}}
 
-                                        <option value="Divorciado">
-                                            Divorciado(a)
-                                        </option>
+    <div class="docente-field">
 
-                                    </select>
+        <label for="input-brevete">
+            Brevete y categoría
+        </label>
 
-                                </div>
+        <input
+            type="text"
+            id="input-brevete"
+            class="form-control persistir-input">
 
+    </div>
 
-                                {{-- MATRIMONIO --}}
 
-                                <div
-                                    class="docente-field"
-                                    id="contenedor-fecha-matrimonio">
+    {{-- =====================================================
+         VEHÍCULO
+    ====================================================== --}}
 
-                                    <label for="input-fec-matrimonio">
-                                        Fecha de matrimonio
-                                    </label>
+    <div class="docente-field docente-field--wide">
 
-                                    <input
-                                        type="date"
-                                        id="input-fec-matrimonio"
-                                        class="form-control persistir-input">
+        <label for="input-vehiculo">
+            Vehículo
+        </label>
 
-                                </div>
+        <input
+            type="text"
+            id="input-vehiculo"
+            class="form-control persistir-input"
+            placeholder="Modelo, placa, año y color">
 
+    </div>
 
-                                {{-- SANGRE --}}
 
-                                <div class="docente-field">
+    {{-- =====================================================
+         ESTADO CIVIL
+    ====================================================== --}}
 
-                                    <label for="input-grupo-sanguineo">
-                                        Grupo sanguíneo
-                                    </label>
+    <div class="docente-field">
 
-                                    <input
-                                        type="text"
-                                        id="input-grupo-sanguineo"
-                                        class="form-control persistir-input"
-                                        placeholder="Ej. O+">
+        <label for="select-estado-civil">
+            Estado civil
+        </label>
 
-                                </div>
+        <select
+            id="select-estado-civil"
+            class="form-select persistir-input">
 
-                            </div>
+            <option value="">
+                -- Seleccionar --
+            </option>
 
+            <option value="Soltero">
+                Soltero(a)
+            </option>
 
-                            {{-- =================================================
+            <option value="Casado">
+                Casado(a)
+            </option>
+
+            <option value="Divorciado">
+                Divorciado(a)
+            </option>
+
+            <option value="Viudo">
+                Viudo(a)
+            </option>
+
+        </select>
+
+    </div>
+
+
+    {{-- =====================================================
+         FECHA DE MATRIMONIO
+    ====================================================== --}}
+
+    <div
+        class="docente-field"
+        id="contenedor-fecha-matrimonio">
+
+        <label for="input-fec-matrimonio">
+            Fecha de matrimonio
+        </label>
+
+        <input
+            type="date"
+            id="input-fec-matrimonio"
+            name="fecMatrimonio"
+            class="form-control persistir-input">
+
+    </div>
+
+
+    {{-- =====================================================
+         GRUPO SANGUÍNEO
+    ====================================================== --}}
+
+    <div class="docente-field">
+
+        <label for="input-grupo-sanguineo">
+            Grupo sanguíneo
+        </label>
+
+        <input
+            type="text"
+            id="input-grupo-sanguineo"
+            class="form-control persistir-input"
+            placeholder="Ej. O+">
+
+    </div>
+
+
+    </div>
+
+
+
+
+                            {{-- =============================================
                                  LUGAR DE NACIMIENTO
-                            ================================================== --}}
+                            ============================================== --}}
 
                             <div class="docente-subsection">
 
@@ -508,6 +621,8 @@
 
                                 <div class="docente-form-grid">
 
+
+                                    {{-- PAÍS --}}
 
                                     <div class="docente-field">
 
@@ -536,6 +651,8 @@
                                     </div>
 
 
+                                    {{-- DEPARTAMENTO --}}
+
                                     <div
                                         id="campo-depa"
                                         class="docente-field d-none">
@@ -546,7 +663,8 @@
 
                                         <select
                                             id="select-depa"
-                                            class="form-select persistir-input">
+                                            class="form-select persistir-input"
+                                            disabled>
 
                                             <option value="">
                                                 -- Seleccionar --
@@ -556,6 +674,8 @@
 
                                     </div>
 
+
+                                    {{-- PROVINCIA --}}
 
                                     <div
                                         id="campo-prov"
@@ -578,6 +698,8 @@
 
                                     </div>
 
+
+                                    {{-- DISTRITO --}}
 
                                     <div
                                         id="campo-dist"
@@ -605,6 +727,8 @@
                             </div>
 
 
+                            {{-- BOTÓN GUARDAR --}}
+
                             <div class="docente-form-footer">
 
                                 <button
@@ -629,7 +753,6 @@
             </section>
 
 
-
             {{-- =================================================
                  SECCIÓN 02 - DOMICILIO
             ================================================== --}}
@@ -639,6 +762,7 @@
                 class="seccion-docente">
 
                 <div class="docente-section-card">
+
 
                     <div class="docente-section-header">
 
@@ -689,6 +813,7 @@
                             <thead>
 
                                 <tr>
+
                                     <th>#</th>
                                     <th>País</th>
                                     <th>Dirección</th>
@@ -700,6 +825,7 @@
                                     <th>Tipo inmueble</th>
                                     <th>N.º inmueble</th>
                                     <th>Acción</th>
+
                                 </tr>
 
                             </thead>
@@ -716,7 +842,6 @@
             </section>
 
 
-
             {{-- =================================================
                  SECCIÓN 03 - FORMACIÓN
             ================================================== --}}
@@ -726,6 +851,7 @@
                 class="seccion-docente">
 
                 <div class="docente-section-card">
+
 
                     <div class="docente-section-header">
 
@@ -776,6 +902,7 @@
                             <thead>
 
                                 <tr>
+
                                     <th>#</th>
                                     <th>Formación</th>
                                     <th>País</th>
@@ -787,6 +914,7 @@
                                     <th>Doc.</th>
                                     <th>Obs.</th>
                                     <th>Acción</th>
+
                                 </tr>
 
                             </thead>
@@ -803,9 +931,8 @@
             </section>
 
 
-
             {{-- =================================================
-                 SECCIÓN 04 - ADICIONALES
+                 SECCIÓN 04 - FAMILIARES
             ================================================== --}}
 
             <section
@@ -813,6 +940,7 @@
                 class="seccion-docente">
 
                 <div class="docente-section-card">
+
 
                     <div class="docente-section-header">
 
@@ -863,6 +991,7 @@
                             <thead>
 
                                 <tr>
+
                                     <th>Apellidos y nombres</th>
                                     <th>Parentesco</th>
                                     <th>Fecha nac.</th>
@@ -872,6 +1001,7 @@
                                     <th>Celular</th>
                                     <th>Depende</th>
                                     <th>Acción</th>
+
                                 </tr>
 
                             </thead>
@@ -888,7 +1018,6 @@
             </section>
 
         </main>
-
 
 
         {{-- =====================================================
@@ -943,7 +1072,6 @@
     </div>
 
 
-
     {{-- =========================================================
          MODAL DOMICILIO
     ========================================================== --}}
@@ -951,11 +1079,13 @@
     <div
         class="modal fade docente-modal"
         id="modalDomicilio"
-        tabindex="-1">
+        tabindex="-1"
+        aria-hidden="true">
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
 
             <div class="modal-content">
+
 
                 <div class="modal-header">
 
@@ -979,6 +1109,7 @@
 
                     </div>
 
+
                     <button
                         type="button"
                         class="btn-close btn-close-white"
@@ -994,9 +1125,12 @@
 
                         <div class="docente-form-grid">
 
+
+                            {{-- PAÍS --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="selectPaisDom">
                                     País
                                 </label>
 
@@ -1021,9 +1155,11 @@
                             </div>
 
 
+                            {{-- DEPARTAMENTO --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="selectDepartamentoDom">
                                     Departamento
                                 </label>
 
@@ -1041,9 +1177,11 @@
                             </div>
 
 
+                            {{-- PROVINCIA --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="selectProvinciaDom">
                                     Provincia
                                 </label>
 
@@ -1061,9 +1199,11 @@
                             </div>
 
 
+                            {{-- DISTRITO --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="selectDistritoDom">
                                     Distrito
                                 </label>
 
@@ -1081,9 +1221,29 @@
                             </div>
 
 
+                            {{-- DIRECCIÓN EXTRANJERA --}}
+
+                            <div
+                                class="docente-field docente-field--wide">
+
+                                <label for="inputDirExtDom">
+                                    Dirección extranjera
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="inputDirExtDom"
+                                    placeholder="Ingrese la dirección si reside en el extranjero">
+
+                            </div>
+
+
+                            {{-- TIPO VÍA --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="selectTipoVia">
                                     Tipo de vía
                                 </label>
 
@@ -1107,28 +1267,45 @@
                                         Calle
                                     </option>
 
+                                    <option value="PASAJE">
+                                        Pasaje
+                                    </option>
+
+                                    <option value="CARRETERA">
+                                        Carretera
+                                    </option>
+
+                                    <option value="OTRO">
+                                        Otro
+                                    </option>
+
                                 </select>
 
                             </div>
 
 
+                            {{-- NOMBRE VÍA --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="nombreVia">
                                     Nombre de la vía
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="nombreVia">
+                                    id="nombreVia"
+                                    placeholder="Ej. Av. Javier Prado">
 
                             </div>
 
 
+                            {{-- TIPO INMUEBLE --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="selectTipoInmueble">
                                     Tipo de inmueble
                                 </label>
 
@@ -1148,21 +1325,32 @@
                                         Departamento
                                     </option>
 
+                                    <option value="OFICINA">
+                                        Oficina
+                                    </option>
+
+                                    <option value="OTRO">
+                                        Otro
+                                    </option>
+
                                 </select>
 
                             </div>
 
 
+                            {{-- NÚMERO --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="numeroInmueble">
                                     Número de inmueble
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="numeroInmueble">
+                                    id="numeroInmueble"
+                                    placeholder="Ej. 123">
 
                             </div>
 
@@ -1182,6 +1370,7 @@
 
                         </button>
 
+
                         <button
                             type="button"
                             class="btn-docente btn-docente--primary"
@@ -1189,7 +1378,7 @@
 
                             <i class="fas fa-save"></i>
 
-                            Guardar
+                            Guardar domicilio
 
                         </button>
 
@@ -1204,7 +1393,6 @@
     </div>
 
 
-
     {{-- =========================================================
          MODAL FORMACIÓN
     ========================================================== --}}
@@ -1212,11 +1400,13 @@
     <div
         class="modal fade docente-modal"
         id="modalFormacion"
-        tabindex="-1">
+        tabindex="-1"
+        aria-hidden="true">
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
 
             <div class="modal-content">
+
 
                 <div class="modal-header">
 
@@ -1240,6 +1430,7 @@
 
                     </div>
 
+
                     <button
                         type="button"
                         class="btn-close btn-close-white"
@@ -1255,9 +1446,12 @@
 
                         <div class="docente-form-grid">
 
+
+                            {{-- NIVEL --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="formacionNivel">
                                     Nivel de formación
                                 </label>
 
@@ -1266,7 +1460,15 @@
                                     id="formacionNivel">
 
                                     <option value="-">
-                                        Seleccionar
+                                        -- Seleccionar --
+                                    </option>
+
+                                    <option value="Técnico">
+                                        Técnico
+                                    </option>
+
+                                    <option value="Bachiller">
+                                        Bachiller
                                     </option>
 
                                     <option value="Licenciatura">
@@ -1281,49 +1483,189 @@
                                         Doctorado
                                     </option>
 
+                                    <option value="Postdoctorado">
+                                        Postdoctorado
+                                    </option>
+
                                 </select>
 
                             </div>
 
 
+                            {{-- PAÍS --}}
+
                             <div class="docente-field">
 
-                                <label>
-                                    Universidad
+                                <label for="formacionPais">
+                                    País
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="formacionPais">
+
+                                    <option value="">
+                                        -- Seleccionar --
+                                    </option>
+
+                                    <option value="Perú">
+                                        Perú
+                                    </option>
+
+                                    <option value="Argentina">
+                                        Argentina
+                                    </option>
+
+                                    <option value="Brasil">
+                                        Brasil
+                                    </option>
+
+                                    <option value="Chile">
+                                        Chile
+                                    </option>
+
+                                    <option value="Colombia">
+                                        Colombia
+                                    </option>
+
+                                    <option value="España">
+                                        España
+                                    </option>
+
+                                    <option value="Estados Unidos">
+                                        Estados Unidos
+                                    </option>
+
+                                    <option value="México">
+                                        México
+                                    </option>
+
+                                    <option value="Otro">
+                                        Otro
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            {{-- UNIVERSIDAD --}}
+
+                            <div class="docente-field docente-field--wide">
+
+                                <label for="formacionUniversidad">
+                                    Universidad / institución
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="formacionUniversidad">
+                                    id="formacionUniversidad"
+                                    placeholder="Nombre de la universidad o institución">
 
                             </div>
 
 
-                            <div class="docente-field">
+                            {{-- ESPECIALIDAD --}}
 
-                                <label>
+                            <div class="docente-field docente-field--wide">
+
+                                <label for="formacionEspecialidad">
                                     Especialidad
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="formacionEspecialidad">
+                                    id="formacionEspecialidad"
+                                    placeholder="Especialidad o carrera">
 
                             </div>
 
 
+                            {{-- FECHA INICIO --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="formacionFecInicio">
+                                    Fecha de inicio
+                                </label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="formacionFecInicio">
+
+                            </div>
+
+
+                            {{-- FECHA FINAL --}}
+
+                            <div class="docente-field">
+
+                                <label for="formacionFecFinal">
+                                    Fecha de finalización
+                                </label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="formacionFecFinal">
+
+                            </div>
+
+
+                            {{-- GRADO --}}
+
+                            <div class="docente-field docente-field--wide">
+
+                                <label for="formacionGrado">
                                     Grado obtenido
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="formacionGrado">
+                                    id="formacionGrado"
+                                    placeholder="Ej. Ingeniero de Sistemas">
+
+                            </div>
+
+
+                            {{-- DOCUMENTO --}}
+
+                            <div class="docente-field docente-field--wide">
+
+                                <label for="formacionDoc">
+                                    Documento de sustento
+                                </label>
+
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    id="formacionDoc"
+                                    accept=".pdf">
+
+                                <small class="text-muted">
+                                    Formato permitido: PDF
+                                </small>
+
+                            </div>
+
+
+                            {{-- OBSERVACIÓN --}}
+
+                            <div class="docente-field docente-field--wide">
+
+                                <label for="formacionObs">
+                                    Observación
+                                </label>
+
+                                <textarea
+                                    class="form-control"
+                                    id="formacionObs"
+                                    rows="3"
+                                    placeholder="Observaciones adicionales"></textarea>
 
                             </div>
 
@@ -1343,6 +1685,7 @@
 
                         </button>
 
+
                         <button
                             type="button"
                             class="btn-docente btn-docente--primary"
@@ -1350,7 +1693,7 @@
 
                             <i class="fas fa-save"></i>
 
-                            Guardar
+                            Guardar formación
 
                         </button>
 
@@ -1365,7 +1708,6 @@
     </div>
 
 
-
     {{-- =========================================================
          MODAL FAMILIAR
     ========================================================== --}}
@@ -1373,11 +1715,13 @@
     <div
         class="modal fade docente-modal"
         id="modalFamiliar"
-        tabindex="-1">
+        tabindex="-1"
+        aria-hidden="true">
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
 
             <div class="modal-content">
+
 
                 <div class="modal-header">
 
@@ -1401,6 +1745,7 @@
 
                     </div>
 
+
                     <button
                         type="button"
                         class="btn-close btn-close-white"
@@ -1416,30 +1761,230 @@
 
                         <div class="docente-form-grid">
 
-                            <div class="docente-field">
 
-                                <label>
+                            {{-- NOMBRE --}}
+
+                            <div class="docente-field docente-field--wide">
+
+                                <label for="familiarNombre">
                                     Nombres y apellidos
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="familiarNombre">
+                                    id="familiarNombre"
+                                    placeholder="Apellidos y nombres">
 
                             </div>
 
 
+                            {{-- PARENTESCO --}}
+
                             <div class="docente-field">
 
-                                <label>
+                                <label for="familiarParentesco">
                                     Parentesco
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="familiarParentesco">
+
+                                    <option value="">
+                                        -- Seleccionar --
+                                    </option>
+
+                                    <option value="Cónyuge">
+                                        Cónyuge
+                                    </option>
+
+                                    <option value="Hijo(a)">
+                                        Hijo(a)
+                                    </option>
+
+                                    <option value="Padre">
+                                        Padre
+                                    </option>
+
+                                    <option value="Madre">
+                                        Madre
+                                    </option>
+
+                                    <option value="Hermano(a)">
+                                        Hermano(a)
+                                    </option>
+
+                                    <option value="Otro">
+                                        Otro
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            {{-- FECHA NACIMIENTO --}}
+
+                            <div class="docente-field">
+
+                                <label for="familiarFecNac">
+                                    Fecha de nacimiento
+                                </label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="familiarFecNac">
+
+                            </div>
+
+
+                            {{-- ESTADO CIVIL --}}
+
+                            <div class="docente-field">
+
+                                <label for="familiarEstadoCivil">
+                                    Estado civil
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="familiarEstadoCivil">
+
+                                    <option value="">
+                                        -- Seleccionar --
+                                    </option>
+
+                                    <option value="Soltero(a)">
+                                        Soltero(a)
+                                    </option>
+
+                                    <option value="Casado(a)">
+                                        Casado(a)
+                                    </option>
+
+                                    <option value="Divorciado(a)">
+                                        Divorciado(a)
+                                    </option>
+
+                                    <option value="Viudo(a)">
+                                        Viudo(a)
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            {{-- ESTUDIOS --}}
+
+                            <div class="docente-field">
+
+                                <label for="familiarEstudios">
+                                    Nivel de estudios
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="familiarEstudios">
+
+                                    <option value="">
+                                        -- Seleccionar --
+                                    </option>
+
+                                    <option value="Inicial">
+                                        Inicial
+                                    </option>
+
+                                    <option value="Primaria">
+                                        Primaria
+                                    </option>
+
+                                    <option value="Secundaria">
+                                        Secundaria
+                                    </option>
+
+                                    <option value="Técnico">
+                                        Técnico
+                                    </option>
+
+                                    <option value="Universitario">
+                                        Universitario
+                                    </option>
+
+                                    <option value="Maestría">
+                                        Maestría
+                                    </option>
+
+                                    <option value="Doctorado">
+                                        Doctorado
+                                    </option>
+
+                                    <option value="Otro">
+                                        Otro
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            {{-- OCUPACIÓN --}}
+
+                            <div class="docente-field">
+
+                                <label for="familiarOcupacion">
+                                    Ocupación
                                 </label>
 
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="familiarParentesco">
+                                    id="familiarOcupacion"
+                                    placeholder="Ocupación">
+
+                            </div>
+
+
+                            {{-- CELULAR --}}
+
+                            <div class="docente-field">
+
+                                <label for="familiarCelular">
+                                    Celular
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="familiarCelular"
+                                    placeholder="Número de celular">
+
+                            </div>
+
+
+                            {{-- DEPENDENCIA --}}
+
+                            <div class="docente-field">
+
+                                <label for="familiarDepende">
+                                    ¿Depende económicamente?
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="familiarDepende">
+
+                                    <option value="No">
+                                        No
+                                    </option>
+
+                                    <option value="Si">
+                                        Sí
+                                    </option>
+
+                                </select>
 
                             </div>
 
@@ -1459,6 +2004,7 @@
 
                         </button>
 
+
                         <button
                             type="button"
                             class="btn-docente btn-docente--primary"
@@ -1466,7 +2012,7 @@
 
                             <i class="fas fa-save"></i>
 
-                            Guardar
+                            Guardar familiar
 
                         </button>
 
@@ -1481,7 +2027,6 @@
     </div>
 
 
-
     {{-- =========================================================
          CSS
     ========================================================== --}}
@@ -1489,11 +2034,38 @@
     @vite(['public/css/informacion.css'])
 
 
-    {{-- =========================================================
-         JAVASCRIPT
-    ========================================================== --}}
+ 
 
-    <script src="{{ asset('js/informacion.js') }}"></script>
+
+
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+{{-- ============================================================
+     RUTAS API
+     ============================================================ --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+    window.informacionApi = {
+        informacion: "{{ url('/api/docente/informacion') }}",
+        domicilios: "{{ url('/api/docente/domicilios') }}",
+        familiares: "{{ url('/api/docente/familiares') }}",
+        formaciones: "{{ url('/api/docente/formaciones') }}"
+    };
+</script>
+
+
+{{-- ============================================================
+     JAVASCRIPT
+     ============================================================ --}}
+
+<script src="{{ asset('js/informacion.js') }}"></script>
+
+
+
 
 
 </x-app-layout>
+

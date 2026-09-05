@@ -11,6 +11,10 @@ class Alumno extends Model
 
     protected $table = 'alumnos';
 
+    protected $primaryKey = 'id';
+
+    public $timestamps = true;
+
     protected $fillable = [
         'codAlumno',
         'apePaterno',
@@ -21,3 +25,4 @@ class Alumno extends Model
         'email',
     ];
 }
+

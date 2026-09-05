@@ -453,6 +453,10 @@ document.addEventListener(
    CARGAR JSON
 ============================================================ */
 
+/* ============================================================
+   CARGAR DATOS DESDE LARAVEL + MYSQL
+============================================================ */
+
 async function cargarDatosCompletos() {
 
     if (cargandoDatos) {
@@ -471,8 +475,15 @@ async function cargarDatosCompletos() {
     const valorRaw =
         selectSemestre
             ? selectSemestre.value
-            : '20261';
+            : '20262';
 
+
+    /*
+     * Normalizar semestre
+     *
+     * 20262 -> 20262
+     * 20261 -> 20261
+     */
 
     const semestreSeleccionado =
         String(valorRaw)
@@ -484,12 +495,12 @@ async function cargarDatosCompletos() {
     try {
 
         /* ====================================================
-           URL HORARIO
+           URL API HORARIO
         ==================================================== */
 
-        const urlHorario =
-            window.urlHorarioJson ||
-            '/json/horario.json';
+        const urlHorarioApi =
+            window.urlHorarioApi ||
+            '/api/horarios';
 
 
         /* ====================================================
@@ -502,7 +513,30 @@ async function cargarDatosCompletos() {
 
 
         /* ====================================================
-           CARGAR AMBOS JSON
+           PARÁMETROS API
+        ==================================================== */
+
+        const parametros =
+            new URLSearchParams({
+
+                semestre:
+                    semestreSeleccionado
+
+            });
+
+
+        const urlFinalHorario =
+            `${urlHorarioApi}?${parametros.toString()}`;
+
+
+        console.log(
+            'Consultando API:',
+            urlFinalHorario
+        );
+
+
+        /* ====================================================
+           CARGAR HORARIO + ALUMNOS
         ==================================================== */
 
         const [
@@ -511,8 +545,15 @@ async function cargarDatosCompletos() {
         ] = await Promise.all([
 
             fetch(
-                urlHorario,
+                urlFinalHorario,
                 {
+                    method: 'GET',
+
+                    headers: {
+                        'Accept':
+                            'application/json'
+                    },
+
                     cache: 'no-store'
                 }
             ),
@@ -520,6 +561,8 @@ async function cargarDatosCompletos() {
             fetch(
                 urlAlumnos,
                 {
+                    method: 'GET',
+
                     cache: 'no-store'
                 }
             )
@@ -534,7 +577,7 @@ async function cargarDatosCompletos() {
         if (!resHorarios.ok) {
 
             throw new Error(
-                'No se pudo cargar horario.json'
+                `Error HTTP horario: ${resHorarios.status}`
             );
 
         }
@@ -547,17 +590,17 @@ async function cargarDatosCompletos() {
         if (!resAlumnos.ok) {
 
             throw new Error(
-                'No se pudo cargar alumnos.json'
+                `No se pudo cargar alumnos.json`
             );
 
         }
 
 
         /* ====================================================
-           CONVERTIR JSON
+           CONVERTIR RESPUESTAS
         ==================================================== */
 
-        const dataHorarios =
+        const resultadoHorario =
             await resHorarios.json();
 
 
@@ -566,21 +609,37 @@ async function cargarDatosCompletos() {
 
 
         /* ====================================================
-           VALIDAR ARRAYS
+           VALIDAR RESPUESTA API
         ==================================================== */
 
         if (
-            !Array.isArray(
-                dataHorarios
-            )
+            !resultadoHorario ||
+            resultadoHorario.success !== true
         ) {
 
             throw new Error(
-                'horario.json debe contener un arreglo'
+                resultadoHorario?.error ||
+                'La API de horarios no devolvió datos válidos.'
             );
 
         }
 
+
+        /* ====================================================
+           OBTENER DATA
+        ==================================================== */
+
+        horariosData =
+            Array.isArray(
+                resultadoHorario.data
+            )
+                ? resultadoHorario.data
+                : [];
+
+
+        /* ====================================================
+           VALIDAR ALUMNOS
+        ==================================================== */
 
         if (
             !Array.isArray(
@@ -596,20 +655,6 @@ async function cargarDatosCompletos() {
 
 
         /* ====================================================
-           FILTRAR SEMESTRE
-        ==================================================== */
-
-        horariosData =
-            dataHorarios.filter(
-                item =>
-                    String(
-                        item.semestre
-                    ) ===
-                    semestreSeleccionado
-            );
-
-
-        /* ====================================================
            CONSOLA
         ==================================================== */
 
@@ -622,8 +667,17 @@ async function cargarDatosCompletos() {
         );
 
         console.log(
+            'Fuente: Laravel + MySQL'
+        );
+
+        console.log(
             'Semestre:',
             semestreSeleccionado
+        );
+
+        console.log(
+            'Total horarios:',
+            horariosData.length
         );
 
         console.log(
