@@ -633,23 +633,15 @@
     </div>
 
 
-    {{-- =====================================================
-        CONFIGURACIÓN DE RUTAS JSON
-    ====================================================== --}}
     <script>
-    window.urlAsistenciaJson = "{{ asset('json/asistencia-docente.json') }}";
-    window.urlHorarioJson = "{{ asset('json/horario.json') }}";
-    window.urlAlumnosJson = "{{ asset('json/alumnos.json') }}";
+    window.asistenciaApi = {
+        asistencias: "{{ url('/api/asistencias') }}",
+        horarios: "{{ url('/api/horarios') }}",
+        alumnos: "{{ url('/api/alumnos') }}"
+    };
 </script>
 
-
-    {{-- =====================================================
-        JAVASCRIPT
-        ARCHIVO:
-        public/js/asistencia.js
-    ====================================================== --}}
-    <script src="{{ asset('js/asistencia.js') }}"></script>
-
+<script src="{{ asset('js/asistencia.js') }}"></script>
 
 </x-app-layout>
 

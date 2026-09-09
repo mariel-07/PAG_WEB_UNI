@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -60,11 +59,6 @@ Route::middleware('auth')->group(function () {
     | ========================================================================
     | MÓDULO INFORMACIÓN DOCENTE
     | ========================================================================
-    |
-    | El docente autenticado se identifica mediante:
-    |
-    | users.email → docentes.email
-    |
     |--------------------------------------------------------------------------
     */
 
@@ -84,11 +78,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | INFORMACIÓN GENERAL DEL DOCENTE
     |--------------------------------------------------------------------------
-    |
-    | GET  → Obtener información desde MySQL
-    | PUT  → Actualizar datos personales
-    |
-    |--------------------------------------------------------------------------
     */
 
     Route::get(
@@ -105,12 +94,6 @@ Route::middleware('auth')->group(function () {
     /*
     |--------------------------------------------------------------------------
     | DOMICILIOS
-    |--------------------------------------------------------------------------
-    |
-    | POST   → Registrar domicilio
-    | PUT    → Editar domicilio
-    | DELETE → Eliminar domicilio
-    |
     |--------------------------------------------------------------------------
     */
 
@@ -134,12 +117,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | FAMILIARES / CARGA FAMILIAR
     |--------------------------------------------------------------------------
-    |
-    | POST   → Registrar familiar
-    | PUT    → Editar familiar
-    | DELETE → Eliminar familiar
-    |
-    |--------------------------------------------------------------------------
     */
 
     Route::post(
@@ -162,12 +139,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | FORMACIÓN PROFESIONAL
     |--------------------------------------------------------------------------
-    |
-    | POST   → Registrar formación + PDF
-    | PUT    → Editar formación
-    | DELETE → Eliminar formación + PDF
-    |
-    |--------------------------------------------------------------------------
     */
 
     Route::post(
@@ -181,9 +152,10 @@ Route::middleware('auth')->group(function () {
     );
 
     Route::delete(
-    '/api/docente/formaciones/{id}',
-    [InformacionController::class, 'eliminarFormacion']
-);
+        '/api/docente/formaciones/{id}',
+        [InformacionController::class, 'eliminarFormacion']
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -195,9 +167,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get(
         '/docente/asistencia',
-        function () {
-            return view('docente.asistencia');
-        }
+        [AsistenciaController::class, 'vista']
     )->name('docente.asistencia');
 
 
@@ -209,31 +179,101 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('api/asistencias')->group(function () {
 
-        // LISTAR
+        /*
+        |----------------------------------------------------------------------
+        | LISTAR ASISTENCIAS
+        |----------------------------------------------------------------------
+        */
+
         Route::get('/', [
             AsistenciaController::class,
             'index'
         ]);
 
-        // CREAR
+
+        /*
+        |----------------------------------------------------------------------
+        | CREAR ASISTENCIA GENERAL
+        |----------------------------------------------------------------------
+        */
+
         Route::post('/', [
             AsistenciaController::class,
             'store'
         ]);
 
-        // VER UNA
+
+        /*
+        |----------------------------------------------------------------------
+        | GUARDAR / ACTUALIZAR ASISTENCIA DE UN ALUMNO
+        |----------------------------------------------------------------------
+        |
+        | Aquí se guarda:
+        |
+        | codHorario
+        | codDocente
+        | codAlumno
+        | fecha
+        | codCurso
+        | secCurso
+        | semestre
+        | estado
+        | observacion
+        |
+        */
+
+        Route::post('/alumno', [
+            AsistenciaController::class,
+            'guardarAsistenciaAlumno'
+        ]);
+
+
+        /*
+        |----------------------------------------------------------------------
+        | OBTENER ASISTENCIAS INDIVIDUALES DE ALUMNOS
+        |----------------------------------------------------------------------
+        |
+        | Esta ruta será utilizada también por Horario Docente
+        | para mostrar el mismo estado guardado en MySQL.
+        |
+        */
+
+        Route::get('/alumnos', [
+            AsistenciaController::class,
+            'obtenerAsistenciasAlumnos'
+        ]);
+
+
+        /*
+        |----------------------------------------------------------------------
+        | VER UNA ASISTENCIA
+        |----------------------------------------------------------------------
+        */
+
         Route::get('/{id}', [
             AsistenciaController::class,
             'show'
         ]);
 
-        // ACTUALIZAR
+
+        /*
+        |----------------------------------------------------------------------
+        | ACTUALIZAR ASISTENCIA
+        |----------------------------------------------------------------------
+        */
+
         Route::put('/{id}', [
             AsistenciaController::class,
             'update'
         ]);
 
-        // ELIMINAR
+
+        /*
+        |----------------------------------------------------------------------
+        | ELIMINAR ASISTENCIA
+        |----------------------------------------------------------------------
+        */
+
         Route::delete('/{id}', [
             AsistenciaController::class,
             'destroy'
@@ -271,9 +311,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | RUTA ALTERNATIVA HORARIOS
     |--------------------------------------------------------------------------
-    |
-    | Compatible con versiones anteriores del JavaScript.
-    |
     */
 
     Route::get(
@@ -298,9 +335,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | RUTA ALTERNATIVA ALUMNOS
     |--------------------------------------------------------------------------
-    |
-    | Compatible con versiones anteriores del JavaScript.
-    |
     */
 
     Route::get(

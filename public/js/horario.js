@@ -2,15 +2,15 @@
    HORARIO DOCENTE
    ============================================================
 
-   FUENTES JSON:
+   FUENTES:
 
-   horario.json
+   Laravel + MySQL
         |
         | codHorario
         v
-   alumnos.json
+   API /api/alumnos
         |
-        | idHorario
+        | codCurso + secCurso + semestre
         v
    LISTA DE ALUMNOS
 
@@ -71,6 +71,29 @@ const diasMap = {
 let horariosData = [];
 
 let alumnosDataCache = [];
+
+/*
+ * NUEVO:
+ * Guarda los alumnos de cada horario.
+ *
+ * Ejemplo:
+ *
+ * alumnosPorHorario[27922]
+ * alumnosPorHorario[28522]
+ *
+ */
+
+let alumnosPorHorario = {};
+
+
+/*
+ * NUEVO:
+ * Evita consultar varias veces el mismo
+ * curso + sección + semestre.
+ */
+
+let alumnosPorCurso = {};
+
 
 let cargandoDatos = false;
 
@@ -324,6 +347,10 @@ document.addEventListener(
     'DOMContentLoaded',
     () => {
 
+        console.log(
+            'Inicializando horario...'
+        );
+
         cargarDatosCompletos();
 
 
@@ -450,10 +477,6 @@ document.addEventListener(
 
 
 /* ============================================================
-   CARGAR JSON
-============================================================ */
-
-/* ============================================================
    CARGAR DATOS DESDE LARAVEL + MYSQL
 ============================================================ */
 
@@ -479,17 +502,14 @@ async function cargarDatosCompletos() {
 
 
     /*
-     * Normalizar semestre
+     * El select actualmente usa:
      *
-     * 20262 -> 20262
-     * 20261 -> 20261
+     * 20262
+     * 20261
      */
 
     const semestreSeleccionado =
-        String(valorRaw)
-            .replace('-', '')
-            .replace('I', '1')
-            .replace('II', '2');
+        String(valorRaw);
 
 
     try {
@@ -504,16 +524,16 @@ async function cargarDatosCompletos() {
 
 
         /* ====================================================
-           URL ALUMNOS
+           URL API ALUMNOS
         ==================================================== */
 
-        const urlAlumnos =
-            window.urlAlumnosJson ||
-            '/json/alumnos.json';
+        const urlAlumnosApi =
+            window.urlAlumnosApi ||
+            '/api/alumnos';
 
 
         /* ====================================================
-           PARÁMETROS API
+           PARÁMETROS HORARIO
         ==================================================== */
 
         const parametros =
@@ -530,21 +550,17 @@ async function cargarDatosCompletos() {
 
 
         console.log(
-            'Consultando API:',
+            'Consultando horarios:',
             urlFinalHorario
         );
 
 
         /* ====================================================
-           CARGAR HORARIO + ALUMNOS
+           CARGAR HORARIOS
         ==================================================== */
 
-        const [
-            resHorarios,
-            resAlumnos
-        ] = await Promise.all([
-
-            fetch(
+        const resHorarios =
+            await fetch(
                 urlFinalHorario,
                 {
                     method: 'GET',
@@ -556,23 +572,8 @@ async function cargarDatosCompletos() {
 
                     cache: 'no-store'
                 }
-            ),
+            );
 
-            fetch(
-                urlAlumnos,
-                {
-                    method: 'GET',
-
-                    cache: 'no-store'
-                }
-            )
-
-        ]);
-
-
-        /* ====================================================
-           VALIDAR HORARIO
-        ==================================================== */
 
         if (!resHorarios.ok) {
 
@@ -583,33 +584,12 @@ async function cargarDatosCompletos() {
         }
 
 
-        /* ====================================================
-           VALIDAR ALUMNOS
-        ==================================================== */
-
-        if (!resAlumnos.ok) {
-
-            throw new Error(
-                `No se pudo cargar alumnos.json`
-            );
-
-        }
-
-
-        /* ====================================================
-           CONVERTIR RESPUESTAS
-        ==================================================== */
-
         const resultadoHorario =
             await resHorarios.json();
 
 
-        alumnosDataCache =
-            await resAlumnos.json();
-
-
         /* ====================================================
-           VALIDAR RESPUESTA API
+           VALIDAR HORARIO
         ==================================================== */
 
         if (
@@ -637,21 +617,257 @@ async function cargarDatosCompletos() {
                 : [];
 
 
+        console.log(
+            'Horarios cargados desde MySQL:',
+            horariosData
+        );
+
+
+        console.log(
+            'Total horarios:',
+            horariosData.length
+        );
+
+
         /* ====================================================
-           VALIDAR ALUMNOS
+           LIMPIAR CACHE DE ALUMNOS
         ==================================================== */
 
-        if (
-            !Array.isArray(
-                alumnosDataCache
-            )
-        ) {
+        alumnosDataCache = [];
 
-            throw new Error(
-                'alumnos.json debe contener un arreglo'
+        alumnosPorHorario = {};
+
+        alumnosPorCurso = {};
+
+
+        /* ====================================================
+           CARGAR ALUMNOS DE CADA HORARIO
+        ==================================================== */
+
+        const consultasAlumnos =
+            horariosData.map(
+                async clase => {
+
+                    const codHorario =
+                        Number(
+                            clase.codHorario
+                        );
+
+
+                    const codCurso =
+                        clase.codCurso;
+
+
+                    const secCurso =
+                        clase.secCurso;
+
+
+                    const clave =
+                        `${codCurso}_${secCurso}_${semestreSeleccionado}`;
+
+
+                    console.log(
+                        'Consultando alumnos:',
+                        codCurso,
+                        secCurso,
+                        semestreSeleccionado
+                    );
+
+
+                    /* ========================================
+                       SI YA TENEMOS ESE CURSO
+                    ======================================== */
+
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            alumnosPorCurso,
+                            clave
+                        )
+                    ) {
+
+                        const alumnos =
+                            alumnosPorCurso[clave] || [];
+
+
+                        alumnosPorHorario[
+                            codHorario
+                        ] =
+                            alumnos;
+
+
+                        return alumnos;
+
+                    }
+
+
+                    /* ========================================
+                       PARÁMETROS ALUMNOS
+                    ======================================== */
+
+                    const parametrosAlumnos =
+                        new URLSearchParams({
+
+                            codCurso:
+                                codCurso,
+
+                            secCurso:
+                                secCurso,
+
+                            semestre:
+                                semestreSeleccionado
+
+                        });
+
+
+                    const urlFinalAlumnos =
+                        `${urlAlumnosApi}?${parametrosAlumnos.toString()}`;
+
+
+                    /* ========================================
+                       CONSULTAR API
+                    ======================================== */
+
+                    const resAlumnos =
+                        await fetch(
+                            urlFinalAlumnos,
+                            {
+                                method: 'GET',
+
+                                headers: {
+                                    'Accept':
+                                        'application/json'
+                                },
+
+                                cache: 'no-store'
+                            }
+                        );
+
+
+                    if (!resAlumnos.ok) {
+
+                        throw new Error(
+                            `Error HTTP alumnos: ${resAlumnos.status}`
+                        );
+
+                    }
+
+
+                    const resultadoAlumnos =
+                        await resAlumnos.json();
+
+
+                    /* ========================================
+                       VALIDAR
+                    ======================================== */
+
+                    if (
+                        !resultadoAlumnos ||
+                        resultadoAlumnos.success !== true
+                    ) {
+
+                        throw new Error(
+                            resultadoAlumnos?.error ||
+                            `No se pudieron cargar alumnos de ${codCurso}-${secCurso}`
+                        );
+
+                    }
+
+
+                    const alumnos =
+                        Array.isArray(
+                            resultadoAlumnos.alumnos
+                        )
+                            ? resultadoAlumnos.alumnos
+                            : [];
+
+
+                    /* ========================================
+                       GUARDAR POR CURSO
+                    ======================================== */
+
+                    alumnosPorCurso[
+                        clave
+                    ] =
+                        alumnos;
+
+
+                    /* ========================================
+                       GUARDAR POR HORARIO
+                    ======================================== */
+
+                    alumnosPorHorario[
+                        codHorario
+                    ] =
+                        alumnos;
+
+
+                    return alumnos;
+
+                }
             );
 
-        }
+
+        /* ====================================================
+           ESPERAR TODAS LAS CONSULTAS
+        ==================================================== */
+
+        const resultadosAlumnos =
+            await Promise.all(
+                consultasAlumnos
+            );
+
+
+        /* ====================================================
+           CREAR CACHE GENERAL
+        ==================================================== */
+
+        const alumnosUnicos = {};
+
+
+        resultadosAlumnos.forEach(
+            alumnos => {
+
+                if (
+                    !Array.isArray(
+                        alumnos
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                alumnos.forEach(
+                    alumno => {
+
+                        const codigo =
+                            alumno.codigo;
+
+
+                        if (
+                            codigo !== undefined &&
+                            codigo !== null
+                        ) {
+
+                            alumnosUnicos[
+                                codigo
+                            ] =
+                                alumno;
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        alumnosDataCache =
+            Object.values(
+                alumnosUnicos
+            );
 
 
         /* ====================================================
@@ -659,39 +875,14 @@ async function cargarDatosCompletos() {
         ==================================================== */
 
         console.log(
-            '================================'
+            'Alumnos cargados desde MySQL:',
+            alumnosDataCache.length
         );
 
-        console.log(
-            'HORARIO DOCENTE'
-        );
 
         console.log(
-            'Fuente: Laravel + MySQL'
-        );
-
-        console.log(
-            'Semestre:',
-            semestreSeleccionado
-        );
-
-        console.log(
-            'Total horarios:',
-            horariosData.length
-        );
-
-        console.log(
-            'Horarios:',
-            horariosData
-        );
-
-        console.log(
-            'Alumnos:',
-            alumnosDataCache
-        );
-
-        console.log(
-            '================================'
+            'Alumnos por horario:',
+            alumnosPorHorario
         );
 
 
@@ -762,6 +953,11 @@ function construirMapaHorario() {
                 !rango
             ) {
 
+                console.warn(
+                    'Horario descartado:',
+                    clase
+                );
+
                 return;
 
             }
@@ -770,6 +966,11 @@ function construirMapaHorario() {
             if (
                 !mapa[dia]
             ) {
+
+                console.warn(
+                    'Día no reconocido:',
+                    clase.dia
+                );
 
                 return;
 
@@ -1116,14 +1317,32 @@ function renderizarTablaHorario() {
                             );
 
 
+                        /*
+                         * CAMBIO IMPORTANTE:
+                         *
+                         * Ya no buscamos:
+                         *
+                         * alumno.idHorario
+                         *
+                         * porque MySQL devuelve:
+                         *
+                         * codigo
+                         * nombre
+                         * celular
+                         * esp
+                         * email
+                         *
+                         */
+
+
+                        const alumnosDelHorario =
+                            alumnosPorHorario[
+                                idHorarioBuscado
+                            ] || [];
+
+
                         const cantidadAlumnos =
-                            alumnosDataCache.filter(
-                                alumno =>
-                                    Number(
-                                        alumno.idHorario
-                                    ) ===
-                                    idHorarioBuscado
-                            ).length;
+                            alumnosDelHorario.length;
 
 
                         /* =====================================
@@ -1489,53 +1708,7 @@ async function cargarYMostrarAlumnos(
     try {
 
         /* ====================================================
-           RECUPERAR ALUMNOS
-        ==================================================== */
-
-        let todosLosAlumnos =
-            alumnosDataCache;
-
-
-        if (
-            !todosLosAlumnos ||
-            todosLosAlumnos.length === 0
-        ) {
-
-            const urlAlumnos =
-                window.urlAlumnosJson ||
-                '/json/alumnos.json';
-
-
-            const resAlumnos =
-                await fetch(
-                    urlAlumnos,
-                    {
-                        cache: 'no-store'
-                    }
-                );
-
-
-            if (!resAlumnos.ok) {
-
-                throw new Error(
-                    'No se pudo cargar alumnos.json'
-                );
-
-            }
-
-
-            todosLosAlumnos =
-                await resAlumnos.json();
-
-
-            alumnosDataCache =
-                todosLosAlumnos;
-
-        }
-
-
-        /* ====================================================
-           BUSCAR POR HORARIO
+           RECUPERAR ALUMNOS DESDE CACHE
         ==================================================== */
 
         const idHorarioBuscado =
@@ -1544,14 +1717,121 @@ async function cargarYMostrarAlumnos(
             );
 
 
+        let alumnos =
+            alumnosPorHorario[
+                idHorarioBuscado
+            ];
+
+
+        /* ====================================================
+           SI NO EXISTE, CONSULTAR API
+        ==================================================== */
+
+        if (!alumnos) {
+
+            const selectSemestre =
+                document.getElementById(
+                    'selectSemestre'
+                );
+
+
+            const semestre =
+                selectSemestre
+                    ? selectSemestre.value
+                    : (
+                        clase.semestre ||
+                        '20262'
+                    );
+
+
+            const urlAlumnosApi =
+                window.urlAlumnosApi ||
+                '/api/alumnos';
+
+
+            const parametros =
+                new URLSearchParams({
+
+                    codCurso:
+                        clase.codCurso,
+
+                    secCurso:
+                        clase.secCurso,
+
+                    semestre:
+                        semestre
+
+                });
+
+
+            const url =
+                `${urlAlumnosApi}?${parametros.toString()}`;
+
+
+            const resAlumnos =
+                await fetch(
+                    url,
+                    {
+                        method: 'GET',
+
+                        headers: {
+                            'Accept':
+                                'application/json'
+                        },
+
+                        cache: 'no-store'
+                    }
+                );
+
+
+            if (!resAlumnos.ok) {
+
+                throw new Error(
+                    `Error HTTP alumnos: ${resAlumnos.status}`
+                );
+
+            }
+
+
+            const resultado =
+                await resAlumnos.json();
+
+
+            if (
+                !resultado ||
+                resultado.success !== true
+            ) {
+
+                throw new Error(
+                    resultado?.error ||
+                    'No se pudieron cargar los alumnos.'
+                );
+
+            }
+
+
+            alumnos =
+                Array.isArray(
+                    resultado.alumnos
+                )
+                    ? resultado.alumnos
+                    : [];
+
+
+            alumnosPorHorario[
+                idHorarioBuscado
+            ] =
+                alumnos;
+
+        }
+
+
+        /* ====================================================
+           GUARDAR ALUMNOS DEL MODAL
+        ==================================================== */
+
         window.currentAlumnosModal =
-            todosLosAlumnos.filter(
-                alumno =>
-                    Number(
-                        alumno.idHorario
-                    ) ===
-                    idHorarioBuscado
-            );
+            alumnos || [];
 
 
         const total =
@@ -1625,6 +1905,22 @@ async function cargarYMostrarAlumnos(
 
         /* ====================================================
            ESTADÍSTICAS
+        ====================================================
+
+           IMPORTANTE:
+
+           La API de alumnos actualmente devuelve:
+
+           codigo
+           nombre
+           celular
+           esp
+           email
+
+           No devuelve asistencia.
+
+           Por eso las estadísticas de asistencia
+           se mantienen en 0 / sin registro.
         ==================================================== */
 
         const presentes =
@@ -1822,6 +2118,10 @@ async function cargarYMostrarAlumnos(
                         'alumno-item';
 
 
+                    /*
+                     * La API MySQL no trae asistencia.
+                     */
+
                     const asistencia =
                         String(
                             al.asistencia ||
@@ -1854,7 +2154,7 @@ async function cargarYMostrarAlumnos(
                                     <i class="far fa-user"></i>
 
                                     ${escapeHTML(
-                                        al.nombres ||
+                                        al.nombre ||
                                         '--'
                                     )}
 
@@ -1866,7 +2166,7 @@ async function cargarYMostrarAlumnos(
                                     <i class="fas fa-envelope"></i>
 
                                     ${escapeHTML(
-                                        al.correo ||
+                                        al.email ||
                                         '--'
                                     )}
 
@@ -1886,7 +2186,7 @@ async function cargarYMostrarAlumnos(
                                 <strong>
 
                                     ${escapeHTML(
-                                        al.codigoEstudiante ||
+                                        al.codigo ||
                                         '--'
                                     )}
 
@@ -1907,13 +2207,14 @@ async function cargarYMostrarAlumnos(
 
 
                             ${
-                                al.observacion
+                                al.celular
                                     ? `
 
                                         <span class="observacion-alumno">
 
+                                            Tel:
                                             ${escapeHTML(
-                                                al.observacion
+                                                al.celular
                                             )}
 
                                         </span>
@@ -2066,23 +2367,25 @@ function exportarExcelAlumnos() {
                 index + 1,
 
                 `"${limpiarCSV(
-                    al.codigoEstudiante
+                    al.codigo
                 )}"`,
 
                 `"${limpiarCSV(
-                    al.nombres
+                    al.nombre
                 )}"`,
 
                 `"${limpiarCSV(
-                    al.correo
+                    al.email
                 )}"`,
 
                 `"${limpiarCSV(
-                    al.asistencia
+                    al.asistencia ||
+                    'SIN REGISTRO'
                 )}"`,
 
                 `"${limpiarCSV(
-                    al.observacion
+                    al.celular ||
+                    ''
                 )}"`
 
             ].join(',');
@@ -2117,15 +2420,11 @@ function exportarExcelAlumnos() {
     link.setAttribute(
         'download',
         `lista_alumnos_${
-
             window.currentClaseModal?.codCurso ||
             'curso'
-
         }_Seccion_${
-
             window.currentClaseModal?.secCurso ||
             ''
-
         }.csv`
     );
 
@@ -2620,21 +2919,21 @@ function exportarPDFAlumnos() {
 
                     <td>
                         ${escapeHTML(
-                            al.codigoEstudiante ||
+                            al.codigo ||
                             ''
                         )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            al.nombres ||
+                            al.nombre ||
                             ''
                         )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            al.correo ||
+                            al.email ||
                             ''
                         )}
                     </td>
@@ -2642,13 +2941,13 @@ function exportarPDFAlumnos() {
                     <td>
                         ${escapeHTML(
                             al.asistencia ||
-                            ''
+                            'SIN REGISTRO'
                         )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            al.observacion ||
+                            al.celular ||
                             ''
                         )}
                     </td>
@@ -2834,6 +3133,18 @@ window.horarioDocenteDebug =
         console.log(
             'Alumnos:',
             alumnosDataCache
+        );
+
+
+        console.log(
+            'Alumnos por horario:',
+            alumnosPorHorario
+        );
+
+
+        console.log(
+            'Alumnos por curso:',
+            alumnosPorCurso
         );
 
 

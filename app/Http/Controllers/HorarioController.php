@@ -93,91 +93,101 @@ class HorarioController extends Controller
      * API:
      * Obtener alumnos matriculados
      */
-    public function getAlumnosMatriculados(Request $request)
-    {
-        try {
+    /**
+ * API:
+ * Obtener alumnos matriculados
+ */
+public function getAlumnosMatriculados(Request $request)
+{
+    try {
 
-            $codCurso = $request->query('codCurso');
+        $codCurso = $request->query('codCurso');
+        $secCurso = $request->query('secCurso');
+        $semestre = $request->query('semestre');
 
-            $secCurso = $request->query('secCurso');
+        $alumnos = DB::table('matricula')
+            ->join(
+                'alumnos',
+                'matricula.codAlumno',
+                '=',
+                'alumnos.codAlumno'
+            )
 
-            $semestre = $request->query('semestre');
+            ->where(
+                'matricula.codCurso',
+                $codCurso
+            )
 
+            ->where(
+                'matricula.secCurso',
+                $secCurso
+            )
 
-            $alumnos = DB::table('matricula')
+            ->where(
+                'matricula.semestre',
+                $semestre
+            )
 
-                ->join(
-                    'alumnos',
-                    'matricula.codAlumno',
-                    '=',
-                    'alumnos.codAlumno'
-                )
+            ->select(
+                'alumnos.codAlumno as codigo',
 
-                ->where(
-                    'matricula.codCurso',
-                    $codCurso
-                )
+                DB::raw("
+                    CONCAT(
+                        alumnos.apePaterno,
+                        ' ',
+                        alumnos.apeMaterno,
+                        ', ',
+                        alumnos.nombres
+                    ) as nombre
+                "),
 
-                ->where(
-                    'matricula.secCurso',
-                    $secCurso
-                )
+                'alumnos.celular',
 
-                ->where(
-                    'matricula.semestre',
-                    $semestre
-                )
+                'alumnos.especialidad as esp',
 
-                ->select(
+                'alumnos.email'
+            )
 
-                    'alumnos.codAlumno as codigo',
+            /*
+             * IMPORTANTE:
+             * elimina alumnos repetidos
+             */
+            ->distinct()
 
-                    DB::raw("
-                        CONCAT(
-                            alumnos.apePaterno,
-                            ' ',
-                            alumnos.apeMaterno,
-                            ', ',
-                            alumnos.nombres
-                        ) as nombre
-                    "),
+            /*
+             * seguridad adicional:
+             * un código de alumno solo debe aparecer
+             * una vez
+             */
+            ->orderBy(
+                'alumnos.codAlumno'
+            )
 
-                    'alumnos.celular',
+            ->get();
 
-                    'alumnos.especialidad as esp',
+        return response()->json([
 
-                    'alumnos.email'
+            'success' => true,
 
-                )
+            'total' => $alumnos->count(),
 
-                ->get();
+            'alumnos' => $alumnos
 
+        ]);
 
-            return response()->json([
+    } catch (\Exception $e) {
 
-                'success' => true,
+        return response()->json([
 
-                'total' => $alumnos->count(),
+            'success' => false,
 
-                'alumnos' => $alumnos
+            'total' => 0,
 
-            ]);
+            'alumnos' => [],
 
+            'error' => $e->getMessage()
 
-        } catch (\Exception $e) {
-
-            return response()->json([
-
-                'success' => false,
-
-                'total' => 0,
-
-                'alumnos' => [],
-
-                'error' => $e->getMessage()
-
-            ], 500);
-
-        }
+        ], 500);
     }
+}
 }
