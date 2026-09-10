@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
+use App\Models\AsistenciaAlumno;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Validation\ValidationException;
 
-class AsistenciaController extends Controller
-{
+class AsistenciaController extends Controller {
     /**
      * Vista de asistencia del docente.
      */
-    public function vista()
-    {
+    public function vista() {
         try {
             if (!Auth::check()) {
                 return redirect()->route('login');
@@ -44,7 +45,6 @@ class AsistenciaController extends Controller
                 'docente' => $docente,
                 'errorDocente' => null
             ]);
-
         } catch (\Throwable $e) {
 
             return view('docente.asistencia', [
@@ -64,8 +64,7 @@ class AsistenciaController extends Controller
      *
      * alumnos -> matricula
      */
-    public function index(Request $request): JsonResponse
-    {
+    public function index(Request $request): JsonResponse {
         try {
 
             /*
@@ -240,7 +239,6 @@ class AsistenciaController extends Controller
 
                 'alumnos' => $alumnos
             ]);
-
         } catch (\Throwable $e) {
 
             return response()->json([
@@ -255,8 +253,7 @@ class AsistenciaController extends Controller
     /**
      * Registrar asistencia.
      */
-    public function store(Request $request): JsonResponse
-    {
+    public function store(Request $request): JsonResponse {
         try {
 
             $validated = $request->validate([
@@ -328,7 +325,6 @@ class AsistenciaController extends Controller
                 'message' => 'Asistencia registrada correctamente.',
                 'data' => $asistencia
             ], 201);
-
         } catch (ValidationException $e) {
 
             return response()->json([
@@ -336,7 +332,6 @@ class AsistenciaController extends Controller
                 'message' => 'Los datos enviados no son válidos.',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Throwable $e) {
 
             return response()->json([
@@ -351,8 +346,7 @@ class AsistenciaController extends Controller
     /**
      * Mostrar una asistencia.
      */
-    public function show($id): JsonResponse
-    {
+    public function show($id): JsonResponse {
         try {
 
             $asistencia = Asistencia::find($id);
@@ -369,7 +363,6 @@ class AsistenciaController extends Controller
                 'success' => true,
                 'data' => $asistencia
             ]);
-
         } catch (\Throwable $e) {
 
             return response()->json([
@@ -384,8 +377,7 @@ class AsistenciaController extends Controller
     /**
      * Actualizar asistencia.
      */
-    public function update(Request $request, $id): JsonResponse
-    {
+    public function update(Request $request, $id): JsonResponse {
         try {
 
             $asistencia = Asistencia::find($id);
@@ -464,7 +456,6 @@ class AsistenciaController extends Controller
                 'message' => 'Asistencia actualizada correctamente.',
                 'data' => $asistencia
             ]);
-
         } catch (ValidationException $e) {
 
             return response()->json([
@@ -472,7 +463,6 @@ class AsistenciaController extends Controller
                 'message' => 'Los datos enviados no son válidos.',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Throwable $e) {
 
             return response()->json([
@@ -487,8 +477,7 @@ class AsistenciaController extends Controller
     /**
      * Eliminar asistencia.
      */
-    public function destroy($id): JsonResponse
-    {
+    public function destroy($id): JsonResponse {
         try {
 
             $asistencia = Asistencia::find($id);
@@ -507,7 +496,6 @@ class AsistenciaController extends Controller
                 'success' => true,
                 'message' => 'Asistencia eliminada correctamente.'
             ]);
-
         } catch (\Throwable $e) {
 
             return response()->json([
@@ -519,110 +507,138 @@ class AsistenciaController extends Controller
     }
 
     /**
- * Guardar o actualizar asistencia de un alumno.
- */
-public function guardarAsistenciaAlumno(Request $request): JsonResponse
-{
-    try {
+     * Asegurar que la tabla asistencia_alumnos exista en la base de datos.
+     */
+    private function asegurarTablaAsistenciaAlumnos(): void {
+        if (!Schema::hasTable('asistencia_alumnos')) {
+            Schema::create('asistencia_alumnos', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('codHorario')->nullable();
+                $table->string('codDocente', 20);
+                $table->string('codAlumno', 20);
+                $table->date('fecha');
+                $table->string('codCurso', 50);
+                $table->string('secCurso', 20);
+                $table->string('semestre', 20);
+                $table->string('estado', 30);
+                $table->text('observacion')->nullable();
+                $table->timestamps();
 
-        $validated = $request->validate([
-            'codHorario' => 'nullable|integer',
-            'codDocente' => 'required|string|max:20',
-            'codAlumno' => 'required|string|max:20',
-            'fecha' => 'required|date',
-            'codCurso' => 'required|string|max:50',
-            'secCurso' => 'required|string|max:20',
-            'semestre' => 'required|string|max:20',
-            'estado' => 'required|string|max:30',
-            'observacion' => 'nullable|string',
-        ]);
+                $table->index(['codAlumno', 'fecha']);
+                $table->index(['codCurso', 'secCurso', 'semestre']);
+            });
+        }
+    }
 
-        $asistencia = AsistenciaAlumno::updateOrCreate(
-            [
-                'codHorario' => $validated['codHorario'] ?? null,
-                'codAlumno' => $validated['codAlumno'],
-                'fecha' => $validated['fecha'],
-                'semestre' => $validated['semestre'],
-            ],
-            $validated
-        );
+    /**
+     * Guardar o actualizar asistencia de un alumno.
+     */
+    public function guardarAsistenciaAlumno(Request $request): JsonResponse {
+        try {
+            $this->asegurarTablaAsistenciaAlumnos();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Asistencia del alumno guardada correctamente.',
-            'data' => $asistencia
-        ]);
+            $codDocente = $request->input('codDocente');
+            if (empty($codDocente) && Auth::check()) {
+                $docente = DB::table('docentes')->where('email', Auth::user()->email)->first();
+                $codDocente = $docente ? $docente->codDocente : 'DOCENTE';
+                $request->merge(['codDocente' => $codDocente]);
+            }
 
-    } catch (ValidationException $e) {
+            if (empty($request->input('codDocente'))) {
+                $request->merge(['codDocente' => 'DOCENTE']);
+            }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Los datos enviados no son válidos.',
-            'errors' => $e->errors()
-        ], 422);
+            $validated = $request->validate([
+                'codHorario' => 'nullable|integer',
+                'codDocente' => 'required|string|max:20',
+                'codAlumno' => 'required|string|max:20',
+                'fecha' => 'required|date',
+                'codCurso' => 'required|string|max:50',
+                'secCurso' => 'required|string|max:20',
+                'semestre' => 'required|string|max:20',
+                'estado' => 'required|string|max:30',
+                'observacion' => 'nullable|string',
+            ]);
 
-    } catch (\Throwable $e) {
+            $asistencia = AsistenciaAlumno::updateOrCreate(
+                [
+                    'codAlumno' => $validated['codAlumno'],
+                    'fecha' => $validated['fecha'],
+                    'codCurso' => $validated['codCurso'],
+                    'secCurso' => $validated['secCurso'],
+                    'semestre' => $validated['semestre'],
+                ],
+                $validated
+            );
 
-        return response()->json([
-            'success' => false,
-            'message' => 'No se pudo guardar la asistencia del alumno.',
-            'error' => $e->getMessage()
-        ], 500);
+            return response()->json([
+                'success' => true,
+                'message' => 'Asistencia del alumno guardada correctamente.',
+                'data' => $asistencia
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Los datos enviados no son válidos.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo guardar la asistencia del alumno.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener asistencias individuales de los alumnos.
+     */
+    public function obtenerAsistenciasAlumnos(Request $request): JsonResponse {
+        try {
+            $this->asegurarTablaAsistenciaAlumnos();
+
+            $query = AsistenciaAlumno::query();
+
+            if ($request->filled('codHorario')) {
+                $query->where('codHorario', $request->codHorario);
+            }
+
+            if ($request->filled('codDocente')) {
+                $query->where('codDocente', $request->codDocente);
+            }
+
+            if ($request->filled('fecha')) {
+                $query->where('fecha', $request->fecha);
+            }
+
+            if ($request->filled('codCurso')) {
+                $query->where('codCurso', $request->codCurso);
+            }
+
+            if ($request->filled('secCurso')) {
+                $query->where('secCurso', $request->secCurso);
+            }
+
+            if ($request->filled('semestre')) {
+                $query->where('semestre', $request->semestre);
+            }
+
+            $asistencias = $query
+                ->orderBy('codAlumno')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'total' => $asistencias->count(),
+                'data' => $asistencias
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudieron obtener las asistencias de los alumnos.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
-
-
-/**
- * Obtener asistencias individuales de los alumnos.
- */
-public function obtenerAsistenciasAlumnos(Request $request): JsonResponse
-{
-    try {
-
-        $query = AsistenciaAlumno::query();
-
-        if ($request->filled('codHorario')) {
-            $query->where('codHorario', $request->codHorario);
-        }
-
-        if ($request->filled('codDocente')) {
-            $query->where('codDocente', $request->codDocente);
-        }
-
-        if ($request->filled('fecha')) {
-            $query->where('fecha', $request->fecha);
-        }
-
-        if ($request->filled('codCurso')) {
-            $query->where('codCurso', $request->codCurso);
-        }
-
-        if ($request->filled('secCurso')) {
-            $query->where('secCurso', $request->secCurso);
-        }
-
-        if ($request->filled('semestre')) {
-            $query->where('semestre', $request->semestre);
-        }
-
-        $asistencias = $query
-            ->orderBy('codAlumno')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'total' => $asistencias->count(),
-            'data' => $asistencias
-        ]);
-
-    } catch (\Throwable $e) {
-
-        return response()->json([
-            'success' => false,
-            'message' => 'No se pudieron obtener las asistencias de los alumnos.',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-}
-

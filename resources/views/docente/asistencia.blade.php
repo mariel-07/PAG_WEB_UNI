@@ -1,469 +1,331 @@
-
-{{-- =========================================================
-    VISTA: ASISTENCIA DOCENTE
-========================================================= --}}
-
 <x-app-layout>
 
-    {{-- =====================================================
-        HEADER
-    ====================================================== --}}
-    <x-slot name="header">
-
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-
-            <div class="d-flex align-items-center">
-
-                <div class="uni-header-icon me-3">
-                    <i class="fas fa-clipboard-check"></i>
-                </div>
-
-                <div>
-                    <h2 class="h5 fw-bold mb-1 uni-title">
-                        {{ __('Asistencia Docente') }}
-                    </h2>
-
-                    <span class="uni-subtitle">
-                        Control y seguimiento de asistencia
-                    </span>
-                </div>
-
-            </div>
-
-            <div class="uni-institution">
-
-                <i class="fas fa-university me-2"></i>
-
-                UNIVERSIDAD NACIONAL DE INGENIERÍA
-
-                <span class="uni-divider">|</span>
-
-                FIM
-
-            </div>
-
-        </div>
-
-    </x-slot>
-
-
-    {{-- =====================================================
-        FONT AWESOME
-    ====================================================== --}}
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
-    {{-- =====================================================
-        CSS DE ASISTENCIA
-        ARCHIVO:
-        public/css/asistencia.css
-    ====================================================== --}}
+    <!-- =========================================================
+         LIBRERÍAS Y ESTILOS
+         ========================================================= -->
     <link rel="stylesheet"
           href="{{ asset('css/asistencia.css') }}">
 
-
-    {{-- =====================================================
-        CONTENIDO
-    ====================================================== --}}
-
+    <!-- =========================================================
+         CONTENIDO PRINCIPAL
+         ========================================================= -->
     <div class="asistencia-page">
 
         <div class="asistencia-container">
 
+            <!-- =====================================================
+                 ENCABEZADO INSTITUCIONAL
+                 ===================================================== -->
+            <div class="asistencia-heading-block">
 
-            {{-- =================================================
-                ENCABEZADO
-            ================================================== --}}
+                <div class="asistencia-heading-left">
+                    <div class="asistencia-header-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
 
-            <div class="asistencia-heading">
-
-                <div>
-
-                    <span class="section-label">
-                        GESTIÓN ACADÉMICA
-                    </span>
-
-                    <h1>
-                        Asistencia docente
-                    </h1>
-
-                    <p>
-                        Consulte y supervise la asistencia correspondiente
-                        a sus clases programadas.
-                    </p>
-
+                    <div class="asistencia-heading-text">
+                        <div class="asistencia-institution-badge">
+                            <i class="fas fa-university me-1"></i>
+                            UNIVERSIDAD NACIONAL DE INGENIERÍA &bull; FIM
+                        </div>
+                        <h1 class="asistencia-title">
+                            Control de Asistencia Docente
+                        </h1>
+                        <p class="asistencia-subtitle">
+                            Supervisión de sesiones lectivas, registro de firmas y control de asistencia estudiantil.
+                        </p>
+                    </div>
                 </div>
 
+                <div class="asistencia-heading-actions">
+                    <button type="button"
+                            class="btn-asistencia-action btn-asistencia-outline"
+                            id="btnRecargarAsistencia"
+                            title="Recargar datos de asistencia"
+                            onclick="cargarDatos()">
+                        <i class="fas fa-rotate me-2"></i>
+                        <span>Actualizar</span>
+                    </button>
 
-                <button class="btn-pdf"
-                        type="button"
-                        onclick="window.print()">
-
-                    <i class="fas fa-file-pdf me-2"></i>
-
-                    Exportar PDF
-
-                </button>
+                    <button type="button"
+                            class="btn-asistencia-action btn-asistencia-pdf"
+                            onclick="window.print()"
+                            title="Exportar reporte en formato PDF o imprimir">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        <span>Exportar PDF</span>
+                    </button>
+                </div>
 
             </div>
 
+            <!-- =====================================================
+                 TARJETAS DE INFORMACIÓN (ACADÉMICA)
+                 ===================================================== -->
+            <div class="asistencia-info-grid">
 
-            {{-- =================================================
-                INFORMACIÓN
-            ================================================== --}}
-
-            <div class="info-row">
-
-                {{-- SEMESTRE --}}
-                <div class="info-card">
-
-                    <div class="info-icon">
+                <!-- SEMESTRE -->
+                <div class="info-card card-semestre">
+                    <div class="info-icon-wrapper">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-
-                    <div>
-
-                        <span>
-                            SEMESTRE ACADÉMICO
-                        </span>
-
-                        <select id="selectSemestre"
-                                class="form-select form-select-sm mt-1">
-
-                            <option value="20262">
-                                2026-II
-                            </option>
-
-                            <option value="20261">
-                                2026-I
-                            </option>
-
-                            <option value="20252">
-                                2025-II
-                            </option>
-
-                        </select>
-
+                    <div class="info-body">
+                        <span class="info-label">SEMESTRE ACADÉMICO</span>
+                        <div class="select-wrapper">
+                            <select id="selectSemestre" class="form-select form-select-sm uni-select">
+                                <option value="20262" selected>2026 - II</option>
+                                <option value="20261">2026 - I</option>
+                                <option value="20252">2025 - II</option>
+                            </select>
+                        </div>
                     </div>
-
                 </div>
 
-
-                {{-- DOCENTE --}}
-                <div class="info-card">
-
-                    <div class="info-icon">
-                        <i class="fas fa-user"></i>
+                <!-- DOCENTE -->
+                <div class="info-card card-docente">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-chalkboard-user"></i>
                     </div>
-
-                    <div>
-
-                        <span>
-                            DOCENTE
-                        </span>
-
-                        <strong id="lblDocente">
-                            Dulce
+                    <div class="info-body">
+                        <span class="info-label">DOCENTE RESPONSABLE</span>
+                        <strong class="info-value-text" id="lblDocente">
+                            {{ $nombreDocente ?? (Auth::user()->name ?? 'Docente') }}
                         </strong>
-
+                        <small class="info-meta-text">
+                            <i class="fas fa-id-badge me-1"></i>
+                            Personal Docente &bull; FIM
+                        </small>
                     </div>
-
                 </div>
 
-
-                {{-- CARGA HORARIA --}}
-                <div class="info-card">
-
-                    <div class="info-icon">
-                        <i class="fas fa-clock"></i>
+                <!-- CARGA HORARIA -->
+                <div class="info-card card-horas">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-business-time"></i>
                     </div>
-
-                    <div>
-
-                        <span>
-                            CARGA HORARIA
-                        </span>
-
-                        <strong id="lblCargaHoraria">
-                            0 HRS
-                        </strong>
-
+                    <div class="info-body">
+                        <span class="info-label">CARGA HORARIA PROGRAMADA</span>
+                        <div class="horas-value-box">
+                            <strong class="horas-number" id="lblCargaHoraria">0</strong>
+                            <span class="horas-unit">HRS / SEMANA</span>
+                        </div>
                     </div>
-
                 </div>
 
             </div>
 
+            <!-- =====================================================
+                 ESTADÍSTICAS DE ASISTENCIA DEL DOCENTE (KPIS)
+                 ===================================================== -->
+            <div class="asistencia-stats-grid">
 
-            {{-- =================================================
-                ESTADÍSTICAS
-            ================================================== --}}
-
-            <div class="stats-row">
-
-                <div class="stat-card programadas">
-
-                    <span class="stat-title">
-                        PROGRAMADAS
-                    </span>
-
-                    <div class="stat-value"
-                         id="statProgramadas">
-                        0
+                <div class="stat-card stat-programadas">
+                    <div class="stat-top">
+                        <span class="stat-title">PROGRAMADAS</span>
+                        <i class="fas fa-calendar-check stat-icon"></i>
                     </div>
-
+                    <div class="stat-value" id="statProgramadas">0</div>
+                    <span class="stat-desc">Sesiones en ciclo</span>
                 </div>
 
-
-                <div class="stat-card puntuales">
-
-                    <span class="stat-title">
-                        PUNTUALES
-                    </span>
-
-                    <div class="stat-value"
-                         id="statPuntuales">
-                        0
+                <div class="stat-card stat-puntuales">
+                    <div class="stat-top">
+                        <span class="stat-title">PUNTUALES</span>
+                        <i class="fas fa-circle-check stat-icon"></i>
                     </div>
-
+                    <div class="stat-value" id="statPuntuales">0</div>
+                    <span class="stat-desc">A tiempo (&le; 10 min)</span>
                 </div>
 
-
-                <div class="stat-card tardanzas">
-
-                    <span class="stat-title">
-                        TARDANZAS
-                    </span>
-
-                    <div class="stat-value"
-                         id="statTardanzas">
-                        0
+                <div class="stat-card stat-tardanzas">
+                    <div class="stat-top">
+                        <span class="stat-title">TARDANZAS</span>
+                        <i class="fas fa-clock-rotate-left stat-icon"></i>
                     </div>
-
+                    <div class="stat-value" id="statTardanzas">0</div>
+                    <span class="stat-desc">Ingreso tardío</span>
                 </div>
 
-
-                <div class="stat-card inasistencias">
-
-                    <span class="stat-title">
-                        INASISTENCIAS
-                    </span>
-
-                    <div class="stat-value"
-                         id="statInasistencias">
-                        0
+                <div class="stat-card stat-inasistencias">
+                    <div class="stat-top">
+                        <span class="stat-title">INASISTENCIAS</span>
+                        <i class="fas fa-circle-xmark stat-icon"></i>
                     </div>
-
+                    <div class="stat-value" id="statInasistencias">0</div>
+                    <span class="stat-desc">Faltas registradas</span>
                 </div>
 
-
-                <div class="stat-card no-aplica">
-
-                    <span class="stat-title">
-                        NO APLICA
-                    </span>
-
-                    <div class="stat-value"
-                         id="statNoAplica">
-                        0
+                <div class="stat-card stat-no-aplica">
+                    <div class="stat-top">
+                        <span class="stat-title">NO APLICA</span>
+                        <i class="fas fa-ban stat-icon"></i>
                     </div>
-
+                    <div class="stat-value" id="statNoAplica">0</div>
+                    <span class="stat-desc">Exonerado / Feriado</span>
                 </div>
 
-
-                <div class="stat-card proceso">
-
-                    <span class="stat-title">
-                        EN PROCESO DE CAMBIO
-                    </span>
-
-                    <div class="stat-value"
-                         id="statProceso">
-                        0
+                <div class="stat-card stat-proceso">
+                    <div class="stat-top">
+                        <span class="stat-title">EN PROCESO</span>
+                        <i class="fas fa-arrows-rotate stat-icon"></i>
                     </div>
-
+                    <div class="stat-value" id="statProceso">0</div>
+                    <span class="stat-desc">Reprogramación</span>
                 </div>
 
             </div>
 
-
-            {{-- =================================================
-                CALENDARIO
-            ================================================== --}}
-
+            <!-- =====================================================
+                 CALENDARIO SEMANAL DE ASISTENCIA
+                 ===================================================== -->
             <div class="calendar-card">
 
-
-                {{-- CABECERA DEL CALENDARIO --}}
+                <!-- CABECERA DEL CALENDARIO Y NAVEGACIÓN -->
                 <div class="calendar-header">
 
-                    <div class="calendar-title">
-
+                    <div class="calendar-title-box">
                         <div class="calendar-title-icon">
                             <i class="fas fa-calendar-week"></i>
                         </div>
-
                         <div>
-
-                            <h3>
-                                Programación de asistencia
-                            </h3>
-
-                            <p>
-                                Clases programadas según horario docente
+                            <h2 class="calendar-heading">
+                                Programación de Clases y Asistencia
+                            </h2>
+                            <p class="calendar-subheading">
+                                Seleccione una clase para registrar o modificar la asistencia de los alumnos.
                             </p>
-
                         </div>
-
                     </div>
 
-
-                    {{-- CONTROLES --}}
-                    <div class="week-controls">
-
+                    <!-- CONTROLES DE NAVEGACIÓN SEMANAL -->
+                    <div class="week-navigation-controls">
                         <button id="btnSemanaAnterior"
                                 type="button"
+                                class="btn-week-nav"
                                 title="Semana anterior">
-
                             <i class="fas fa-chevron-left"></i>
-
                         </button>
 
-
-                        <div class="week-label"
-                             id="lblSemana">
-
-                            --
-
+                        <div class="week-display-badge" id="lblSemana">
+                            <i class="far fa-calendar me-2 text-primary"></i>
+                            <span>Cargando semana...</span>
                         </div>
-
 
                         <button id="btnSemanaSiguiente"
                                 type="button"
+                                class="btn-week-nav"
                                 title="Semana siguiente">
-
                             <i class="fas fa-chevron-right"></i>
-
                         </button>
-
 
                         <button id="btnSemanaActual"
                                 type="button"
-                                title="Semana actual">
-
-                            <i class="fas fa-calendar-day"></i>
-
+                                class="btn-week-today"
+                                title="Ir a la semana actual">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            <span>Hoy</span>
                         </button>
-
                     </div>
 
                 </div>
 
-
-                {{-- TABLA DEL CALENDARIO --}}
+                <!-- TABLA DEL CALENDARIO -->
                 <div class="table-wrapper">
-
-                    <table class="asistencia-table"
-                           id="tablaAsistencia">
-
+                    <table class="asistencia-table" id="tablaAsistencia">
                         <thead>
-
                             <tr>
-
                                 <th class="hora-header">
+                                    <i class="far fa-clock me-1"></i>
                                     HORA
                                 </th>
-
                                 <th data-dia="LUNES">
-                                    LUNES
+                                    <div class="dia-name">LUNES</div>
+                                    <span class="dia-code">LU</span>
                                 </th>
-
                                 <th data-dia="MARTES">
-                                    MARTES
+                                    <div class="dia-name">MARTES</div>
+                                    <span class="dia-code">MA</span>
                                 </th>
-
                                 <th data-dia="MIÉRCOLES">
-                                    MIÉRCOLES
+                                    <div class="dia-name">MIÉRCOLES</div>
+                                    <span class="dia-code">MI</span>
                                 </th>
-
                                 <th data-dia="JUEVES">
-                                    JUEVES
+                                    <div class="dia-name">JUEVES</div>
+                                    <span class="dia-code">JU</span>
                                 </th>
-
                                 <th data-dia="VIERNES">
-                                    VIERNES
+                                    <div class="dia-name">VIERNES</div>
+                                    <span class="dia-code">VI</span>
                                 </th>
-
-                                <th data-dia="SÁBADO">
-                                    SÁBADO
+                                <th data-dia="SÁBADO" class="col-sabado">
+                                    <div class="dia-name">SÁBADO</div>
+                                    <span class="dia-code">SA</span>
                                 </th>
-
-                                <th data-dia="DOMINGO"
-                                    class="domingo">
-                                    DOMINGO
+                                <th data-dia="DOMINGO" class="col-domingo">
+                                    <div class="dia-name">DOMINGO</div>
+                                    <span class="dia-code">DO</span>
                                 </th>
-
                             </tr>
-
                         </thead>
 
-
                         <tbody id="tbodyAsistencia">
-
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <div class="mt-2 text-muted fw-semibold">
+                                        Cargando programación de asistencia...
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
-
                     </table>
-
                 </div>
 
-
-                {{-- =================================================
-                    LEYENDA
-                ================================================== --}}
-
+                <!-- LEYENDA PEDAGÓGICA -->
                 <div class="legend">
+                    <div class="legend-list">
+                        <span class="legend-title">
+                            <i class="fas fa-tags me-1"></i>
+                            Estado de la sesión:
+                        </span>
 
-                    <span class="legend-title">
-                        Referencia:
-                    </span>
+                        <span class="legend-item">
+                            <span class="legend-dot dot-programada"></span>
+                            Programada
+                        </span>
 
+                        <span class="legend-item">
+                            <span class="legend-dot dot-puntual"></span>
+                            Puntual
+                        </span>
 
-                    <span class="legend-item">
-                        <span class="legend-dot dot-programada"></span>
-                        Programada
-                    </span>
+                        <span class="legend-item">
+                            <span class="legend-dot dot-tardanza"></span>
+                            Tardanza
+                        </span>
 
+                        <span class="legend-item">
+                            <span class="legend-dot dot-inasistencia"></span>
+                            Inasistencia
+                        </span>
 
-                    <span class="legend-item">
-                        <span class="legend-dot dot-puntual"></span>
-                        Puntual
-                    </span>
+                        <span class="legend-item">
+                            <span class="legend-dot dot-no-aplica"></span>
+                            No aplica
+                        </span>
 
+                        <span class="legend-item">
+                            <span class="legend-dot dot-proceso"></span>
+                            En proceso
+                        </span>
+                    </div>
 
-                    <span class="legend-item">
-                        <span class="legend-dot dot-tardanza"></span>
-                        Tardanza
-                    </span>
-
-
-                    <span class="legend-item">
-                        <span class="legend-dot dot-inasistencia"></span>
-                        Inasistencia
-                    </span>
-
-
-                    <span class="legend-item">
-                        <span class="legend-dot dot-no-aplica"></span>
-                        No aplica
-                    </span>
-
-
-                    <span class="legend-item">
-                        <span class="legend-dot dot-proceso"></span>
-                        En proceso de cambio
-                    </span>
-
+                    <div class="legend-action-hint">
+                        <i class="fas fa-arrow-pointer me-1"></i>
+                        <span>Haga clic en una clase para tomar lista a los estudiantes.</span>
+                    </div>
                 </div>
 
             </div>
@@ -472,158 +334,143 @@
 
     </div>
 
-
-    {{-- =====================================================
-        MODAL DE ALUMNOS
-    ====================================================== --}}
-
+    <!-- =========================================================
+         MODAL PROFESIONAL: REGISTRO Y TOMA DE ASISTENCIA
+         ========================================================= -->
     <div class="modal fade"
          id="modalAsistencia"
          tabindex="-1"
+         aria-labelledby="modalTitulo"
          aria-hidden="true">
 
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
 
             <div class="modal-content asistencia-modal-content">
 
-
-                {{-- CABECERA DEL MODAL --}}
+                <!-- CABECERA DEL MODAL -->
                 <div class="modal-header modal-header-uni">
-
                     <div class="modal-header-info">
-
                         <div class="modal-header-icon">
                             <i class="fas fa-user-check"></i>
                         </div>
-
                         <div>
-
-                            <h5 class="modal-title"
-                                id="modalTitulo">
-
-                                Asistencia de alumnos
-
-                            </h5>
-
-                            <small id="modalSubtitulo">
-
+                            <div class="modal-header-pretitle">
+                                CONTROL ACADÉMICO DE ASISTENCIA
+                            </div>
+                            <h4 class="modal-title" id="modalTitulo">
+                                Asistencia de Alumnos
+                            </h4>
+                            <div class="modal-subtitle-text" id="modalSubtitulo">
                                 --
-
-                            </small>
-
+                            </div>
                         </div>
-
                     </div>
-
 
                     <button type="button"
                             class="btn-close btn-close-white"
                             data-bs-dismiss="modal"
                             aria-label="Cerrar">
-
                     </button>
-
                 </div>
 
+                <!-- CUERPO DEL MODAL -->
+                <div class="modal-body modal-asistencia-body">
 
-                {{-- CUERPO DEL MODAL --}}
-                <div class="modal-body">
-
-
-                    {{-- INFORMACIÓN DE LA CLASE --}}
-                    <div class="modal-info-grid">
-
-
-                        <div class="modal-info-card">
-
-                            <div class="modal-info-icon">
-                                <i class="fas fa-book"></i>
-                            </div>
-
+                    <!-- TARJETAS DE DETALLE DE LA CLASE -->
+                    <div class="modal-class-meta-grid">
+                        <div class="class-meta-box">
+                            <div class="meta-box-icon"><i class="fas fa-book"></i></div>
                             <div>
-
-                                <span>
-                                    CURSO
-                                </span>
-
-                                <strong id="modalCurso">
-                                    --
-                                </strong>
-
+                                <span class="meta-box-label">ASIGNATURA</span>
+                                <strong class="meta-box-value" id="modalCurso">--</strong>
                             </div>
-
                         </div>
 
-
-                        <div class="modal-info-card">
-
-                            <div class="modal-info-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-
+                        <div class="class-meta-box">
+                            <div class="meta-box-icon"><i class="far fa-clock"></i></div>
                             <div>
-
-                                <span>
-                                    HORARIO
-                                </span>
-
-                                <strong id="modalHorario">
-                                    --
-                                </strong>
-
+                                <span class="meta-box-label">HORARIO Y DÍA</span>
+                                <strong class="meta-box-value" id="modalHorario">--</strong>
                             </div>
-
                         </div>
 
-
-                        <div class="modal-info-card">
-
-                            <div class="modal-info-icon">
-                                <i class="fas fa-circle-info"></i>
-                            </div>
-
+                        <div class="class-meta-box">
+                            <div class="meta-box-icon"><i class="fas fa-location-dot"></i></div>
                             <div>
-
-                                <span>
-                                    ESTADO
-                                </span>
-
-                                <strong id="modalEstado">
-                                    --
-                                </strong>
-
+                                <span class="meta-box-label">AULA ASIGNADA</span>
+                                <strong class="meta-box-value" id="modalAula">--</strong>
                             </div>
+                        </div>
 
+                        <div class="class-meta-box">
+                            <div class="meta-box-icon"><i class="fas fa-signal"></i></div>
+                            <div>
+                                <span class="meta-box-label">ESTADO DE SESIÓN</span>
+                                <strong class="meta-box-value" id="modalEstado">--</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BARRA DE HERRAMIENTAS Y ACCIONES RÁPIDAS -->
+                    <div class="asistencia-actions-toolbar">
+
+                        <!-- BUSCADOR -->
+                        <div class="asistencia-search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text"
+                                   id="buscarAlumnoAsistenciaInput"
+                                   class="form-control form-control-sm input-search-asistencia"
+                                   placeholder="Filtrar por apellidos, nombres o código de estudiante...">
+                        </div>
+
+                        <!-- BOTONES DE MARCA RÁPIDA -->
+                        <div class="asistencia-quick-tools">
+                            <button type="button"
+                                    class="btn-tool-action btn-mark-all"
+                                    id="btnMarcarTodosAsistio"
+                                    title="Marcar a todos los alumnos como asistió">
+                                <i class="fas fa-check-double me-1 text-success"></i>
+                                <span>Marcar Todos Asistió</span>
+                            </button>
+
+                            <button type="button"
+                                    class="btn-tool-action btn-export-excel"
+                                    id="btnExportarExcelAsistencia"
+                                    title="Exportar reporte de asistencia en Excel (.csv)">
+                                <i class="fas fa-file-excel me-1 text-success"></i>
+                                <span>Excel</span>
+                            </button>
                         </div>
 
                     </div>
 
-
-                    <div class="modal-separator"></div>
-
-
-                    {{-- LISTA GENERADA POR JAVASCRIPT --}}
-                    <div id="listaAlumnos">
-
+                    <!-- INDICADOR DE GUARDADO EN VIVO -->
+                    <div class="save-feedback-bar">
+                        <div class="save-status-badge" id="saveStatusBadge">
+                            <i class="fas fa-circle-check text-success"></i>
+                            <span>Las marcas de asistencia se sincronizan automáticamente con MySQL.</span>
+                        </div>
                     </div>
 
+                    <!-- LISTA / TABLA DE ALUMNOS (GENERADA DINÁMICAMENTE) -->
+                    <div id="listaAlumnos" class="asistencia-students-container">
+                        <!-- Generado por asistencia.js -->
+                    </div>
 
                 </div>
 
-
-                {{-- PIE DEL MODAL --}}
-                <div class="modal-footer">
-
+                <!-- PIE DEL MODAL -->
+                <div class="modal-footer modal-asistencia-footer">
+                    <span class="footer-note">
+                        <i class="fas fa-shield-halved text-success me-1"></i>
+                        Registro oficial de asistencia estudiantil &bull; FIM UNI.
+                    </span>
                     <button type="button"
-                            class="btn-modal-cerrar"
+                            class="btn-modal-cerrar-asistencia"
                             data-bs-dismiss="modal">
-
-                        <i class="fas fa-times"></i>
-
-                        CERRAR
-
+                        <i class="fas fa-check me-1"></i>
+                        Finalizar y Cerrar
                     </button>
-
                 </div>
 
             </div>
@@ -632,16 +479,20 @@
 
     </div>
 
-
+    <!-- =========================================================
+         CONFIGURACIÓN Y SCRIPTS
+         ========================================================= -->
     <script>
-    window.asistenciaApi = {
-        asistencias: "{{ url('/api/asistencias') }}",
-        horarios: "{{ url('/api/horarios') }}",
-        alumnos: "{{ url('/api/alumnos') }}"
-    };
-</script>
-
-<script src="{{ asset('js/asistencia.js') }}"></script>
+        window.asistenciaApi = {
+            codDocente: "{{ $codDocente ?? '' }}",
+            asistencias: "{{ url('/api/asistencias') }}",
+            asistenciaAlumno: "{{ url('/api/asistencias/alumno') }}",
+            asistenciasAlumnos: "{{ url('/api/asistencias/alumnos') }}",
+            horarios: "{{ url('/api/horarios') }}",
+            alumnos: "{{ url('/api/alumnos') }}"
+        };
+        window.csrfToken = "{{ csrf_token() }}";
+    </script>
+    <script src="{{ asset('js/asistencia.js') }}"></script>
 
 </x-app-layout>
-

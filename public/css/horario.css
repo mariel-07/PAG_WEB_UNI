@@ -1,2023 +1,1479 @@
-
-
+/* ============================================================
+   HORARIO ACADÉMICO DOCENTE - ESTILOS PROFESIONALES
+   UNIVERSIDAD NACIONAL DE INGENIERÍA - FACULTAD DE INGENIERÍA MECÁNICA
+   ============================================================ */
 
 :root {
-    --uni-guinda: #7A0019;
-    --uni-guinda-dark: #560012;
-    --uni-guinda-light: #f7e8eb;
+    /* Paleta Institucional UNI */
+    --uni-maroon: #7A1015;
+    --uni-maroon-dark: #560A0D;
+    --uni-maroon-light: #F8EEF0;
+    --uni-maroon-border: #E8C4C8;
 
-    --uni-rojo: #b91c2c;
-    --uni-rojo-light: #f8dfe2;
+    --uni-gold: #C6A15B;
+    --uni-gold-dark: #A07E36;
+    --uni-gold-light: #FBF7ED;
+    --uni-gold-border: #EADBBA;
 
-    --uni-verde: #4b9b3f;
-    --uni-verde-light: #dcefd7;
+    --uni-navy: #173F67;
+    --uni-navy-dark: #0F2942;
+    --uni-navy-light: #EBF2F8;
 
-    --uni-dorado: #c9a227;
-    --uni-dorado-light: #f5ebca;
+    /* Colores Semánticos para Asignaturas / Sesiones */
+    --color-teoria: #4F46E5;
+    --color-teoria-bg: #EEF2FF;
+    --color-teoria-border: #C7D2FE;
+    --color-teoria-text: #312E81;
 
-    --uni-blanco: #ffffff;
+    --color-practica: #059669;
+    --color-practica-bg: #ECFDF5;
+    --color-practica-border: #A7F3D0;
+    --color-practica-text: #064E3B;
 
-    --uni-bg: #f4f5f7;
+    --color-laboratorio: #D97706;
+    --color-laboratorio-bg: #FFFBEB;
+    --color-laboratorio-border: #FDE68A;
+    --color-laboratorio-text: #78350F;
 
-    --uni-text: #252b31;
-    --uni-text-secondary: #59636d;
-    --uni-text-muted: #89929b;
+    --color-virtual: #0D9488;
+    --color-virtual-bg: #F0FDFA;
+    --color-virtual-border: #99F6E4;
+    --color-virtual-text: #134E4A;
 
-    --uni-border: #dfe3e7;
-    --uni-border-dark: #d1d6db;
+    /* Superficies y Neutros */
+    --uni-surface: #FFFFFF;
+    --uni-bg-page: #F8FAFC;
+    --uni-bg-muted: #F1F5F9;
 
-    --uni-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.055);
+    --uni-border: #E2E8F0;
+    --uni-border-dark: #CBD5E1;
 
-    --uni-shadow-hover:
-        0 5px 16px rgba(0, 0, 0, 0.09);
+    --uni-text-main: #1E293B;
+    --uni-text-secondary: #475569;
+    --uni-text-muted: #64748B;
+    --uni-text-light: #94A3B8;
+
+    /* Sombras y Radios */
+    --uni-radius-sm: 6px;
+    --uni-radius-md: 10px;
+    --uni-radius-lg: 14px;
+
+    --uni-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --uni-shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.05);
+    --uni-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.07);
+    --uni-shadow-lg: 0 10px 25px -4px rgba(15, 23, 42, 0.10);
+    --uni-shadow-hover: 0 8px 20px rgba(122, 16, 21, 0.12);
 }
-
 
 /* ============================================================
-   RESET
+   CONTENEDOR GENERAL
    ============================================================ */
 
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-
-    background: var(--uni-bg);
-
-    color: var(--uni-text);
-
-    font-family:
-        "Segoe UI",
-        Arial,
-        Helvetica,
-        sans-serif;
-}
-
-
-/* ============================================================
-   HEADER DE LARAVEL
-   ============================================================ */
-
-.uni-header-icon {
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: var(--uni-guinda);
-
-    border-radius: 8px;
-
-    color: #ffffff;
-
-    font-size: 18px;
-
-    box-shadow:
-        0 2px 6px rgba(122, 0, 25, .18);
-}
-
-.uni-title {
-    color: var(--uni-text) !important;
-
-    font-size: 17px !important;
-    font-weight: 800 !important;
-
-    letter-spacing: -.2px;
-}
-
-.uni-subtitle {
-    display: block;
-
-    color: var(--uni-text-muted);
-
-    font-size: 11px;
-}
-
-.uni-institution {
-    display: flex;
-    align-items: center;
-
-    color: var(--uni-guinda);
-
-    font-size: 10px;
-    font-weight: 800;
-
-    letter-spacing: .35px;
-
-    text-transform: uppercase;
-}
-
-.uni-institution i {
-    font-size: 13px;
-}
-
-.uni-divider {
-    margin: 0 9px;
-
-    color: #c3c7ca;
-}
-
-
-/* ============================================================
-   PÁGINA PRINCIPAL
-   ============================================================ */
-
-.uni-page {
+.horario-page {
     width: 100%;
-    min-height: calc(100vh - 70px);
-
-    background:
-        linear-gradient(
-            180deg,
-            #f6f7f8 0%,
-            #f3f4f6 100%
-        );
-}
-
-.uni-page > .container-fluid {
-    max-width: 1550px;
-
+    max-width: 1420px;
     margin: 0 auto;
+    padding: 10px 4px 40px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--uni-text-main);
 }
 
-
 /* ============================================================
-   ENCABEZADO DEL MÓDULO
+   ENCABEZADO INSTITUCIONAL
    ============================================================ */
 
-.uni-page-heading {
+.horario-header-block {
     display: flex;
-
-    align-items: flex-end;
-
     justify-content: space-between;
-
-    gap: 20px;
-
-    margin-bottom: 20px;
-}
-
-.uni-section-label {
-    display: inline-block;
-
-    margin-bottom: 5px;
-
-    color: var(--uni-guinda);
-
-    font-size: 10px;
-    font-weight: 800;
-
-    letter-spacing: .8px;
-
-    text-transform: uppercase;
-}
-
-.uni-page-heading h1 {
-    margin: 0;
-
-    color: var(--uni-text);
-
-    font-size: 25px;
-    font-weight: 800;
-
-    letter-spacing: -.4px;
-}
-
-.uni-page-heading p {
-    margin: 5px 0 0;
-
-    color: var(--uni-text-muted);
-
-    font-size: 12px;
-}
-
-
-/* ============================================================
-   BOTÓN PDF
-   ============================================================ */
-
-.uni-btn-pdf {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-
-    height: 36px;
-
-    padding: 0 15px;
-
-    background: var(--uni-guinda);
-
-    border: 1px solid var(--uni-guinda);
-
-    border-radius: 6px;
-
-    color: #ffffff;
-
-    font-size: 11px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition:
-        background .2s ease,
-        transform .2s ease,
-        box-shadow .2s ease;
-}
-
-.uni-btn-pdf:hover {
-    background: var(--uni-guinda-dark);
-
-    border-color: var(--uni-guinda-dark);
-
-    color: #ffffff;
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 4px 10px rgba(122, 0, 25, .16);
-}
-
-
-/* ============================================================
-   INFORMACIÓN ACADÉMICA
-   ============================================================ */
-
-.uni-info-wrapper {
-    display: grid;
-
-    grid-template-columns:
-        1.15fr
-        1fr
-        .8fr;
-
-    gap: 14px;
-
-    margin-bottom: 20px;
-}
-
-
-/* ============================================================
-   TARJETAS DE INFORMACIÓN
-   ============================================================ */
-
-.uni-info-card {
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-
-    min-height: 91px;
-
-    padding: 16px 18px;
-
-    background: var(--uni-blanco);
-
-    border: 1px solid var(--uni-border);
-
-    border-radius: 9px;
-
-    box-shadow: var(--uni-shadow);
-
-    overflow: hidden;
-
-    transition:
-        box-shadow .2s ease,
-        transform .2s ease;
-}
-
-.uni-info-card:hover {
-    box-shadow: var(--uni-shadow-hover);
-
-    transform: translateY(-1px);
-}
-
-
-/* Línea institucional */
-
-.uni-info-card::before {
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 0;
-    bottom: 0;
-
-    width: 4px;
-
-    background: var(--uni-guinda);
-}
-
-.uni-info-card:nth-child(2)::before {
-    background: var(--uni-dorado);
-}
-
-.uni-info-card:nth-child(3)::before {
-    background: var(--uni-verde);
-}
-
-
-/* ============================================================
-   ICONOS INFORMACIÓN
-   ============================================================ */
-
-.uni-info-icon {
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    margin-right: 13px;
-
-    background: var(--uni-guinda-light);
-
-    border-radius: 8px;
-
-    color: var(--uni-guinda);
-
-    font-size: 16px;
-}
-
-.uni-info-card:nth-child(2) .uni-info-icon {
-    background: var(--uni-dorado-light);
-
-    color: #927516;
-}
-
-.uni-info-card:nth-child(3) .uni-info-icon {
-    background: var(--uni-verde-light);
-
-    color: #397b31;
-}
-
-
-/* ============================================================
-   CONTENIDO INFORMACIÓN
-   ============================================================ */
-
-.uni-info-content {
-    min-width: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
     align-items: flex-start;
-}
-
-.uni-info-content > span {
-    margin-bottom: 4px;
-
-    color: var(--uni-text-muted);
-
-    font-size: 9px;
-    font-weight: 800;
-
-    letter-spacing: .5px;
-
-    text-transform: uppercase;
-}
-
-.uni-info-content strong {
-    color: var(--uni-text);
-
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.uni-info-content small {
-    margin-top: 2px;
-
-    color: var(--uni-text-muted);
-
-    font-size: 9px;
-}
-
-
-/* ============================================================
-   SELECT SEMESTRE
-   ============================================================ */
-
-.uni-select {
-    width: 150px;
-
-    height: 32px;
-
-    padding:
-        0
-        30px
-        0
-        9px;
-
-    background-color: #ffffff;
-
-    border: 1px solid var(--uni-border-dark);
-
-    border-radius: 5px;
-
-    color: var(--uni-text);
-
-    font-size: 11px;
-    font-weight: 700;
-
-    outline: none;
-
-    cursor: pointer;
-
-    transition:
-        border-color .2s ease,
-        box-shadow .2s ease;
-}
-
-.uni-select:hover {
-    border-color: #b7bdc3;
-}
-
-.uni-select:focus {
-    border-color: var(--uni-guinda);
-
-    box-shadow:
-        0 0 0 3px rgba(122, 0, 25, .08);
-}
-
-
-/* ============================================================
-   ESTADO DEFINITIVO
-   ============================================================ */
-
-.uni-status {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    margin-top: 5px;
-
-    color: var(--uni-verde);
-
-    font-size: 8px;
-    font-weight: 800;
-
-    letter-spacing: .4px;
-}
-
-.uni-status i {
-    font-size: 9px;
-}
-
-
-/* ============================================================
-   HORAS
-   ============================================================ */
-
-.uni-hours strong {
-    color: var(--uni-guinda);
-
-    font-size: 19px;
-}
-
-
-/* ============================================================
-   TARJETA DEL HORARIO
-   ============================================================ */
-
-.uni-schedule-card {
-    width: 100%;
-
-    background: #ffffff;
-
-    border: 1px solid var(--uni-border);
-
-    border-radius: 10px;
-
-    box-shadow: var(--uni-shadow);
-
-    overflow: hidden;
-}
-
-
-/* ============================================================
-   CABECERA DEL HORARIO
-   ============================================================ */
-
-.uni-schedule-header {
-    min-height: 78px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
+    flex-wrap: wrap;
     gap: 20px;
-
-    padding: 15px 19px;
-
-    background: #ffffff;
-
+    margin-bottom: 24px;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--uni-border);
 }
 
-.uni-schedule-title {
+.horario-header-left {
     display: flex;
-
-    align-items: center;
-
-    gap: 12px;
+    align-items: flex-start;
+    gap: 16px;
+    max-width: 800px;
 }
 
-.uni-calendar-icon {
-    width: 41px;
-    height: 41px;
-
+.horario-header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--uni-radius-md);
+    background: linear-gradient(135deg, var(--uni-maroon), var(--uni-maroon-dark));
+    color: #ffffff;
     display: flex;
-
     align-items: center;
     justify-content: center;
-
-    background: var(--uni-guinda);
-
-    border-radius: 7px;
-
-    color: #ffffff;
-
-    font-size: 17px;
+    font-size: 24px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(122, 16, 21, 0.25);
 }
 
-.uni-schedule-title h3 {
+.horario-institution-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--uni-maroon-light);
+    color: var(--uni-maroon);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+    border: 1px solid var(--uni-maroon-border);
+}
+
+.horario-title {
+    margin: 0 0 6px 0;
+    color: var(--uni-text-main);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.horario-subtitle {
     margin: 0;
+    color: var(--uni-text-muted);
+    font-size: 13.5px;
+    line-height: 1.45;
+}
 
-    color: var(--uni-text);
+.horario-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.btn-horario-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: var(--uni-radius-sm);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-horario-outline {
+    background: var(--uni-surface);
+    color: var(--uni-text-secondary);
+    border: 1px solid var(--uni-border-dark);
+}
+
+.btn-horario-outline:hover {
+    background: var(--uni-bg-muted);
+    color: var(--uni-text-main);
+    border-color: #94A3B8;
+}
+
+.btn-horario-pdf {
+    background: linear-gradient(135deg, var(--uni-maroon), var(--uni-maroon-dark));
+    color: #ffffff;
+    border: 1px solid var(--uni-maroon);
+    box-shadow: 0 3px 8px rgba(122, 16, 21, 0.25);
+}
+
+.btn-horario-pdf:hover {
+    background: var(--uni-maroon-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(122, 16, 21, 0.35);
+    color: #ffffff;
+}
+
+/* ============================================================
+   GRID DE KPIS / METRICAS
+   ============================================================ */
+
+.horario-kpi-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1.25fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.horario-kpi-card {
+    background: var(--uni-surface);
+    border: 1px solid var(--uni-border);
+    border-radius: var(--uni-radius-md);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: var(--uni-shadow-xs);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.horario-kpi-card:hover {
+    box-shadow: var(--uni-shadow-md);
+    transform: translateY(-2px);
+}
+
+.horario-kpi-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.kpi-semestre::before { background: var(--uni-maroon); }
+.kpi-docente::before { background: var(--uni-navy); }
+.kpi-horas::before { background: var(--uni-gold); }
+.kpi-cursos::before { background: var(--color-practica); }
+
+.kpi-icon-wrapper {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+}
+
+.kpi-semestre .kpi-icon-wrapper {
+    background: var(--uni-maroon-light);
+    color: var(--uni-maroon);
+}
+
+.kpi-docente .kpi-icon-wrapper {
+    background: var(--uni-navy-light);
+    color: var(--uni-navy);
+}
+
+.kpi-horas .kpi-icon-wrapper {
+    background: var(--uni-gold-light);
+    color: var(--uni-gold-dark);
+}
+
+.kpi-cursos .kpi-icon-wrapper {
+    background: var(--color-practica-bg);
+    color: var(--color-practica);
+}
+
+.kpi-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.kpi-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    color: var(--uni-text-muted);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.uni-select-semestre {
+    height: 34px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--uni-text-main);
+    border-color: var(--uni-border-dark);
+    border-radius: var(--uni-radius-sm);
+    cursor: pointer;
+    background-color: #ffffff;
+    max-width: 160px;
+}
+
+.uni-select-semestre:focus {
+    border-color: var(--uni-maroon);
+    box-shadow: 0 0 0 3px rgba(122, 16, 21, 0.12);
+}
+
+.kpi-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+.status-oficial {
+    color: var(--color-practica);
+}
+
+.kpi-docente-nombre {
+    display: block;
     font-size: 15px;
     font-weight: 800;
+    color: var(--uni-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.uni-schedule-title p {
-    margin: 3px 0 0;
-
+.kpi-docente-meta {
+    display: block;
+    font-size: 11px;
     color: var(--uni-text-muted);
-
-    font-size: 10px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.uni-schedule-info {
+.kpi-value-container {
     display: flex;
-
-    align-items: center;
-
+    align-items: baseline;
     gap: 6px;
+}
 
-    padding: 7px 10px;
+.kpi-value-number {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--uni-text-main);
+    letter-spacing: -0.5px;
+}
 
-    background: var(--uni-guinda-light);
+.kpi-horas .kpi-value-number {
+    color: var(--uni-maroon);
+}
 
-    border: 1px solid #eed4d9;
+.kpi-cursos .kpi-value-number {
+    color: var(--uni-navy);
+}
 
-    border-radius: 5px;
+.kpi-value-unit {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--uni-text-muted);
+}
 
-    color: var(--uni-guinda);
+/* ============================================================
+   TARJETA PRINCIPAL DEL HORARIO
+   ============================================================ */
 
-    font-size: 9px;
+.horario-main-card {
+    background: var(--uni-surface);
+    border: 1px solid var(--uni-border);
+    border-radius: var(--uni-radius-lg);
+    box-shadow: var(--uni-shadow-sm);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+/* TOOLBAR */
+.horario-card-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 22px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--uni-border);
+}
+
+.toolbar-title-group {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.toolbar-calendar-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--uni-radius-sm);
+    background: var(--uni-maroon-light);
+    color: var(--uni-maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+}
+
+.toolbar-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--uni-text-main);
+    letter-spacing: -0.2px;
+}
+
+.toolbar-subtitle {
+    margin: 3px 0 0 0;
+    font-size: 11.5px;
+    color: var(--uni-text-muted);
+}
+
+.toolbar-controls-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    margin: 0;
+    font-size: 11.5px;
     font-weight: 700;
-}
-
-.uni-schedule-info i {
-    font-size: 10px;
-}
-
-
-/* ============================================================
-   CONTENEDOR TABLA
-   ============================================================ */
-
-.uni-table-container {
-    width: 100%;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    background: #ffffff;
-}
-
-
-/* ============================================================
-   TABLA PRINCIPAL
-   ============================================================ */
-
-.tbl-horario {
-    width: 100% !important;
-
-    min-width: 980px;
-
-    margin: 0 !important;
-
-    table-layout: fixed;
-
-    border-collapse: separate !important;
-
-    border-spacing: 0 !important;
-
-    background: #ffffff;
-}
-
-
-/* ============================================================
-   CABECERA TABLA
-   ============================================================ */
-
-.tbl-horario thead th {
-    height: 43px;
-
-    padding: 8px 5px !important;
-
-    background: #eef1f3;
-
-    border-top: none !important;
-
-    border-right: 1px solid #d9dee2 !important;
-
-    border-bottom: 1px solid #d9dee2 !important;
-
-    color: #5a6570;
-
-    font-size: 9px !important;
-
-    font-weight: 800 !important;
-
-    letter-spacing: .4px;
-
-    text-align: center;
-
-    vertical-align: middle !important;
-
+    color: var(--uni-text-secondary);
     white-space: nowrap;
 }
 
-.tbl-horario thead th:first-child {
-    width: 92px;
-
-    background: #e9edf0;
-
-    color: #53606a;
+.uni-filter-select {
+    height: 33px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--uni-radius-sm);
+    border-color: var(--uni-border-dark);
+    min-width: 170px;
+    background-color: #ffffff;
 }
 
-.tbl-horario thead th:last-child {
-    background: #f8e7e9;
-
-    border-right: none !important;
-
-    color: var(--uni-guinda);
+.uni-filter-select:focus {
+    border-color: var(--uni-maroon);
+    box-shadow: 0 0 0 3px rgba(122, 16, 21, 0.1);
 }
 
+/* BOTONES DE VISTA (PILLS) */
+.view-toggle-pills {
+    display: inline-flex;
+    background: var(--uni-bg-muted);
+    padding: 3px;
+    border-radius: var(--uni-radius-sm);
+    border: 1px solid var(--uni-border);
+}
 
-/* ============================================================
-   CUERPO
-   ============================================================ */
+.btn-toggle-view {
+    border: none;
+    background: transparent;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--uni-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+}
 
-.tbl-horario tbody td {
-    height: 58px;
+.btn-toggle-view:hover {
+    color: var(--uni-text-main);
+}
 
-    padding: 0 !important;
-
+.btn-toggle-view.active {
     background: #ffffff;
-
-    border-right: 1px solid #e1e5e8 !important;
-
-    border-bottom: 1px solid #e1e5e8 !important;
-
-    vertical-align: top !important;
+    color: var(--uni-maroon);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-
-.tbl-horario tbody tr {
-    height: 58px;
-}
-
-.tbl-horario tbody td:last-child {
-    background: #fff8f9;
-
-    border-right: none !important;
-}
-
 
 /* ============================================================
-   CELDA HORA
+   TABLA DE HORARIOS (CUADRÍCULA)
    ============================================================ */
 
-.tbl-horario .hora-column {
-    width: 92px;
+.horario-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: #ffffff;
 }
 
-.tbl-horario .celda-hora {
-    width: 92px;
+.tbl-horario {
+    width: 100% !important;
+    min-width: 1020px;
+    margin: 0 !important;
+    table-layout: fixed;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: #ffffff;
+}
 
-    padding: 7px 4px !important;
-
-    background: #fafbfc;
-
+/* CABECERA DE LA TABLA */
+.tbl-horario thead th {
+    padding: 10px 6px !important;
+    background: #F1F5F9;
+    border-top: none !important;
+    border-right: 1px solid var(--uni-border) !important;
+    border-bottom: 2px solid var(--uni-border-dark) !important;
+    color: var(--uni-text-secondary);
     text-align: center;
-
     vertical-align: middle !important;
 }
 
-.celda-hora .hora-inicio {
-    display: block;
+.tbl-horario thead th:last-child {
+    border-right: none !important;
+}
 
-    color: #35424d;
+.tbl-horario thead th.col-hora {
+    width: 95px;
+    background: #E2E8F0;
+    color: var(--uni-navy-dark);
+}
 
+.col-header-hora {
     font-size: 11px;
-
     font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
-.celda-hora .hora-separador {
-    display: block;
-
-    margin: 1px 0;
-
-    color: #a5adb4;
-
-    font-size: 8px;
+.dia-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    color: var(--uni-text-main);
 }
 
-.celda-hora .hora-fin {
+.dia-subtitle {
     display: block;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--uni-text-light);
+    margin-top: 2px;
+}
 
-    color: #77828c;
+.col-sabado {
+    background: #F3F4F6 !important;
+}
 
+.col-domingo {
+    background: #FDF2F4 !important;
+    color: var(--uni-maroon) !important;
+}
+
+.col-domingo .dia-title {
+    color: var(--uni-maroon);
+}
+
+/* CUERPO DE LA TABLA */
+.tbl-horario tbody tr {
+    height: 64px;
+}
+
+.tbl-horario tbody td {
+    height: 64px;
+    padding: 0 !important;
+    border-right: 1px solid var(--uni-border) !important;
+    border-bottom: 1px solid var(--uni-border) !important;
+    vertical-align: top !important;
+}
+
+.tbl-horario tbody td:last-child {
+    border-right: none !important;
+}
+
+/* CELDA HORA */
+.tbl-horario .celda-hora {
+    width: 95px;
+    padding: 8px 4px !important;
+    background: #F8FAFC;
+    text-align: center;
+    vertical-align: middle !important;
+    user-select: none;
+}
+
+.hora-inicio {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--uni-text-main);
+    font-family: monospace;
+}
+
+.hora-separador {
+    display: block;
     font-size: 9px;
+    color: var(--uni-text-light);
+    margin: 1px 0;
 }
 
+.hora-fin {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--uni-text-muted);
+    font-family: monospace;
+}
 
-/* ============================================================
-   CELDAS DE LOS DÍAS
-   ============================================================ */
-
+/* CELDAS DE DÍAS */
 .tbl-horario .celda-dia {
     position: relative;
-
-    height: 58px;
-
-    padding: 0 !important;
-
+    height: 64px;
+    padding: 2px !important;
     background: #ffffff;
-
-    vertical-align: top !important;
-
-    transition:
-        background .2s ease;
+    transition: background 0.15s ease;
 }
 
 .tbl-horario .celda-dia:hover {
-    background: #fcfcfd;
+    background: #FAFCFF;
 }
 
+.tbl-horario tbody tr td.celda-fin-semana {
+    background: #FBFBFC;
+}
 
 /* ============================================================
-   DOMINGO
-   ============================================================ */
-
-.tbl-horario tbody td:nth-child(8) {
-    background: #fff8f9;
-}
-
-.tbl-horario thead th:nth-child(8) {
-    background: #f8e7e9;
-
-    color: var(--uni-guinda);
-}
-
-
-/* ============================================================
-   BLOQUE DE CLASE
+   BLOQUES DE CLASE PROFESIONALES (HERO COMPONENT)
    ============================================================ */
 
 .bloque-clase {
     position: relative;
-
     width: calc(100% - 6px);
-
-    height: calc(100% - 4px);
-
-    min-height: 54px;
-
-    margin: 2px 3px;
-
-    padding: 7px 8px;
-
-    background: var(--uni-verde-light);
-
-    border-left: 4px solid var(--uni-verde);
-
-    border-radius: 5px;
-
-    color: #243328;
-
-    overflow: hidden;
-
+    height: calc(100% - 6px);
+    margin: 3px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     cursor: pointer;
-
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, .045);
-
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        filter .18s ease;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    user-select: none;
 }
 
 .bloque-clase:hover {
-    z-index: 20;
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 5px 12px rgba(0, 0, 0, .13);
-
-    filter: brightness(.985);
+    z-index: 25;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+    filter: brightness(0.98);
 }
 
+/* VARIANTES CROMÁTICAS SEGÚN TIPO Y CURSO */
+.bloque-teoria {
+    background: var(--color-teoria-bg);
+    border-left: 4px solid var(--color-teoria);
+    color: var(--color-teoria-text);
+}
 
-/* ============================================================
-   CABECERA DEL BLOQUE
-   ============================================================ */
+.bloque-practica {
+    background: var(--color-practica-bg);
+    border-left: 4px solid var(--color-practica);
+    color: var(--color-practica-text);
+}
 
+.bloque-laboratorio {
+    background: var(--color-laboratorio-bg);
+    border-left: 4px solid var(--color-laboratorio);
+    color: var(--color-laboratorio-text);
+}
+
+.bloque-virtual {
+    background: var(--color-virtual-bg);
+    border-left: 4px solid var(--color-virtual);
+    color: var(--color-virtual-text);
+}
+
+.bloque-institucional {
+    background: var(--uni-maroon-light);
+    border-left: 4px solid var(--uni-maroon);
+    color: var(--uni-maroon-dark);
+}
+
+/* CONTENIDOS INTERNOS DEL BLOQUE */
 .bloque-cabecera {
     display: flex;
-
     align-items: center;
-
-    width: 100%;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 4px;
 }
 
-.bloque-curso {
-    display: flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    min-width: 0;
-
-    color: #243127;
-
-    font-size: 10px;
-
+.bloque-curso-codigo {
+    font-size: 12px;
     font-weight: 800;
-
-    line-height: 1.25;
-
+    letter-spacing: 0.3px;
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.bloque-curso i {
+.bloque-badges {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     flex-shrink: 0;
+}
 
-    color: #36513a;
-
+.badge-seccion {
+    display: inline-block;
+    padding: 1px 5px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
     font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
-.bloque-seccion {
-    margin-left: 4px;
-
-    color: #68766b;
-
-    font-size: 8px;
-
-    white-space: nowrap;
+.badge-tipo {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
+.bloque-teoria .badge-tipo {
+    background: #E0E7FF;
+    color: var(--color-teoria);
+}
 
-/* ============================================================
-   INFORMACIÓN INTERNA DEL BLOQUE
-   ============================================================ */
+.bloque-practica .badge-tipo {
+    background: #D1FAE5;
+    color: var(--color-practica);
+}
+
+.bloque-laboratorio .badge-tipo {
+    background: #FEF3C7;
+    color: var(--color-laboratorio);
+}
+
+.bloque-virtual .badge-tipo {
+    background: #CCFBF1;
+    color: var(--color-virtual);
+}
+
+/* DETALLES DE AULA Y HORARIO */
+.bloque-cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+}
 
 .bloque-aula,
-.bloque-tipo,
-.bloque-alumnos,
 .bloque-hora {
+    font-size: 10px;
+    font-weight: 600;
     display: flex;
-
     align-items: center;
-
     gap: 5px;
-
-    margin-top: 3px;
-
-    color: #5d6b61;
-
-    font-size: 8px;
-
-    line-height: 1.15;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .bloque-aula i,
-.bloque-tipo i,
-.bloque-alumnos i,
 .bloque-hora i {
-    width: 10px;
-
-    flex-shrink: 0;
-
-    color: #6f7b72;
-
-    font-size: 7px;
-
-    text-align: center;
-}
-
-
-/* ============================================================
-   TIPO DE ASISTENCIA
-   ============================================================ */
-
-.bloque-tipo {
-    color: #2f7628;
-
-    font-weight: 800;
-
-    text-transform: uppercase;
-}
-
-
-/* ============================================================
-   BOTÓN CONSULTAR
-   ============================================================ */
-
-.bloque-consultar {
-    position: absolute;
-
-    right: 5px;
-
-    bottom: 4px;
-
-    width: 22px;
-    height: 22px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    background: rgba(255, 255, 255, .93);
-
-    border: none;
-
-    border-radius: 50%;
-
-    color: #66716a;
-
     font-size: 9px;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 1px 4px rgba(0, 0, 0, .12);
-
-    transition:
-        background .2s ease,
-        color .2s ease,
-        transform .2s ease;
+    width: 12px;
+    text-align: center;
+    opacity: 0.75;
 }
 
-.bloque-consultar:hover {
-    background: var(--uni-guinda);
-
-    color: #ffffff;
-
-    transform: scale(1.08);
-}
-
-
-/* ============================================================
-   ESTADOS DE LOS BLOQUES
-   ============================================================ */
-
-
-/* VERDE - PUNTUAL */
-
-.bloque-puntual {
-    background: #cce8c3;
-
-    border-left-color: #4b9b3f;
-}
-
-.bloque-puntual .bloque-tipo {
-    color: #2e7627;
-}
-
-
-/* DORADO - TARDANZA */
-
-.bloque-tardanza {
-    background: #f6e2b8;
-
-    border-left-color: #c38a19;
-}
-
-.bloque-tardanza .bloque-tipo {
-    color: #956000;
-}
-
-
-/* ROJO - INASISTENCIA */
-
-.bloque-inasistencia {
-    background: #f2c7cc;
-
-    border-left-color: #c52235;
-}
-
-.bloque-inasistencia .bloque-tipo {
-    color: #9f1728;
-}
-
-
-/* GRIS - NO APLICA */
-
-.bloque-no-aplica {
-    background: #eeeeef;
-
-    border-left-color: #8c9399;
-
-    color: #555d63;
-}
-
-.bloque-no-aplica .bloque-tipo {
-    color: #646b71;
-}
-
-
-/* DORADO CLARO - PROCESO */
-
-.bloque-proceso {
-    background: #f2e8c9;
-
-    border-left-color: var(--uni-dorado);
-}
-
-.bloque-proceso .bloque-tipo {
-    color: #80640f;
-}
-
-
-/* GUINDA - PROGRAMADA */
-
-.bloque-programada {
-    background: #f3dfe3;
-
-    border-left-color: var(--uni-guinda);
-}
-
-.bloque-programada .bloque-tipo {
-    color: var(--uni-guinda);
-}
-
-
-/* ============================================================
-   BLOQUE CLARO
-   ============================================================ */
-
-.bloque-clase-claro {
-    background: #e3f1de;
-}
-
-
-/* ============================================================
-   LEYENDA
-   ============================================================ */
-
-.uni-legend {
+/* PIE DEL BLOQUE */
+.bloque-pie {
     display: flex;
-
     align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+}
 
+.bloque-alumnos-pill {
+    font-size: 9.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bloque-alumnos-pill i {
+    font-size: 9px;
+}
+
+.bloque-action-icon {
+    font-size: 9.5px;
+    opacity: 0.7;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.bloque-clase:hover .bloque-action-icon {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* ============================================================
+   BARRA DE LEYENDA
+   ============================================================ */
+
+.horario-legend-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
-
-    gap: 17px;
-
-    min-height: 52px;
-
-    padding: 11px 18px;
-
-    background: #fafbfc;
-
+    gap: 16px;
+    padding: 12px 20px;
+    background: #FAFBFD;
     border-top: 1px solid var(--uni-border);
 }
 
-.uni-legend-title {
-    color: var(--uni-text);
+.legend-items {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
 
-    font-size: 9px;
-
+.legend-title {
+    font-size: 11px;
     font-weight: 800;
-
+    color: var(--uni-text-secondary);
     text-transform: uppercase;
 }
 
-.uni-legend-item {
+.legend-badge {
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
+    font-size: 11px;
+    font-weight: 600;
     color: var(--uni-text-secondary);
-
-    font-size: 9px;
 }
 
-.uni-legend-class,
-.uni-legend-empty {
-    width: 14px;
-    height: 14px;
-
-    display: inline-block;
-
+.legend-dot {
+    width: 12px;
+    height: 12px;
     border-radius: 3px;
+    display: inline-block;
 }
 
-.uni-legend-class {
-    background: #cce8c3;
+.dot-teoria { background: var(--color-teoria); }
+.dot-practica { background: var(--color-practica); }
+.dot-laboratorio { background: var(--color-laboratorio); }
+.dot-virtual { background: var(--color-virtual); }
 
-    border-left: 3px solid var(--uni-verde);
-}
-
-.uni-legend-empty {
-    background: #ffffff;
-
-    border: 1px solid #d9dee2;
-}
-
-.uni-legend-note {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    margin-left: auto;
-
+.legend-hint {
+    font-size: 11px;
+    font-weight: 600;
     color: var(--uni-text-muted);
-
-    font-size: 8px;
 }
-
-.uni-legend-note i {
-    color: var(--uni-guinda);
-
-    font-size: 9px;
-}
-
 
 /* ============================================================
-   INFORMACIÓN INFERIOR
+   VISTA 2: TABLA RESUMEN DE ASIGNATURAS
    ============================================================ */
 
-.uni-help-card,
-.uni-update-card {
-    min-height: 82px;
+.table-resumen-cursos {
+    border-collapse: separate;
+    border-spacing: 0;
+}
 
-    display: flex;
+.table-resumen-cursos thead th {
+    background: #F1F5F9;
+    color: var(--uni-text-secondary);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 14px;
+    border-bottom: 2px solid var(--uni-border-dark);
+}
 
-    align-items: center;
+.table-resumen-cursos tbody td {
+    padding: 12px 14px;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--uni-border);
+}
 
-    gap: 13px;
+.table-resumen-cursos tbody tr:hover td {
+    background: #F8FAFC;
+}
 
-    padding: 15px 17px;
+.curso-code-badge {
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--uni-maroon);
+    background: var(--uni-maroon-light);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--uni-maroon-border);
+}
 
+.btn-consultar-alumnos {
+    padding: 5px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: var(--uni-radius-sm);
+    color: var(--uni-maroon);
+    border: 1px solid var(--uni-maroon);
     background: #ffffff;
-
-    border: 1px solid var(--uni-border);
-
-    border-radius: 9px;
-
-    box-shadow: var(--uni-shadow);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
+.btn-consultar-alumnos:hover {
+    background: var(--uni-maroon);
+    color: #ffffff;
+}
 
 /* ============================================================
-   ICONO AYUDA
+   TARJETAS INFORMATIVAS INFERIORES
    ============================================================ */
 
-.uni-help-icon {
-    width: 38px;
-    height: 38px;
-
+.horario-note-card,
+.horario-system-card {
+    background: var(--uni-surface);
+    border: 1px solid var(--uni-border);
+    border-radius: var(--uni-radius-md);
+    padding: 16px 18px;
     display: flex;
+    align-items: center;
+    gap: 15px;
+    height: 100%;
+    box-shadow: var(--uni-shadow-xs);
+}
 
+.note-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--uni-navy-light);
+    color: var(--uni-navy);
+    display: flex;
     align-items: center;
     justify-content: center;
-
+    font-size: 18px;
     flex-shrink: 0;
-
-    background: var(--uni-guinda-light);
-
-    border-radius: 7px;
-
-    color: var(--uni-guinda);
-
-    font-size: 15px;
 }
 
-.uni-help-card strong {
-    display: block;
-
-    margin-bottom: 3px;
-
-    color: var(--uni-text);
-
-    font-size: 11px;
-
+.note-title {
+    margin: 0 0 4px 0;
+    font-size: 13px;
     font-weight: 800;
+    color: var(--uni-text-main);
 }
 
-.uni-help-card p {
+.note-description {
     margin: 0;
-
+    font-size: 11.5px;
     color: var(--uni-text-muted);
-
-    font-size: 9px;
-
     line-height: 1.5;
 }
 
-
-/* ============================================================
-   ESTADO DEL SISTEMA
-   ============================================================ */
-
-.uni-update-icon {
-    width: 38px;
-    height: 38px;
-
+.system-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--color-practica-bg);
+    color: var(--color-practica);
     display: flex;
-
     align-items: center;
     justify-content: center;
-
+    font-size: 18px;
     flex-shrink: 0;
-
-    background: var(--uni-verde-light);
-
-    border-radius: 7px;
-
-    color: var(--uni-verde);
-
-    font-size: 14px;
 }
 
-.uni-update-card span {
+.system-label {
     display: block;
-
-    margin-bottom: 4px;
-
-    color: var(--uni-text-muted);
-
-    font-size: 8px;
-
+    font-size: 9.5px;
     font-weight: 800;
-
-    letter-spacing: .5px;
+    color: var(--uni-text-muted);
+    letter-spacing: 0.6px;
+    margin-bottom: 4px;
 }
 
-.uni-update-card strong {
+.system-status {
     display: flex;
-
     align-items: center;
-
-    gap: 6px;
-
-    color: #3e7337;
-
-    font-size: 10px;
-
-    font-weight: 700;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--color-practica);
 }
 
-.uni-update-card strong i {
-    color: var(--uni-verde);
-
-    font-size: 7px;
+.status-indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-practica);
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+    display: inline-block;
 }
-
 
 /* ============================================================
-   MODAL
+   MODAL DE ALUMNOS MATRICULADOS
    ============================================================ */
 
-.uni-modal {
+.modal-alumnos-content {
     border: none !important;
-
-    border-radius: 10px !important;
-
+    border-radius: var(--uni-radius-lg) !important;
+    box-shadow: var(--uni-shadow-lg) !important;
     overflow: hidden;
-
-    box-shadow:
-        0 18px 50px rgba(0, 0, 0, .22);
 }
 
-
-/* ============================================================
-   HEADER MODAL
-   ============================================================ */
-
-.uni-modal-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    min-height: 72px;
-
-    padding: 14px 18px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--uni-guinda),
-            var(--uni-guinda-dark)
-        );
-
+/* HEADER MODAL */
+.modal-alumnos-header {
+    background: linear-gradient(135deg, var(--uni-maroon), var(--uni-maroon-dark));
     color: #ffffff;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 3px solid var(--uni-gold);
 }
 
-.uni-modal-icon {
-    width: 39px;
-    height: 39px;
-
+.modal-header-main {
     display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
 
+.modal-header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    display: flex;
     align-items: center;
     justify-content: center;
-
-    margin-right: 11px;
-
-    background: rgba(255, 255, 255, .14);
-
-    border: 1px solid rgba(255, 255, 255, .18);
-
-    border-radius: 7px;
-
-    color: #ffffff;
-
-    font-size: 15px;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
-.uni-modal-header .modal-title {
-    margin: 0;
-
-    color: #ffffff;
-
-    font-size: 14px;
-
+.modal-header-pretitle {
+    font-size: 10px;
     font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--uni-gold);
+    margin-bottom: 4px;
 }
 
-#modalCantidadAlumnos {
-    display: block;
-
-    margin-top: 2px;
-
-    color: rgba(255, 255, 255, .72);
-
-    font-size: 9px;
+.modal-alumnos-header .modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.2px;
 }
 
-
-/* ============================================================
-   MODAL BODY
-   ============================================================ */
-
-.uni-modal .modal-body {
-    padding: 16px !important;
-
-    background: #f7f8f9;
-}
-
-
-/* ============================================================
-   BARRA EXPORTACIÓN
-   ============================================================ */
-
-.uni-export-bar {
+.modal-header-meta {
     display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
 
+.badge-modal-meta {
+    display: inline-flex;
     align-items: center;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
 
+/* BODY MODAL */
+.modal-alumnos-body {
+    padding: 20px 24px !important;
+    background: var(--uni-bg-page);
+}
+
+.modal-toolbar-card {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-
+    flex-wrap: wrap;
     gap: 12px;
+    margin-bottom: 14px;
+}
 
-    margin-bottom: 12px;
+.modal-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
 
-    padding: 10px 12px;
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--uni-text-light);
+}
 
+.input-search-student {
+    height: 38px;
+    padding-left: 34px !important;
+    padding-right: 32px !important;
+    font-size: 12.5px;
+    border-radius: var(--uni-radius-sm);
+    border-color: var(--uni-border-dark);
     background: #ffffff;
-
-    border: 1px solid var(--uni-border);
-
-    border-radius: 7px;
 }
 
-.uni-export-bar > span {
-    color: var(--uni-text-secondary);
-
-    font-size: 9px;
-
-    font-weight: 700;
+.input-search-student:focus {
+    border-color: var(--uni-maroon);
+    box-shadow: 0 0 0 3px rgba(122, 16, 21, 0.1);
 }
 
-.uni-export-bar > span i {
-    color: var(--uni-guinda);
+.btn-clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--uni-text-light);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px;
 }
 
-
-/* ============================================================
-   BOTÓN PDF DEL MODAL
-   ============================================================ */
-
-.uni-export-bar .btn-outline-danger {
-    color: var(--uni-rojo) !important;
-
-    border-color: #d8a0a8 !important;
-
-    background: #fff !important;
-
-    font-size: 9px !important;
-
-    font-weight: 700 !important;
+.btn-clear-search:hover {
+    color: var(--uni-text-main);
 }
 
-.uni-export-bar .btn-outline-danger:hover {
-    background: var(--uni-rojo-light) !important;
-
-    border-color: var(--uni-rojo) !important;
-}
-
-
-/* ============================================================
-   BOTÓN EXCEL DEL MODAL
-   ============================================================ */
-
-.uni-export-bar .btn-outline-success {
-    color: #36782e !important;
-
-    border-color: #a8c99f !important;
-
-    background: #fff !important;
-
-    font-size: 9px !important;
-
-    font-weight: 700 !important;
-}
-
-.uni-export-bar .btn-outline-success:hover {
-    background: var(--uni-verde-light) !important;
-
-    border-color: var(--uni-verde) !important;
-}
-
-
-/* ============================================================
-   LISTA ALUMNOS
-   ============================================================ */
-
-.uni-student-list {
+.modal-export-buttons {
     display: flex;
-
-    flex-direction: column;
-
-    gap: 7px;
-
-    max-height: 410px;
-
-    overflow-y: auto;
-
-    padding-right: 3px;
-}
-
-
-/* ============================================================
-   ITEM ALUMNO
-   ============================================================ */
-
-.alumno-item {
-    display: flex;
-
     align-items: center;
+    gap: 8px;
+}
 
-    gap: 10px;
-
-    padding: 9px 10px;
-
+.btn-export {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: var(--uni-radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
     background: #ffffff;
+    border: 1px solid var(--uni-border-dark);
+    color: var(--uni-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.15s ease;
+}
 
+.btn-export:hover {
+    background: var(--uni-bg-muted);
+    border-color: #94A3B8;
+    color: var(--uni-text-main);
+}
+
+.modal-student-count-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.count-badge {
+    color: var(--uni-text-secondary);
+    font-weight: 600;
+}
+
+.count-badge strong {
+    color: var(--uni-maroon);
+    font-weight: 800;
+    margin-left: 4px;
+}
+
+/* LISTA DE ALUMNOS (CONTAINER) */
+.students-list-wrapper {
+    max-height: 420px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+.student-card-item {
+    background: #ffffff;
     border: 1px solid var(--uni-border);
-
-    border-radius: 7px;
-
-    transition:
-        border-color .2s ease,
-        box-shadow .2s ease,
-        transform .2s ease;
+    border-radius: var(--uni-radius-sm);
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: all 0.15s ease;
 }
 
-.alumno-item:hover {
-    border-color: #d6b8be;
-
-    box-shadow:
-        0 3px 8px rgba(0, 0, 0, .06);
-
-    transform: translateY(-1px);
+.student-card-item:hover {
+    border-color: var(--uni-maroon-border);
+    box-shadow: 0 2px 8px rgba(122, 16, 21, 0.08);
+    transform: translateX(2px);
 }
 
+.student-main-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
 
-/* ============================================================
-   NÚMERO ALUMNO
-   ============================================================ */
-
-.alumno-numero {
+.student-index-badge {
     width: 28px;
     height: 28px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    background: var(--uni-guinda-light);
-
     border-radius: 50%;
-
-    color: var(--uni-guinda);
-
-    font-size: 9px;
-
+    background: var(--uni-maroon-light);
+    color: var(--uni-maroon);
+    font-size: 10.5px;
     font-weight: 800;
-}
-
-
-/* ============================================================
-   DATOS ALUMNO
-   ============================================================ */
-
-.alumno-datos {
-    flex: 1;
-
-    min-width: 0;
-}
-
-.alumno-nombre {
-    color: var(--uni-text);
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-}
-
-.alumno-correo {
-    margin-top: 2px;
-
-    color: var(--uni-text-muted);
-
-    font-size: 8px;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-}
-
-.alumno-extra {
     display: flex;
-
-    gap: 8px;
-
-    margin-top: 3px;
-}
-
-.alumno-codigo {
-    color: var(--uni-text-muted);
-
-    font-size: 8px;
-}
-
-
-/* ============================================================
-   ESTADOS ALUMNOS
-   ============================================================ */
-
-.estado-alumno {
-    display: inline-flex;
-
     align-items: center;
     justify-content: center;
-
     flex-shrink: 0;
+}
 
-    padding: 4px 8px;
-
-    border-radius: 20px;
-
-    font-size: 7px;
-
-    font-weight: 800;
-
-    text-transform: uppercase;
-
+.student-name-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--uni-text-main);
+    line-height: 1.25;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.estado-presente {
-    background: #dcefd7;
-
-    color: #34772c;
-}
-
-.estado-falto {
-    background: #f5d9dd;
-
-    color: #a21b2c;
-}
-
-.estado-tardanza {
-    background: #f5e3bd;
-
-    color: #956000;
-}
-
-.estado-justificado {
-    background: #eee5ca;
-
-    color: #77600f;
-}
-
-.estado-sin-registro {
-    background: #eceeef;
-
-    color: #646b71;
-}
-
-
-/* ============================================================
-   OBSERVACIÓN
-   ============================================================ */
-
-.observacion-alumno {
-    margin-top: 3px;
-
-    color: var(--uni-text-muted);
-
-    font-size: 8px;
-
-    font-style: italic;
-}
-
-
-/* ============================================================
-   FOOTER MODAL
-   ============================================================ */
-
-.uni-modal-footer {
+.student-contact-row {
     display: flex;
-
-    justify-content: flex-end;
-
-    padding: 11px 16px;
-
-    background: #ffffff;
-
-    border-top: 1px solid var(--uni-border);
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--uni-text-muted);
 }
 
-.uni-btn-close {
-    height: 32px;
+.student-contact-link {
+    color: var(--uni-text-muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
 
-    padding: 0 14px;
+.student-contact-link:hover {
+    color: var(--uni-maroon);
+    text-decoration: underline;
+}
 
-    background: #ffffff;
-
-    border: 1px solid var(--uni-border-dark);
-
-    border-radius: 5px;
-
-    color: var(--uni-text-secondary);
-
-    font-size: 9px;
-
+.student-code-badge {
+    font-family: monospace;
+    font-size: 11px;
     font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #F1F5F9;
+    color: var(--uni-navy);
+    border: 1px solid var(--uni-border);
+    flex-shrink: 0;
+}
 
+/* FOOTER MODAL */
+.modal-alumnos-footer {
+    background: #ffffff;
+    border-top: 1px solid var(--uni-border);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-footer-note {
+    font-size: 11px;
+    color: var(--uni-text-muted);
+}
+
+.btn-modal-close {
+    height: 36px;
+    padding: 0 18px;
+    background: #ffffff;
+    border: 1px solid var(--uni-border-dark);
+    border-radius: var(--uni-radius-sm);
+    color: var(--uni-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
-
-    transition:
-        background .2s ease,
-        color .2s ease,
-        border-color .2s ease;
+    transition: all 0.15s ease;
 }
 
-.uni-btn-close:hover {
-    background: var(--uni-guinda-light);
-
-    border-color: #d7b4bb;
-
-    color: var(--uni-guinda);
+.btn-modal-close:hover {
+    background: var(--uni-maroon-light);
+    color: var(--uni-maroon);
+    border-color: var(--uni-maroon-border);
 }
-
 
 /* ============================================================
-   SCROLLBAR
+   PERSONALIZACIÓN DE SCROLLBARS
    ============================================================ */
 
-.uni-table-container::-webkit-scrollbar,
-.uni-student-list::-webkit-scrollbar {
+.horario-table-wrapper::-webkit-scrollbar,
+.students-list-wrapper::-webkit-scrollbar {
     width: 6px;
-
     height: 7px;
 }
 
-.uni-table-container::-webkit-scrollbar-track,
-.uni-student-list::-webkit-scrollbar-track {
-    background: #f0f2f4;
+.horario-table-wrapper::-webkit-scrollbar-track,
+.students-list-wrapper::-webkit-scrollbar-track {
+    background: #F1F5F9;
 }
 
-.uni-table-container::-webkit-scrollbar-thumb,
-.uni-student-list::-webkit-scrollbar-thumb {
-    background: #bdc3c8;
-
-    border-radius: 10px;
+.horario-table-wrapper::-webkit-scrollbar-thumb,
+.students-list-wrapper::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 6px;
 }
 
-.uni-table-container::-webkit-scrollbar-thumb:hover,
-.uni-student-list::-webkit-scrollbar-thumb:hover {
-    background: var(--uni-guinda);
+.horario-table-wrapper::-webkit-scrollbar-thumb:hover,
+.students-list-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--uni-maroon);
 }
-
 
 /* ============================================================
-   BOOTSTRAP MODAL BACKDROP
+   RESPONSIVIDAD
    ============================================================ */
 
-.modal-backdrop.show {
-    opacity: .45;
-}
-
-
-/* ============================================================
-   ANIMACIONES
-   ============================================================ */
-
-.uni-info-card,
-.uni-schedule-card,
-.uni-help-card,
-.uni-update-card {
-    animation:
-        uniFadeIn .35s ease both;
-}
-
-@keyframes uniFadeIn {
-    from {
-        opacity: 0;
-
-        transform: translateY(5px);
-    }
-
-    to {
-        opacity: 1;
-
-        transform: translateY(0);
+@media (max-width: 1200px) {
+    .horario-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-
-/* ============================================================
-   RESPONSIVE - TABLET
-   ============================================================ */
-
-@media (max-width: 1100px) {
-
-    .uni-info-wrapper {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .uni-info-card:last-child {
-        grid-column: span 2;
-    }
-
-    .uni-page-heading h1 {
-        font-size: 22px;
-    }
-
-    .uni-institution {
-        display: none;
-    }
-}
-
-
-/* ============================================================
-   RESPONSIVE - TABLET PEQUEÑA
-   ============================================================ */
-
-@media (max-width: 800px) {
-
-    .uni-page-heading {
-        align-items: flex-start;
-
+@media (max-width: 768px) {
+    .horario-header-block {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    .uni-btn-pdf {
+    .horario-header-actions {
         width: 100%;
     }
 
-    .uni-info-wrapper {
+    .horario-header-actions button {
+        flex: 1;
+    }
+
+    .horario-kpi-grid {
         grid-template-columns: 1fr;
     }
 
-    .uni-info-card:last-child {
-        grid-column: auto;
-    }
-
-    .uni-schedule-header {
-        align-items: flex-start;
-
+    .horario-card-toolbar {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    .uni-schedule-info {
-        width: 100%;
+    .toolbar-controls-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
+    .filter-wrapper {
+        width: 100%;
+    }
+
+    .uni-filter-select {
+        flex: 1;
+    }
+
+    .view-toggle-pills {
+        width: 100%;
+    }
+
+    .btn-toggle-view {
+        flex: 1;
         justify-content: center;
     }
 
-    .uni-legend {
-        align-items: flex-start;
-
+    .horario-legend-bar {
         flex-direction: column;
-
-        gap: 8px;
-    }
-
-    .uni-legend-note {
-        margin-left: 0;
+        align-items: flex-start;
     }
 }
 
-
 /* ============================================================
-   RESPONSIVE - MÓVIL
-   ============================================================ */
-
-@media (max-width: 576px) {
-
-    .uni-page > .container-fluid {
-        padding-left: 10px !important;
-
-        padding-right: 10px !important;
-    }
-
-    .uni-page-heading h1 {
-        font-size: 20px;
-    }
-
-    .uni-page-heading p {
-        font-size: 10px;
-    }
-
-    .uni-info-card {
-        min-height: 82px;
-
-        padding: 13px;
-    }
-
-    .uni-info-icon {
-        width: 37px;
-        height: 37px;
-
-        margin-right: 10px;
-
-        font-size: 14px;
-    }
-
-    .uni-select {
-        width: 135px;
-    }
-
-    .uni-schedule-header {
-        padding: 13px;
-    }
-
-    .uni-calendar-icon {
-        width: 37px;
-        height: 37px;
-
-        font-size: 15px;
-    }
-
-    .uni-schedule-title h3 {
-        font-size: 13px;
-    }
-
-    .uni-schedule-title p {
-        font-size: 9px;
-    }
-
-    .uni-export-bar {
-        align-items: flex-start;
-
-        flex-direction: column;
-    }
-
-    .uni-export-bar > div {
-        width: 100%;
-    }
-
-    .uni-export-bar button {
-        flex: 1;
-    }
-}
-
-
-/* ============================================================
-   IMPRESIÓN / PDF
+   ESTILOS OPTIMIZADOS PARA IMPRESIÓN Y EXPORTACIÓN PDF
    ============================================================ */
 
 @media print {
-
-    body {
+    /* Ocultar elementos de interfaz ajenos a la hoja oficial */
+    body, html {
         background: #ffffff !important;
+        font-size: 11pt !important;
     }
 
-    .uni-page {
-        background: #ffffff !important;
-    }
-
-    .uni-btn-pdf,
-    .uni-schedule-info,
-    .uni-modal,
+    .uni-topbar,
+    .uni-sidebar,
+    .horario-header-actions,
+    .toolbar-controls-group,
+    .legend-hint,
+    .horario-note-card,
+    .horario-system-card,
     .modal,
-    .uni-help-card,
-    .uni-update-card {
+    .modal-backdrop {
         display: none !important;
     }
 
-    .uni-info-wrapper {
-        grid-template-columns:
-            repeat(3, 1fr);
+    .uni-content {
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
-    .uni-schedule-card {
-        border: 1px solid #ccc !important;
+    .content-container,
+    .horario-page {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 
+    .horario-main-card {
+        border: 1px solid #94A3B8 !important;
         box-shadow: none !important;
+        border-radius: 0 !important;
     }
 
     .tbl-horario {
-        min-width: 0 !important;
-    }
-
-    .tbl-horario thead th {
-        background: #eeeeee !important;
-
-        color: #333333 !important;
+        min-width: 100% !important;
     }
 
     .bloque-clase {
-        print-color-adjust: exact;
+        box-shadow: none !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
 
-        -webkit-print-color-adjust: exact;
+    .horario-kpi-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        margin-bottom: 15px !important;
+    }
+
+    .horario-kpi-card {
+        box-shadow: none !important;
+        border: 1px solid #CBD5E1 !important;
+        padding: 8px 10px !important;
     }
 }
