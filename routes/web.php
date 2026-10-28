@@ -6,6 +6,11 @@ use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InformacionController;
+use App\Http\Controllers\ExportacionController;
+use App\Http\Controllers\MessageRecipientController;
+use App\Livewire\Messages\Inbox;
+use App\Livewire\Messages\ShowMessage;
+use App\Livewire\Messages\SendMessage;
 
 
 /*
@@ -52,6 +57,19 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | BANDEJA DE MENSAJERÍA (LIVEWIRE 3)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('mensajes')->name('messages.')->group(function () {
+        Route::get('/', Inbox::class)->name('inbox');
+        Route::get('/redactar', SendMessage::class)->name('create');
+        Route::get('/buscar-receptores', [MessageRecipientController::class, 'search'])->name('search-recipients');
+        Route::get('/adjuntos/{id}/descargar', [MessageRecipientController::class, 'downloadAttachment'])->name('attachment.download');
+        Route::get('/{id}', ShowMessage::class)->name('show');
+    });
 
 
     /*
@@ -165,6 +183,13 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | PÁGINA ASISTENCIA DOCENTE
+    |--------------------------------------------------------------------------
+    */
+
     Route::get(
         '/docente/asistencia',
         [AsistenciaController::class, 'vista']
@@ -180,9 +205,9 @@ Route::middleware('auth')->group(function () {
     Route::prefix('api/asistencias')->group(function () {
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | LISTAR ASISTENCIAS
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
 
         Route::get('/', [
@@ -192,9 +217,9 @@ Route::middleware('auth')->group(function () {
 
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | CREAR ASISTENCIA GENERAL
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
 
         Route::post('/', [
@@ -204,12 +229,11 @@ Route::middleware('auth')->group(function () {
 
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | GUARDAR / ACTUALIZAR ASISTENCIA DE UN ALUMNO
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         |
-        | Aquí se guarda:
-        |
+        | Guarda:
         | codHorario
         | codDocente
         | codAlumno
@@ -229,13 +253,9 @@ Route::middleware('auth')->group(function () {
 
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | OBTENER ASISTENCIAS INDIVIDUALES DE ALUMNOS
-        |----------------------------------------------------------------------
-        |
-        | Esta ruta será utilizada también por Horario Docente
-        | para mostrar el mismo estado guardado en MySQL.
-        |
+        |--------------------------------------------------------------------------
         */
 
         Route::get('/alumnos', [
@@ -245,9 +265,9 @@ Route::middleware('auth')->group(function () {
 
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | VER UNA ASISTENCIA
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
 
         Route::get('/{id}', [
@@ -257,9 +277,9 @@ Route::middleware('auth')->group(function () {
 
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | ACTUALIZAR ASISTENCIA
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
 
         Route::put('/{id}', [
@@ -269,9 +289,9 @@ Route::middleware('auth')->group(function () {
 
 
         /*
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | ELIMINAR ASISTENCIA
-        |----------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
 
         Route::delete('/{id}', [
@@ -284,8 +304,56 @@ Route::middleware('auth')->group(function () {
     /*
     |--------------------------------------------------------------------------
     | ========================================================================
+    | EXPORTACIONES DE ASISTENCIA
+    | ========================================================================
+    |--------------------------------------------------------------------------
+    |
+    | Estas rutas utilizan:
+    |
+    | PDF   -> DOMPDF
+    | Excel -> Maatwebsite Excel
+    |
+    | Ambas reciben los filtros de asistencia mediante GET.
+    |
+    */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | EXPORTAR ASISTENCIA A PDF
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/exportaciones/asistencia/pdf',
+        [ExportacionController::class, 'asistenciaPdf']
+    )->name('exportaciones.asistencia.pdf');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | EXPORTAR ASISTENCIA A EXCEL
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/exportaciones/asistencia/excel',
+        [ExportacionController::class, 'asistenciaExcel']
+    )->name('exportaciones.asistencia.excel');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ========================================================================
     | MÓDULO HORARIO DOCENTE
     | ========================================================================
+    |--------------------------------------------------------------------------
+    */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PÁGINA HORARIO DOCENTE
     |--------------------------------------------------------------------------
     */
 

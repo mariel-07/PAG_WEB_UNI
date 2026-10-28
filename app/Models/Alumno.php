@@ -24,5 +24,25 @@ class Alumno extends Model
         'celular',
         'email',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESORES COMPATIBILIDAD POSTGRESQL (SUPABASE) / MYSQL
+    |--------------------------------------------------------------------------
+    */
+    public function getApePaternoAttribute($value)
+    {
+        return $value ?? $this->attributes['apepaterno'] ?? $this->attributes['apePaterno'] ?? null;
+    }
+
+    public function getApeMaternoAttribute($value)
+    {
+        return $value ?? $this->attributes['apematerno'] ?? $this->attributes['apeMaterno'] ?? null;
+    }
+
+    public function getCodAlumnoAttribute($value)
+    {
+        return $value ?? $this->attributes['codalumno'] ?? $this->attributes['codAlumno'] ?? null;
+    }
 }
 

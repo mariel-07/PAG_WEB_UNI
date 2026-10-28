@@ -27,8 +27,17 @@
         rel="stylesheet"
     >
 
+    {{-- jQuery (Requerido para Select2 y utilidades) --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    {{-- Select2 CSS y Tema Bootstrap 5 --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
     {{-- html2pdf --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    @livewireStyles
 
     <style>
 
@@ -57,6 +66,22 @@
             --border: #E3E7EB;
 
             --shadow: 0 8px 25px rgba(16, 47, 77, .07);
+        }
+
+        /* Personalización de Select2 para el tema institucional */
+        .select2-container--bootstrap-5 .select2-dropdown .select2-results__option--highlighted[aria-selected] {
+            background-color: var(--uni-maroon, #7A1015) !important;
+            color: #ffffff !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+            background-color: var(--uni-maroon-light, #F8EEF0) !important;
+            border: 1px solid var(--uni-maroon, #7A1015) !important;
+            color: var(--uni-maroon-dark, #560A0D) !important;
+            font-size: 0.85rem !important;
+            padding: 3px 8px !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+            color: var(--uni-maroon, #7A1015) !important;
         }
 
 
@@ -701,6 +726,19 @@
                     <span>Información docente</span>
                 </a>
 
+                <a
+                    href="{{ route('messages.inbox') }}"
+                    class="sidebar-link {{ request()->routeIs('messages.*') ? 'active' : '' }}"
+                >
+                    <i class="fas fa-envelope"></i>
+                    <span>Mensajería</span>
+                    @if(auth()->check() && auth()->user()->unreadMessagesCount() > 0)
+                        <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.75rem;">
+                            {{ auth()->user()->unreadMessagesCount() }}
+                        </span>
+                    @endif
+                </a>
+
             </nav>
 
 
@@ -747,6 +785,28 @@
 
     {{-- SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- Select2 JS + Traducción al Español --}}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
+
+    @livewireScripts
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('swal:alert', (data) => {
+                const eventData = Array.isArray(data) ? data[0] : data;
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: eventData.type || 'success',
+                        title: eventData.title || '',
+                        text: eventData.text || '',
+                        confirmButtonColor: '#7A1015',
+                    });
+                }
+            });
+        });
+    </script>
 
 </body>
 

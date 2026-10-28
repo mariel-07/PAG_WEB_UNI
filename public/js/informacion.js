@@ -1929,72 +1929,32 @@ function renderTablaDomicilio() {
 }
 
 
-/* =========================================================
-DOMICILIO - ELIMINAR
-========================================================= */
-
-window.eliminarDomicilio =
-async function (id) {
-
-    if (!id) {
-
-        mostrarMensaje(
-            "Error",
-            "No se encontró el ID del domicilio.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const confirmar =
-        await confirmarEliminacion(
-            "¿Eliminar domicilio?",
-            "El registro será eliminado permanentemente."
-        );
-
-
-    if (!confirmar) return;
-
+async function eliminarDomicilio(id) {
+    if (!confirm('¿Estás seguro de eliminar este domicilio?')) return;
 
     try {
+        // Asegúrate de incluir '/api/' tal como lo declaraste en web.php
+        const response = await fetch(`/api/docente/domicilios/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                // Si usas plantillas Blade con token CSRF global:
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
 
-        await enviarSolicitud(
-            `${API.domicilios}/${encodeURIComponent(id)}`,
-            "DELETE"
-        );
+        const resultado = await response.json();
 
-
-        await recargarInformacion();
-
-
-        mostrarMensaje(
-            "Eliminado",
-            "El domicilio fue eliminado correctamente.",
-            "success"
-        );
-
-
+        if (resultado.success) {
+            alert(resultado.message);
+            location.reload(); // Recarga para actualizar la tabla
+        } else {
+            alert('Error: ' + resultado.message);
+        }
     } catch (error) {
-
-        console.error(
-            "Error eliminando domicilio:",
-            error
-        );
-
-
-        mostrarMensaje(
-            "Error",
-            escapeHTML(
-                error.message ||
-                "No se pudo eliminar el domicilio."
-            ),
-            "error"
-        );
+        console.error('Error en la petición de eliminación:', error);
     }
-};
-
+}
 
 /* =========================================================
 FORMACIÓN - GUARDAR

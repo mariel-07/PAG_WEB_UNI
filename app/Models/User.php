@@ -44,4 +44,32 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Mensajes enviados por el usuario.
+     */
+    public function sentMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Mensajes recibidos por el usuario.
+     */
+    public function receivedMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Message::class, 'recipient_id');
+    }
+
+    /**
+     * Total de mensajes no leídos en la bandeja de entrada.
+     */
+    public function unreadMessagesCount(): int
+    {
+        return $this->receivedMessages()
+            ->where('deleted_by_recipient', false)
+            ->whereNull('read_at')
+            ->count();
+    }
 }
+

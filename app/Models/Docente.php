@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\MapsPostgresAttributes;
 
 class Docente extends Model
 {
-    use HasFactory;
+    use HasFactory, MapsPostgresAttributes;
 
     protected $table = 'docentes';
 
@@ -16,28 +17,44 @@ class Docente extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'coddocente',
         'codDocente',
         'dni',
+        'apepaterno',
         'apePaterno',
+        'apematerno',
         'apeMaterno',
         'nombres',
         'sexo',
+        'fecnacimiento',
         'fecNacimiento',
         'telefono',
         'celular',
         'email',
         'ruc',
+        'libmilitar',
         'libMilitar',
+        'brevetecategoria',
         'breveteCategoria',
+        'vehiculoinfo',
         'vehiculoInfo',
+        'estadocivil',
         'estadoCivil',
+        'fecmatrimonio',
         'fecMatrimonio',
+        'gruposanguineo',
         'grupoSanguineo',
+        'paisnacimiento',
         'paisNacimiento',
+        'departamentonacimiento',
         'departamentoNacimiento',
+        'provincianacimiento',
         'provinciaNacimiento',
+        'distritonacimiento',
         'distritoNacimiento',
+        'direccionextranjeranac',
         'direccionExtranjeraNac',
+        'depacademico',
         'depAcademico',
         'dedicacion',
         'condicion',
@@ -45,10 +62,9 @@ class Docente extends Model
     ];
 
     protected $casts = [
-        'fecNacimiento' => 'date:Y-m-d',
-        'fecMatrimonio' => 'date:Y-m-d',
+        'fecnacimiento' => 'date:Y-m-d',
+        'fecmatrimonio' => 'date:Y-m-d',
     ];
-
 
     /*
     |--------------------------------------------------------------------------
